@@ -1,0 +1,16 @@
+#!/bin/sh
+#PBS -j oe
+#PBS -l walltime=24:00:00,select=1:ncpus=16:mpiprocs=16:mem=16200mb
+#PBS -l abaqus_token=16
+#
+module load abaqus/6.14
+module load intel-suite mpi
+
+export LM_LICENSE_FILE="@iclic25.cc.imperial.ac.uk"
+export ABAQUSLM_LICENSE_FILE="@iclic25.cc.imperial.ac.uk"
+
+cp $WORK/EBSD1/Input/* $TMPDIR
+
+pbsexec -grace 90 abaqus job=Polycrystal input=InPolycrystal.inp user=umat.f cpus=16
+sftp -b $HOME/Scripts/MoveFiles.sh jl1908@me-yw1107.me.ic.ac.uk
+cp * $WORK/EBSD1/Output

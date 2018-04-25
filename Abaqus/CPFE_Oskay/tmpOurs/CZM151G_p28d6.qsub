@@ -1,0 +1,33 @@
+#!/bin/sh
+#PBS -j oe
+#PBS -l walltime=24:00:00,select=1:ncpus=24:mpiprocs=24:mem=16200mb
+#PBS -l abaqus_token=16
+#
+
+module load abaqus/6.14
+module load intel-suite mpi
+
+export LM_LICENSE_FILE="@iclic14.cc.imperial.ac.uk"
+export ABAQUSLM_LICENSE_FILE="@iclic14.cc.imperial.ac.uk"
+
+cp $WORK/In617/Input/* $TMPDIR
+
+# Define the Abaqus particulars
+JOB_NAME=CZM151G_p28d6
+INPUT_FILE=${TMPDIR}/${JOB_NAME}.inp
+
+ABAQUS_ARGS="cpus=24 mp_mode=mpi user=${TMPDIR}/umat_uel.f -inter"
+ABAQUS=abaqus
+
+# get the current working directory
+cwd=$(pwd)
+echo pwd: $cwd
+
+## Run the job
+rm ${JOB_NAME}.lck
+pbsexec -grace 60 $ABAQUS job=${JOB_NAME} input=${INPUT_FILE} ${ABAQUS_ARGS}
+# $ABAQUS python ReadData.py
+# rm teture.txto
+
+sftp -b $HOME/Scripts/MoveFiles.sh jl1908@me-yw1107.me.ic.ac.uk
+cp * $WORK/Diamond/Output

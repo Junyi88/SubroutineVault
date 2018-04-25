@@ -1,0 +1,47 @@
+*HEADING
+USER-DEFINED (UMAT) material
+**
+*****************************************
+**            MODEL DEFINITION          *
+*****************************************
+*****************************
+**   MODEL GEOMETRY         *
+*****************************
+**
+*Node
+*include,input=nodes.inc
+**
+*Element, type=C3D20R
+*include,input=elements.inc
+**
+*include,input=sets.inc
+** 
+*include,input=rotationMatrix.inc
+**
+*******************************
+*STEP, NAME=D1,NLGEOM=YES, INC=100000
+*STATIC
+0.01, 5, 1.e-05, 0.1
+**
+** BOUNDARY CONDITIONS
+** 
+** Name: BC-Bottom Type: Displacement/Rotation
+*Boundary
+Sbot, 2, 2
+** Name: BC-X Type: Displacement/Rotation
+*Boundary
+Sright, 1, 1
+** Name: BC-Z Type: Displacement/Rotation
+*Boundary
+Sback, 3, 3
+**
+** Name: BC-Loading Type: Displacement/Rotation
+*Boundary
+Stop, 2, 2, -3
+**
+*OUTPUT, FIELD, frequency=1
+*ELEMENT OUTPUT, ELSET=ALL
+LE, S, SDV
+*NODE OUTPUT, NSET=ALL
+U,RF
+*END STEP
