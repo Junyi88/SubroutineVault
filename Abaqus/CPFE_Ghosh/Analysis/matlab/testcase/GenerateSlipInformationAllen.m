@@ -178,10 +178,11 @@ end
 
 %% WriteOutput
 FileName='FCC_S.csv';
+fstr='%.13e';
 Out1=zeros(12,3);
 for n1=1:12
    Out1(n1,:)=FCCSlips(n1).s.'; 
 end
-dlmwrite(FileName,Out1,'precision','%12.12e');
+dlmwrite(FileName,Out1,'precision',fstr);
 
 save SlipSystemsAllen;
