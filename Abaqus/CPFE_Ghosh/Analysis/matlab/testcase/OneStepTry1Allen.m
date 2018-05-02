@@ -1,18 +1,18 @@
 clear;
-theta=273.15+700;
+theta=273.15+25;
 % Stress=[100 100 100;...
 %     100 200 400;...
 %     100 400 300];
 
-Stress=[1 0 0;...
+Stress=[0 0 0;...
     0 0 0;...
-    0 0 0];
+    0 0 800e6];
 ttx=0;
 R=[cosd(ttx) -sind(ttx) 0; sind(ttx) cosd(ttx) 0; 0 0 1];
 Stress=R.'*Stress.*R;
 
 dStress=[1e-2 0 0;0 0 0; 0 0 0];
-rhoSSD=7.5e9-8.36e6.*theta;
+rhoSSD=7.5e9-(8.36e6).*theta;
 
 %% Setup Elastic
 
@@ -55,8 +55,8 @@ end
 
 %%
 
-load SlipSystems;
-[Tau,TauPE,TauSE,TauCB]=GetTaus(Stress,FCCSlips,CubicSlips);
+load SlipSystemsAllen;
+[Tau,TauPE,TauSE,TauCB]=GetTausAllen(Stress,FCCSlips,CubicSlips);
 
 %%
 c10=25;
@@ -64,7 +64,7 @@ kB=1.38064852e-23;
 G=C44;
 b=2.49e-10; % meters 
 
-[rhoP,rhoF,rhoM]=CalculateRhoPFM(rhoSSD,c10,kB,theta,G,b,FCCSlips,CubicSlips);
+[rhoP,rhoF,rhoM]=CalculateRhoPFMAllen(rhoSSD,c10,kB,theta,G,b,FCCSlips,CubicSlips);
 
 %%
 c1=1.7e16;
@@ -99,4 +99,5 @@ Q=1.1e-20;
 P=0.5;
 [GammaDot,v]=GetFlowRule(rhoM,v0,Tau,theta,...
     TauPass,TauCut,TauC,Q,kB,P,b);
-save NormalResult1
+
+save AllenResult1;

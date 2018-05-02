@@ -15,6 +15,7 @@ for n1=1:12
     else
         M(n1)=sqrt(M(n1));
     end
+    M(n1)=sqrt(M(n1));
 end
 Inx=(h+k1.*(tPE-k2.*tSE)+M);
 H=CH.*Inx;
