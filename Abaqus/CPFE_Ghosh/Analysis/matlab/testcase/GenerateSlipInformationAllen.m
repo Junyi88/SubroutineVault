@@ -175,4 +175,13 @@ CubicSlips(n1).mu=0.5*(CubicSlips(n1).s*CubicSlips(n1).n.'+CubicSlips(n1).n*Cubi
 CubicSlips(n1).ohm=0.5*(CubicSlips(n1).s*CubicSlips(n1).n.'-CubicSlips(n1).n*CubicSlips(n1).s.');
 end
 
+
+%% WriteOutput
+FileName='FCC_S.csv';
+Out1=zeros(12,3);
+for n1=1:12
+   Out1(n1,:)=FCCSlips(n1).s.'; 
+end
+dlmwrite(FileName,Out1,'precision','%12.12e');
+
 save SlipSystemsAllen;
