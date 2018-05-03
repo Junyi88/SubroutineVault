@@ -10,7 +10,7 @@ C Subroutine to calculate forest parallel and mobile dislocations
       real*8,intent(out) ::  H(12), RhoCSD(12), TAUC(18)
 
       real*8,intent(in) :: CinS(11)
-
+      real*8 :: DUM1
       integer ISLIPS
 
 C ------------------------------------------------------	
@@ -22,9 +22,12 @@ C ------------------------------------------------------
 
 C ------------------------------------------------------	
       DO ISLIPS=1,12
+       DUM1=(CinS(10)+abs(TauCB(ISLIPS)))*Cins(11)
+       IF (DUM1.LE.0.0) DUM1=0.0
+	   
        H(ISLIPS)=CinS(6)*(CinS(7)+
-     1	Cins(8)*(TAUPE(ISLIPS)-CinS(ISLIPS)*TAUSE(ISLIPS))+
-     2	sqrt((CinS(10)+abs(TauCB(ISLIPS)))*Cins(11)))
+     1	Cins(8)*(TAUPE(ISLIPS)-CinS(9)*TAUSE(ISLIPS))+
+     2	sqrt(DUM1))
       END DO	  
 	  
 C ------------------------------------------------------	

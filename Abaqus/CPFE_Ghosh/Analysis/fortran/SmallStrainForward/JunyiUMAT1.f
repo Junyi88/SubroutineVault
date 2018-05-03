@@ -28,6 +28,7 @@ c
       IF (KINC.LE.1) THEN
       DO ISLIPS=1,18
        RhoSSD(ISLIPS)=PROPS(NPROPS)
+       STATEV(ISLIPS)=RhoSSD(ISLIPS)
       END DO
       ENDIF
 
@@ -44,6 +45,15 @@ c ------------------------------------------------
      +  FCC_NCB,FCC_SCB,
      +  CUBIC_N,CUBIC_S)
 	 
+	 
+      DO ISLIPS=1,18
+       STATEV(ISLIPS+18)=TAU(ISLIPS)
+       STATEV(ISLIPS+36)=TAUPE(ISLIPS)		
+       STATEV(ISLIPS+54)=TAUSE(ISLIPS)	
+       STATEV(ISLIPS+72)=TAUCB(ISLIPS)	   
+      END DO
+	  
+	  
       call GetRhoPFM(RhoP,RhoF,RhoM,
      1 RhoSSD,
      2 FCC_N,FCC_T,
@@ -53,20 +63,41 @@ c ------------------------------------------------
       call GetTauSlips(RhoP,RhoF,RhoM,
      1 TauPass, TauCut, V0,	  
      2 PROPS(2),PROPS(3),PROPS(4))
-	 
+
+      DO ISLIPS=1,18
+       STATEV(ISLIPS+90)=RhoP(ISLIPS)
+       STATEV(ISLIPS+108)=RhoF(ISLIPS)		
+       STATEV(ISLIPS+126)=RhoM(ISLIPS)	
+       STATEV(ISLIPS+144)=TauPass(ISLIPS)	  
+       STATEV(ISLIPS+162)=TauCut(ISLIPS)
+       STATEV(ISLIPS+180)=V0(ISLIPS)	   
+      END DO
+
       call GetCSDHTauC(TAUPE,TAUSE,TAUCB,
      1 H, RhoCSD, TAUC, 	   
      2 PROPS(5:17))
+	 
+      DO ISLIPS=1,18
+       STATEV(ISLIPS+198)=H(ISLIPS)
+       STATEV(ISLIPS+216)=RhoCSD(ISLIPS)		
+       STATEV(ISLIPS+234)=TAUC(ISLIPS)	   
+      END DO
 	 
       call GetGammaDot(Tau, TauPass, TauCut, V0, RhoM, 
      1 Vs, GammaDot, TauEff, TAUC,	    	   
      2 PROPS(18:20))	 
 	 
+      DO ISLIPS=1,18
+       STATEV(ISLIPS+252)=GammaDot(ISLIPS)
+       STATEV(ISLIPS+270)=Vs(ISLIPS)		
+       STATEV(ISLIPS+288)=TauEff(ISLIPS)	   
+      END DO
+	 
       call GetRhoSSDEvolve(Tau, TauPass, TauCut, V0, RhoM, 
      1 GammaDot, TauEff, SSDDot, RhoSSD, RhoF,      	   
      2 PROPS(21:26))
 	 
-      call GetDSTRESS(DStress,GammaDot,DStrains,Stress,dTIME, 
+      call GetDSTRESS(DStress,GammaDot,dstran,Stress,dTIME, 
      1 FCC_Mu,FCC_Ohm,Cubic_Mu,Cubic_Ohm,	   
      2 PROPS(27:29))
  	  
@@ -93,8 +124,8 @@ c==========================================================
       include 'GetCSDHTauC.f' 
       include 'GetGammaDot.f'
       include 'GetRhoSSDEvolve.f'
-      include 'GetDSTRESS.f'	  
-      include 'GetDDSDDE.f'
+      include 'GetDSTRESSN.f'	  
+      include 'GetDDSDDEN.f'
 	  
 
 

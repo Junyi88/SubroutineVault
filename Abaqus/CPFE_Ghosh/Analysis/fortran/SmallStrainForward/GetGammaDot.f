@@ -29,7 +29,7 @@ C ------------------------------------------------------
       ELSE
        IF (TauEff(ISLIPS).GE.TauC(ISLIPS)) THEN
        Vs(ISLIPS)=V0(ISLIPS)*CINS(1)*
-     1	SINH(TauEff(ISLIPS)/TauCut(ISLIPS)**CINS(2))*
+     1	SINH((TauEff(ISLIPS)/TauCut(ISLIPS))**CINS(2))*
      1	SIGN(TAU(ISLIPS),1.0)
 	 
        GAMMADOT(ISLIPS)=RhoM(ISLIPS)*CINS(3)*Vs(ISLIPS)

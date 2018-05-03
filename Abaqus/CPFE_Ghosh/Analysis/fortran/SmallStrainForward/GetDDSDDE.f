@@ -21,7 +21,7 @@ C ------------------------------------------------------
       DDSDDE(2,3)=CINS(2)-STRESS(2)
 
       DDSDDE(3,1)=CINS(2)-STRESS(3)
-      DDSDDE(3,2)=CINS(3)-STRESS(3)
+      DDSDDE(3,2)=CINS(2)-STRESS(3)
       DDSDDE(3,3)=CINS(1)-STRESS(3)
 	  
 C ------------------------------------------------------	
