@@ -185,4 +185,150 @@ for n1=1:12
 end
 dlmwrite(FileName,Out1,'precision',fstr);
 
+FileName='FCC_N.csv';
+fstr='%.13e';
+Out1=zeros(12,3);
+for n1=1:12
+   Out1(n1,:)=FCCSlips(n1).n.'; 
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+%% WriteOutput
+FileName='FCC_SPe.csv';
+fstr='%.13e';
+Out1=zeros(12,3);
+for n1=1:12
+   Out1(n1,:)=FCCSlips(n1).spe.'; 
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+FileName='FCC_NPe.csv';
+fstr='%.13e';
+Out1=zeros(12,3);
+for n1=1:12
+   Out1(n1,:)=FCCSlips(n1).npe.'; 
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+%% WriteOutput
+FileName='FCC_SSe.csv';
+fstr='%.13e';
+Out1=zeros(12,3);
+for n1=1:12
+   Out1(n1,:)=FCCSlips(n1).sse.'; 
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+FileName='FCC_NSe.csv';
+fstr='%.13e';
+Out1=zeros(12,3);
+for n1=1:12
+   Out1(n1,:)=FCCSlips(n1).nse.'; 
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+%% WriteOutput
+FileName='FCC_SCb.csv';
+fstr='%.13e';
+Out1=zeros(12,3);
+for n1=1:12
+   Out1(n1,:)=FCCSlips(n1).scb.'; 
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+FileName='FCC_NCb.csv';
+fstr='%.13e';
+Out1=zeros(12,3);
+for n1=1:12
+   Out1(n1,:)=FCCSlips(n1).ncb.'; 
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+%% WriteOutput
+FileName='Cubic_S.csv';
+fstr='%.13e';
+Out1=zeros(12,3);
+for n1=1:6
+   Out1(n1,:)=CubicSlips(n1).s.'; 
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+FileName='Cubic_N.csv';
+fstr='%.13e';
+Out1=zeros(12,3);
+for n1=1:6
+   Out1(n1,:)=CubicSlips(n1).n.'; 
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+%% WriteOutput
+FileName='FCC_T.csv';
+fstr='%.13e';
+Out1=zeros(12,3);
+for n1=1:12
+   Out1(n1,:)=FCCSlips(n1).t.'; 
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+FileName='FCC_MU.csv';
+fstr='%.13e';
+Out1=zeros(12,9);
+for n1=1:12
+    for ny=1:3
+        for nx=1:3
+            nn=nx+(ny-1).*3;
+            Out1(n1,nn)=FCCSlips(n1).mu(ny,nx).'; 
+        end
+    end
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+FileName='FCC_OHM.csv';
+fstr='%.13e';
+Out1=zeros(12,9);
+for n1=1:12
+    for ny=1:3
+        for nx=1:3
+            nn=nx+(ny-1).*3;
+            Out1(n1,nn)=FCCSlips(n1).ohm(ny,nx).'; 
+        end
+    end
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+%% WriteOutput
+FileName='Cubic_T.csv';
+fstr='%.13e';
+Out1=zeros(6,3);
+for n1=1:6
+   Out1(n1,:)=CubicSlips(n1).t.'; 
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+FileName='Cubic_MU.csv';
+fstr='%.13e';
+Out1=zeros(6,9);
+for n1=1:6
+    for ny=1:3
+        for nx=1:3
+            nn=nx+(ny-1).*3;
+            Out1(n1,nn)=CubicSlips(n1).mu(ny,nx).'; 
+        end
+    end
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
+FileName='Cubic_OHM.csv';
+fstr='%.13e';
+Out1=zeros(6,9);
+for n1=1:6
+    for ny=1:3
+        for nx=1:3
+            nn=nx+(ny-1).*3;
+            Out1(n1,nn)=CubicSlips(n1).ohm(ny,nx).'; 
+        end
+    end
+end
+dlmwrite(FileName,Out1,'precision',fstr);
+
 save SlipSystemsAllen;
