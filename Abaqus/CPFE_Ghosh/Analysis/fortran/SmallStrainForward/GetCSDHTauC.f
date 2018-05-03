@@ -1,12 +1,12 @@
-      subroutine GetCSDHTauC(TAUPE,TAUSE,TAUCB,
+      subroutine GetCSDHTauC(TAUPEI,TAUSEI,TAUCBI,
      1 H, RhoCSD, TAUC, 	   
      2 CinS)
 
 C Subroutine to calculate forest parallel and mobile dislocations
       
       implicit none
-      
-      real*8,intent(in) :: TAUPE(12),TAUSE(12),TAUCB(12)
+      real*8,intent(in) :: TAUPEI(12),TAUSEI(12),TAUCBI(12)
+      real*8 :: TAUPE(12),TAUSE(12),TAUCB(12)
       real*8,intent(out) ::  H(12), RhoCSD(12), TAUC(18)
 
       real*8,intent(in) :: CinS(11)
@@ -15,9 +15,9 @@ C Subroutine to calculate forest parallel and mobile dislocations
 
 C ------------------------------------------------------	
       DO ISLIPS=1,12
-       TAUPE(ISLIPS)=TAUPE(ISLIPS)*CinS(1)
-       TAUSE(ISLIPS)=TAUSE(ISLIPS)*CinS(1)
-       TAUCB(ISLIPS)=TAUCB(ISLIPS)*CinS(1)
+       TAUPE(ISLIPS)=TAUPEI(ISLIPS)*CinS(1)
+       TAUSE(ISLIPS)=TAUSEI(ISLIPS)*CinS(1)
+       TAUCB(ISLIPS)=TAUCBI(ISLIPS)*CinS(1)
       END DO
 
 C ------------------------------------------------------	

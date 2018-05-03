@@ -1,8 +1,8 @@
       subroutine CalculateTauS(STRESS, TAU, TAUPE, TAUSE, TAUCB,
-     +  FCC_N,FCC_S
-     +  FCC_NPE,FCC_SPE
-     +  FCC_NSE,FCC_SSE
-     +  FCC_NCB,FCC_SCB
+     +  FCC_N,FCC_S,
+     +  FCC_NPE,FCC_SPE,
+     +  FCC_NSE,FCC_SSE,
+     +  FCC_NCB,FCC_SCB,
      +  CUBIC_N,CUBIC_S)
 
 C Subroutine Calculating All Values of ResolveShearStress
@@ -15,11 +15,21 @@ C Subroutine Calculating All Values of ResolveShearStress
       real*8,intent(in) :: FCC_NCB(12,3),FCC_SCB(12,3)	 
       real*8,intent(in) :: CUBIC_N(6,3),CUBIC_S(6,3)	
  	  
-      real*8,intent(out) :: TAU(18)=0.0, TAUPE(12)=0.0, 
-     1 TAUSE(12)=0.0, TAUCB(12)=0.0
+      real*8,intent(out) :: TAU(18), TAUPE(12), 
+     1 TAUSE(12), TAUCB(12)
       integer ISLIPS, ISLIPSX
 	  
 C --------------------------------------------------------------------------
+      DO ISLIPS=1,18    
+       TAU(ISLIPS)=0.0
+      END DO 
+      DO ISLIPS=1,12    
+       TAUPE(ISLIPS)=0.0 
+       TAUSE(ISLIPS)=0.0
+       TAUCB(ISLIPS)=0.0
+      END DO 
+C --------------------------------------------------------------------------
+ 
 C Calculate Tau
       DO ISLIPS=1,12     
        TAU(ISLIPS)=TAU(ISLIPS)+
@@ -31,7 +41,7 @@ C Calculate Tau
      5 (FCC_N(ISLIPS,1)*FCC_S(ISLIPS,3)+
      +   FCC_N(ISLIPS,3)*FCC_S(ISLIPS,1))*STRESS(5)+
      6 (FCC_N(ISLIPS,2)*FCC_S(ISLIPS,3)+
-     +   FCC_N(ISLIPS,3)*FCC_S(ISLIPS,2))*STRESS(6)+
+     +   FCC_N(ISLIPS,3)*FCC_S(ISLIPS,2))*STRESS(6)
       END DO    
       DO ISLIPS=1,6     
        ISLIPSX=ISLIPS+12
@@ -44,7 +54,7 @@ C Calculate Tau
      5 (CUBIC_N(ISLIPS,1)*CUBIC_S(ISLIPS,3)+
      +   CUBIC_N(ISLIPS,3)*CUBIC_S(ISLIPS,1))*STRESS(5)+
      6 (CUBIC_N(ISLIPS,2)*CUBIC_S(ISLIPS,3)+
-     +   CUBIC_N(ISLIPS,3)*CUBIC_S(ISLIPS,2))*STRESS(6)+
+     +   CUBIC_N(ISLIPS,3)*CUBIC_S(ISLIPS,2))*STRESS(6)
       END DO    
 	  
 C --------------------------------------------------------------------------
@@ -59,7 +69,7 @@ C Calculate TauPE
      5 (FCC_NPE(ISLIPS,1)*FCC_SPE(ISLIPS,3)+
      +   FCC_N(ISLIPS,3)*FCC_SPE(ISLIPS,1))*STRESS(5)+
      6 (FCC_NPE(ISLIPS,2)*FCC_SPE(ISLIPS,3)+
-     +   FCC_NPE(ISLIPS,3)*FCC_SPE(ISLIPS,2))*STRESS(6)+
+     +   FCC_NPE(ISLIPS,3)*FCC_SPE(ISLIPS,2))*STRESS(6)
       END DO    
 	  
 C --------------------------------------------------------------------------
@@ -74,7 +84,7 @@ C Calculate TauSE
      5 (FCC_NSE(ISLIPS,1)*FCC_SSE(ISLIPS,3)+
      +   FCC_NSE(ISLIPS,3)*FCC_SSE(ISLIPS,1))*STRESS(5)+
      6 (FCC_NSE(ISLIPS,2)*FCC_SSE(ISLIPS,3)+
-     +   FCC_NSE(ISLIPS,3)*FCC_SSE(ISLIPS,2))*STRESS(6)+
+     +   FCC_NSE(ISLIPS,3)*FCC_SSE(ISLIPS,2))*STRESS(6)
       END DO   	  
 
 C --------------------------------------------------------------------------
@@ -89,7 +99,7 @@ C Calculate TauCB
      5 (FCC_NCB(ISLIPS,1)*FCC_SCB(ISLIPS,3)+
      +   FCC_NCB(ISLIPS,3)*FCC_SCB(ISLIPS,1))*STRESS(5)+
      6 (FCC_NCB(ISLIPS,2)*FCC_SCB(ISLIPS,3)+
-     +   FCC_NCB(ISLIPS,3)*FCC_SCB(ISLIPS,2))*STRESS(6)+
+     +   FCC_NCB(ISLIPS,3)*FCC_SCB(ISLIPS,2))*STRESS(6)
       END DO   
 	  
       return

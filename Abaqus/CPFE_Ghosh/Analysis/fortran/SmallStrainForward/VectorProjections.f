@@ -4,7 +4,7 @@ C Subroutine for vector projection
 C This is projection of vB onto vA for the cosine and sine values
       
       implicit none
-      real*8,intent(in) :: vecA(3),vecB(3)
+      real*8,intent(in) :: vA(3),vB(3)
       real*8,intent(out) :: CosProjection, SinProjection
       real*8 :: MagA
 	  

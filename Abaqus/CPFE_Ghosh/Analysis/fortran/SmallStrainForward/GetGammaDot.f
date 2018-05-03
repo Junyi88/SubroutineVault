@@ -1,5 +1,5 @@
       subroutine GetGammaDot(Tau, TauPass, TauCut, V0, RhoM, 
-     1 Vs, GammaDot, TauEff, 	   
+     1 Vs, GammaDot, TauEff, TAUC,	   
      2 CinS)
 
 C Subroutine to calculate forest parallel and mobile dislocations
@@ -7,12 +7,19 @@ C Subroutine to calculate forest parallel and mobile dislocations
       implicit none
       
       real*8,intent(in) :: Tau(18), TauPass(18), TauCut(18), 
-     1	V0(18), RhoM(18)
-      real*8,intent(out) :: Vs(18)=0.0, GammaDot(18)=0.0, TauEff(18)=0.0
+     1	V0(18), RhoM(18), TAUC(18)
+      real*8,intent(out) :: Vs(18), GammaDot(18), TauEff(18)
 
       real*8,intent(in) :: CinS(3)
 
       integer ISLIPS
+
+C ------------------------------------------------------	
+c      DO ISLIPS=1,18
+c       Tau(ISLIPS)=0.0 
+c       TauPass(ISLIPS)=0.0 
+c       TauCut(ISLIPS)=0.0 
+c      END DO	  
 
 C ------------------------------------------------------	
       DO ISLIPS=1,18
@@ -33,8 +40,8 @@ C ------------------------------------------------------
 C ------------------------------------------------------	
       DO ISLIPS=1,18
        
-      IF TauEff(ISLIPS).GT.TAUC(ISLIPS)
-       Vs(ISLIPS)=V0(ISLIPS)*CINS(1)*SINH(TauEff())
+      IF (TauEff(ISLIPS).GT.TAUC(ISLIPS)) THEN
+       Vs(ISLIPS)=V0(ISLIPS)*CINS(1)*SINH(TauEff(ISLIPS))
 	   
 	   
       END IF

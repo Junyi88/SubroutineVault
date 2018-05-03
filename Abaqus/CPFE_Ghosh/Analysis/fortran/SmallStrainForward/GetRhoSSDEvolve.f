@@ -1,21 +1,26 @@
       subroutine GetRhoSSDEvolve(Tau, TauPass, TauCut, V0, RhoM, 
-     1 Vs, GammaDot, TauEff, SSDDot	   
+     1 GammaDot, TauEff, SSDDot, RhoSSD, RhoF,   
      2 CinS)
 
 C Subroutine to calculate forest parallel and mobile dislocations
       
       implicit none
       
-      real*8,intent(in) :: TauEff(18), Tau(18)
+      real*8,intent(in) :: TauEff(18), Tau(18), TauPass(18) 
+      real*8,intent(in) :: TauCut(18), V0(18)
       real*8,intent(in) :: RhoM(18), RhoSSD(18), RhoF(18)
       real*8,intent(in) :: GammaDot(18)
-      real*8,intent(out) :: SSDDot(18)=0.0
+      real*8,intent(out) :: SSDDot(18)
 
       real*8,intent(in) :: CinS(6)
 
       integer ISLIPS
 
 C ------------------------------------------------------	
+      DO ISLIPS=1,18
+      SSDDot(18)=0.0
+      ENDDO
+
       DO ISLIPS=1,18
        
       IF (GAMMADOT(ISLIPS).GT.0.0) THEN

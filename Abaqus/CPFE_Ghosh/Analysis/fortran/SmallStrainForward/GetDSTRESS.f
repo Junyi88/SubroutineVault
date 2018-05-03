@@ -1,5 +1,5 @@
-      subroutine GetDSTRESS(DStress,GammaDot,DStrains,Stress,dTIME, 
-     1 FCC_Mu,FCC_Ohm,Cubic_Mu,Cubic_Ohm 	   
+      subroutine GetDSTRESS(DStress,GammaDot,DStrain,Stress,dTIME, 
+     1 FCC_Mu,FCC_Ohm,Cubic_Mu,Cubic_Ohm,	   
      2 CinS)
 
 C Subroutine to calculate forest parallel and mobile dislocations
@@ -7,10 +7,10 @@ C Subroutine to calculate forest parallel and mobile dislocations
       implicit none
       
       real*8,intent(in) :: dTIME 
-      real*8,intent(in) :: GammaDot(18),DStrains(6),Stress(6)
-      real*8,intent(in) :: FCC_Mu(18),FCC_Ohm(18)
-      real*8,intent(in) :: Cubic_Mu(18),Cubic_Ohm(18)
-      real*8,intent(out) :: DStress(6)=0.0
+      real*8,intent(in) :: GammaDot(18),DStrain(6),Stress(6)
+      real*8,intent(in) :: FCC_Mu(3,3,18),FCC_Ohm(3,3,18)
+      real*8,intent(in) :: Cubic_Mu(3,3,18),Cubic_Ohm(3,3,18)
+      real*8,intent(out) :: DStress(6)
 
       real*8,intent(in) :: CinS(3)
       
@@ -22,7 +22,9 @@ C Subroutine to calculate forest parallel and mobile dislocations
       DO ISLIPS=1,18
 	        DGA(ISLIPS)=GammaDot(ISLIPS)*DTIME
       END DO
-	  
+      DO ISLIPS=1,6
+	        DStress(ISLIPS)=0.0
+      END DO
 C ------------------------------------------------------	
       DSTRESS(1)=CINS(1)*DSTRAIN(1)+CINS(2)*(DSTRAIN(2)+DSTRAIN(3))
       DSTRESS(1)=DSTRESS(1)-HYDROSTRAIN*STRESS(1)

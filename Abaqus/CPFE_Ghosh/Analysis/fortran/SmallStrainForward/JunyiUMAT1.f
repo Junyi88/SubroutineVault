@@ -38,10 +38,10 @@ c ------------------------------------------------
 	  
 c ------------------------------------------------	 	  
       call CalculateTauS(STRESS, TAU, TAUPE, TAUSE, TAUCB,
-     +  FCC_N,FCC_S
-     +  FCC_NPE,FCC_SPE
-     +  FCC_NSE,FCC_SSE
-     +  FCC_NCB,FCC_SCB
+     +  FCC_N,FCC_S,
+     +  FCC_NPE,FCC_SPE,
+     +  FCC_NSE,FCC_SSE,
+     +  FCC_NCB,FCC_SCB,
      +  CUBIC_N,CUBIC_S)
 	 
       call GetRhoPFM(RhoP,RhoF,RhoM,
@@ -59,15 +59,15 @@ c ------------------------------------------------
      2 PROPS(5:17))
 	 
       call GetGammaDot(Tau, TauPass, TauCut, V0, RhoM, 
-     1 Vs, GammaDot, TauEff, 	   
+     1 Vs, GammaDot, TauEff, TAUC,	    	   
      2 PROPS(18:20))	 
 	 
       call GetRhoSSDEvolve(Tau, TauPass, TauCut, V0, RhoM, 
-     1 Vs, GammaDot, TauEff, SSDDot	    	   
+     1 GammaDot, TauEff, SSDDot, RhoSSD, RhoF,      	   
      2 PROPS(21:26))
 	 
       call GetDSTRESS(DStress,GammaDot,DStrains,Stress,dTIME, 
-     1 FCC_Mu,FCC_Ohm,Cubic_Mu,Cubic_Ohm 	   
+     1 FCC_Mu,FCC_Ohm,Cubic_Mu,Cubic_Ohm,	   
      2 PROPS(27:29))
  	  
       call GetDDSDDE(DDSDDE,Stress,	   
@@ -75,10 +75,10 @@ c ------------------------------------------------
 c ------------------------------------------------	
 c UPDATE ALL
       DO ISLIPS=1,18
-       STATEV(ISLIPS)=STATEV(ISLIPS)+DTIME*SSDDot	
+       STATEV(ISLIPS)=STATEV(ISLIPS)+DTIME*SSDDot(ISLIPS)	
       END DO
       DO ISLIPS=1,6
-       Stress(ISLIPS)=Stress(ISLIPS)+DStress	
+       Stress(ISLIPS)=Stress(ISLIPS)+DStress(ISLIPS)	
       END DO
 	  
 c ------------------------------------------------		  
