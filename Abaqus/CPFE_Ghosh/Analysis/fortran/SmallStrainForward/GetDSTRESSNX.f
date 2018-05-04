@@ -37,8 +37,12 @@ C ------------------------------------------------------
        DUM1=CINS(1)*FCC_Mu(1,1,ISLIPS)+
      1 CINS(2)*(FCC_Mu(2,2,ISLIPS)+FCC_Mu(3,3,ISLIPS))
 	 
+       PRINT *, 'DUM_', ISLIPS, '=', DUM1
        DSTRESS(1)=DSTRESS(1)-DUM1*DGA(ISLIPS)
-	 
+	   
+       PRINT *, 'FCM_', ISLIPS,'=', FCC_Mu(1,1,ISLIPS),FCC_Mu(2,2,ISLIPS)
+     1 ,FCC_Mu(3,3,ISLIPS)
+	  
       END DO
       DO ISLIPS=1,6
        DUM1=CINS(1)*CUBIC_Mu(1,1,ISLIPS)+

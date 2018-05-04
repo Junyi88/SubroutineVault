@@ -26,6 +26,8 @@ C ------------------------------------------------------
        TauEff(ISLIPS)=abs(Tau(ISLIPS))-TauPass(ISLIPS)
       IF (TauEff(ISLIPS).LE.0.0) THEN
        TauEff(ISLIPS)=0.0
+       Vs(ISLIPS)=0.0
+       GAMMADOT(ISLIPS)=0.0	   
       ELSE
        IF (TauEff(ISLIPS).GE.TauC(ISLIPS)) THEN
        Vs(ISLIPS)=V0(ISLIPS)*CINS(1)*
@@ -38,14 +40,7 @@ C ------------------------------------------------------
       END DO
 	  
 C ------------------------------------------------------	
-      DO ISLIPS=1,18
-       
-      IF (TauEff(ISLIPS).GT.TAUC(ISLIPS)) THEN
-       Vs(ISLIPS)=V0(ISLIPS)*CINS(1)*SINH(TauEff(ISLIPS))
-	   
-	   
-      END IF
-      END DO	  
+  
 	  
       return
       end subroutine GetGammaDot

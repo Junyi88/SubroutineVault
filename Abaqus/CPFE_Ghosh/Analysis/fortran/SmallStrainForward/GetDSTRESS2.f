@@ -24,9 +24,7 @@ C Subroutine to calculate forest parallel and mobile dislocations
 	        DGA(ISLIPS)=GammaDot(ISLIPS)*DTIME
       END DO
 C XXX	  
-      DO ISLIPS=1,18
-	        DGA(ISLIPS)=0.0
-      END DO
+
       DO ISLIPS=1,6
 	        DStress(ISLIPS)=0.0
       END DO

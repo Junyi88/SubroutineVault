@@ -30,6 +30,7 @@ c
        RhoSSD(ISLIPS)=PROPS(NPROPS)
        STATEV(ISLIPS)=RhoSSD(ISLIPS)
       END DO
+	  
       ENDIF
 
 c ------------------------------------------------	 
@@ -87,6 +88,7 @@ c ------------------------------------------------
      1 Vs, GammaDot, TauEff, TAUC,	    	   
      2 PROPS(18:20))	 
 	 
+	 
       DO ISLIPS=1,18
        STATEV(ISLIPS+252)=GammaDot(ISLIPS)
        STATEV(ISLIPS+270)=Vs(ISLIPS)		
@@ -98,9 +100,10 @@ c ------------------------------------------------
      2 PROPS(21:26))
 	 
       call GetDSTRESS(DStress,GammaDot,dstran,Stress,dTIME, 
-     1 FCC_Mu,FCC_Ohm,Cubic_Mu,Cubic_Ohm,	   
+     1 FCC_Mu(:,:,:),FCC_Ohm(:,:,:),Cubic_Mu(:,:,:),Cubic_Ohm(:,:,:),	   
      2 PROPS(27:29))
- 	  
+	 
+	  
       call GetDDSDDE(DDSDDE,Stress,	   
      2 PROPS(27:29))
 c ------------------------------------------------	
@@ -124,7 +127,7 @@ c==========================================================
       include 'GetCSDHTauC.f' 
       include 'GetGammaDot.f'
       include 'GetRhoSSDEvolve.f'
-      include 'GetDSTRESSN.f'	  
+      include 'GetDSTRESS2.f'	  
       include 'GetDDSDDEN.f'
 	  
 
