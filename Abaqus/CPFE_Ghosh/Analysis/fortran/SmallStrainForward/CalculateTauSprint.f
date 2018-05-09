@@ -19,7 +19,13 @@ C Subroutine Calculating All Values of ResolveShearStress
      1 TAUSE(12), TAUCB(12)
       integer ISLIPS, ISLIPSX
 	  
- 
+      print *, '=xxx===================='
+      DO ISLIPS=1,12
+	     
+	     print *, 'S=', FCC_S(ISLIPS,:)
+	     print *, 'N=', FCC_N(ISLIPS,:)
+
+      END DO	  
 	  
 C --------------------------------------------------------------------------
       DO ISLIPS=1,18    

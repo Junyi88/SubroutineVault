@@ -23,7 +23,14 @@ c
       real*8 :: H(12), RhoCSD(12), TAUC(18) 
       real*8 :: Vs(18) , GammaDot(18) , TauEff(18), SSDDot(18)
       real*8 :: DStress(6)
-	  
+
+      print *, '=============================================='
+      DO ISLIPS=1,12
+	     
+	     print *, 'S=', FCC_S(ISLIPS,:)
+	     print *, 'N=', FCC_N(ISLIPS,:)
+
+      END DO	  
 	  
       IF (KINC.LE.1) THEN
       DO ISLIPS=1,18
@@ -127,7 +134,7 @@ c ------------------------------------------------
       end subroutine UMAT
 	  
 c==========================================================	 
-      include 'CalculateTauS.f'
+      include 'CalculateTauSprint.f'
       include 'VectorProjections.f'
       include 'GetRhoPFM.f'	  
       include 'GetTauSlips.f'

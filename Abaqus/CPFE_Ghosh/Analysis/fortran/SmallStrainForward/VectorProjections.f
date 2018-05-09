@@ -11,7 +11,8 @@ C This is projection of vB onto vA for the cosine and sine values
       MagA=sqrt(vA(1)*vA(1)+vA(2)*vA(2)+vA(3)*vA(3))
       CosProjection=vB(1)*vA(1)+vB(2)*vA(2)+vB(3)*vA(3)
       CosProjection=abs(CosProjection)/MagA
-      SinProjection=sqrt(1.0-CosProjection*CosProjection)
 	  
+      SinProjection=sqrt(1.0-CosProjection*CosProjection)
+	  	  
       return
       end subroutine VectorProjections
