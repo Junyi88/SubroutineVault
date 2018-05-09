@@ -26,7 +26,9 @@ C ------------------------------------------------------
       IF (GAMMADOT(ISLIPS).GT.0.0) THEN
 	  
       SSDDot(ISLIPS)=SSDDot(ISLIPS)+CinS(1)*sqrt(RhoF(ISLIPS))
-      SSDDot(ISLIPS)=SSDDot(ISLIPS)+CinS(2)*RhoM(ISLIPS)
+      IF (TauEff(ISLIPS).GT.0.0) THEN
+      SSDDot(ISLIPS)=SSDDot(ISLIPS)+CinS(2)*RhoM(ISLIPS)/TauEff(ISLIPS)
+      END IF  
       SSDDot(ISLIPS)=SSDDot(ISLIPS)-CinS(3)*RhoSSD(ISLIPS)
       SSDDot(ISLIPS)=SSDDot(ISLIPS)*GAMMADOT(ISLIPS)
 	  

@@ -39,7 +39,7 @@ C ------------------------------------------------------
       DO ISLIPS=1,12
        TauC(ISLIPS)=CinS(4)*sqrt(RhoCSD(ISLIPS))
       END DO		  
-	  DO ISLIPS=13,18
+      DO ISLIPS=13,18
        TauC(ISLIPS)=CinS(5)
       END DO	
 	  
