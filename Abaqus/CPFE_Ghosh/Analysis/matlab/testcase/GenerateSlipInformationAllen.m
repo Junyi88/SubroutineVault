@@ -139,6 +139,16 @@ for n1=1:12
 
 FCCSlips(n1).t=cross(FCCSlips(n1).s,FCCSlips(n1).n);
 FCCSlips(n1).mu=0.5*(FCCSlips(n1).s*FCCSlips(n1).n.'+FCCSlips(n1).n*FCCSlips(n1).s.');
+
+FCCSlips(n1).mu2=zeros(3,3);
+for nx=1:3
+    for ny=1:3
+        FCCSlips(n1).mu2(ny,nx)=0.5*(FCCSlips(n1).s(nx)*FCCSlips(n1).n(ny)+...
+            FCCSlips(n1).n(nx)*FCCSlips(n1).s(ny));
+    end
+end
+
+
 FCCSlips(n1).ohm=0.5*(FCCSlips(n1).s*FCCSlips(n1).n.'-FCCSlips(n1).n*FCCSlips(n1).s.');
 
 end
