@@ -182,9 +182,11 @@ c NOW FOR THE MAIN STUFF
      2 PROPS(70:75))
 
       call GetDSTRESS(DStress,GammaDot,dstran,Stress,dTIME, 
-     1 FCC_Mu,FCC_Ohm,Cubic_Mu,Cubic_Ohm,	   
+     1 STATEV(1:54),STATEV(55:108),   
      2 PROPS(28:48))
-
+	 
+      call GetDDSDDE(DDSDDE,Stress,	   
+     2 PROPS(28:48))
 	 
 c ------------------------------------------------	
 c UPDATE ALL
