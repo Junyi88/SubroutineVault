@@ -16,8 +16,8 @@ c
 	 
       include 'DeclareParametersSlipsO.f'
       
-      INTEGER:: ISLIPS, I, J, NDUM1
-      real*8 :: TAU(18), TAUPE(12), TAUSE(12), TAUCB(12)	  
+      INTEGER:: ISLIPS, I, J, NDUM1, NA, NB
+      real*8 :: TAU(18), TAUPE(12), TAUSE(12), TAUCB(12), SLIP_T(18)	  
       real*8 :: RhoP(18),RhoF(18),RhoM(18),RhoSSD(18)
       real*8 :: TauPass(18), TauCut(18), V0(18)
       real*8 :: H(12), RhoCSD(12), TAUC(18) 
@@ -55,22 +55,160 @@ c ------------------------------------------------
 c Perform Initialisation
 
       IF (KINC.LE.1) THEN
-       DO ISLIPS=1,18
-          STATEV(ISLIPS+108)=PROPS(NPROPS+9)
+	  
+       DO ISLIPS=1,nstatv
+          STATEV(ISLIPS)=0.0
        END DO
 
-       DO ISLIPS=1,18
-          STATEV(ISLIPS+108)=PROPS(NPROPS+9)
+       NDUM1=0
+       DO I=1,3
+       DO J=1,3
+          NDUM1=NDUM1+1
+          ORI_ROT(I,J)=PROPS(NDUM1)
+       END DO
        END DO
 	   
+       DO ISLIPS=1,18
+          STATEV(ISLIPS+108)=PROPS(NPROPS+9)
+       END DO
+
+c ---- S_SCHMID
+       DO ISLIPS=1,12
+        NDUM1=(ISLIPS-1)*3
+        NA=NDUM1+1
+        NB=NDUM1+3		        
+        call ROTATE_Vec(ORI_ROT,FCC_S0(1:3,ISLIPS),STATEV(NA:NB))
+       END DO
+       DO ISLIPS=1,6
+        NDUM1=(ISLIPS+11)*3
+        NA=NDUM1+1
+        NB=NDUM1+3		        
+        call ROTATE_Vec(ORI_ROT,CUBIC_S0(1:3,ISLIPS),STATEV(NA:NB))
+       END DO
+
+c ---- N_SCHMID
+       DO ISLIPS=1,12
+        NDUM1=(ISLIPS+53)*3
+        NA=NDUM1+1
+        NB=NDUM1+3		        
+        call ROTATE_Vec(ORI_ROT,FCC_N0(1:3,ISLIPS),STATEV(NA:NB))
+       END DO
+       DO ISLIPS=1,6
+        NDUM1=(ISLIPS+65)*3
+        NA=NDUM1+1
+        NB=NDUM1+3		        
+        call ROTATE_Vec(ORI_ROT,CUBIC_N0(1:3,ISLIPS),STATEV(NA:NB))
+       END DO	
+	   
+c ---- S_PE
+       DO ISLIPS=1,12
+        NDUM1=(ISLIPS+183)*3
+        NA=NDUM1+1
+        NB=NDUM1+3		        
+        call ROTATE_Vec(ORI_ROT,FCC_SPE0(1:3,ISLIPS),STATEV(NA:NB))
+       END DO
+c ---- N_PE
+       DO ISLIPS=1,12
+        NDUM1=(ISLIPS+207)*3
+        NA=NDUM1+1
+        NB=NDUM1+3		        
+        call ROTATE_Vec(ORI_ROT,FCC_NPE0(1:3,ISLIPS),STATEV(NA:NB))
+       END DO
+
+c ---- S_SE
+       DO ISLIPS=1,12
+        NDUM1=(ISLIPS+219)*3
+        NA=NDUM1+1
+        NB=NDUM1+3		        
+        call ROTATE_Vec(ORI_ROT,FCC_SSE0(1:3,ISLIPS),STATEV(NA:NB))
+       END DO
+c ---- N_SE
+       DO ISLIPS=1,12
+        NDUM1=(ISLIPS+231)*3
+        NA=NDUM1+1
+        NB=NDUM1+3		        
+        call ROTATE_Vec(ORI_ROT,FCC_NSE0(1:3,ISLIPS),STATEV(NA:NB))
+       END DO	   
+	   
+c ---- S_CB
+       DO ISLIPS=1,12
+        NDUM1=(ISLIPS+243)*3
+        NA=NDUM1+1
+        NB=NDUM1+3		        
+        call ROTATE_Vec(ORI_ROT,FCC_SCB0(1:3,ISLIPS),STATEV(NA:NB))
+       END DO
+c ---- N_CB
+       DO ISLIPS=1,12
+        NDUM1=(ISLIPS+255)*3
+        NA=NDUM1+1
+        NB=NDUM1+3		        
+        call ROTATE_Vec(ORI_ROT,FCC_NCB0(1:3,ISLIPS),STATEV(NA:NB))
+       END DO	      
+c ---- Rotate STIFFNESS TENSOR
+        ROTATE_COMTEN(ORI_ROT,PROPS(28:48),STATEV(164:184))
+
       ENDIF
+c --------------------------------
+C Calculate som common values
+        call Get_TfromSN(STATEV(1:54),STATEV(55:108),SLIP_T)
+	  
+c ------------------------------------------------	
+c NOW FOR THE MAIN STUFF
+        call CalculateTauS(STRESS, TAU, TAUPE, TAUSE, TAUCB,
+     +  STATEV(1:54), STATEV(55:108),
+     +  SLIP_SPE, SLIP_NPE, STATEV(185:196), STATEV(197:208),
+     +  SLIP_SSE, SLIP_NSE, STATEV(209:220), STATEV(221:232),
+     +  SLIP_SCB, SLIP_NCB STATEV(233:244), STATEV(245:256))	
 
+        call GetRhoPFM(RhoP,RhoF,RhoM,
+     1 STATEV(109:126),
+     2 STATEV(55:108),SLIP_T,
+     5 Coefficient1)
+	 
+        call GetTauSlips(RhoP,RhoF,RhoM,
+     1 TauPass, TauCut, V0,	  
+     2 PROPS(51:53))
+	 
+      call GetCSDHTauC(TAUPE,TAUSE,TAUCB,
+     1 H, RhoCSD, TAUC, 	   
+     2 PROPS(54:66))	 
 
+      call GetGammaDot(Tau, TauPass, TauCut, V0, RhoM, 
+     1 Vs, GammaDot, TauEff, TAUC,	    	   
+     2 PROPS(67:69))	 	 
 
+      call GetRhoSSDEvolve(Tau, TauPass, TauCut, V0, RhoM, 
+     1 GammaDot, TauEff, SSDDot, RhoSSD, RhoF,      	   
+     2 PROPS(70:75))
 
+      call GetDSTRESS(DStress,GammaDot,dstran,Stress,dTIME, 
+     1 FCC_Mu,FCC_Ohm,Cubic_Mu,Cubic_Ohm,	   
+     2 PROPS(28:48))
 
+	 
+c ------------------------------------------------	
+c UPDATE ALL
+      DO ISLIPS=1,18
+       STATEV(ISLIPS+108)=STATEV(ISLIPS+108)+DTIME*SSDDot(ISLIPS)	
+       STATEV(ISLIPS+144)=STATEV(ISLIPS+144)+DTIME*GammaDot(ISLIPS)
+       STATEV(145)=STATEV(145)+DTIME*GammaDot(ISLIPS)
+      END DO
+      DO ISLIPS=1,6
+       Stress(ISLIPS)=Stress(ISLIPS)+DStress(ISLIPS)	
+      END DO
+	  
+c ------------------------------------------------		 
 c ------------------------------------------------	 
       return
       end subroutine UMAT
 
       include 'UTILS1.f'
+      include 'StiffnessTensorTools.f'
+      include 'CalculateTauS.f'
+      include 'GetRhoPFM.f'
+      include 'GetTauSlips.f'
+      include 'GetCSDHTauC.f' 
+      include 'GetGammaDot.f'
+      include 'GetRhoSSDEvolve.f'
+      include 'GetDSTRESS2.f'	
+      include 'GetDDSDDEN.f'

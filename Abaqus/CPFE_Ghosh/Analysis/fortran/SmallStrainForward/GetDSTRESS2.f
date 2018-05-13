@@ -30,6 +30,7 @@ C XXX
       END DO
 C ------------------------------------------------------	
       DSTRESS(1)=CINS(1)*DSTRAIN(1)+CINS(2)*(DSTRAIN(2)+DSTRAIN(3))
+      DSTRESS(1)=DSTRESS(1)-HYDROSTRAIN*STRESS(1)
 	  
       DO ISLIPS=1,12
        DUM1=CINS(1)*FCC_Mu(1,1,ISLIPS)+
@@ -110,7 +111,7 @@ C ------------------------------------------------------
       END DO
       DO ISLIPS=1,6
        DUM1=CINS(3)*(CUBIC_Mu(1,3,ISLIPS)+CUBIC_Mu(3,1,ISLIPS))
-       DSTRESS(4)=DSTRESS(4)-DUM1*DGA(ISLIPS+12)
+       DSTRESS(5)=DSTRESS(5)-DUM1*DGA(ISLIPS+12)
 	  
       END DO	
 
