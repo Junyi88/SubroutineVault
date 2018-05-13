@@ -30,7 +30,7 @@ C=======================
         nFinB=3*nB		
 		
         call VectorProjections(CosProjection,SinProjection,
-     1 SLIP_N(nSTARTA,nFinA),SLIP_T(NSTARTB,NFINB))
+     1 SLIP_N(nSTARTA:nFinA),SLIP_T(NSTARTB:NFINB))
 	 
         RhoF(nA)=RhoF(nA)+CosProjection*(RhoSSD(nB))
         RhoP(nA)=RhoP(nA)+SinProjection*(RhoSSD(nB))

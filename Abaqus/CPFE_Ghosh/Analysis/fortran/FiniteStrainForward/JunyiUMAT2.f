@@ -14,7 +14,7 @@ c
      2 stran(ntens),dstran(ntens),time(2),predef(1),dpred(1),
      3 props(nprops),coords(3),drot(3,3),dfgrd0(3,3),dfgrd1(3,3)
 	 
-      include 'DeclareParametersSlipsO.f'
+      include 'DeclareParameterSlipsO.f'
       
       INTEGER:: ISLIPS, I, J, NDUM1, NA, NB
       real*8 :: TAU(18), TAUPE(12), TAUSE(12), TAUCB(12), SLIP_T(18)	  
@@ -24,7 +24,7 @@ c
       real*8 :: Vs(18) , GammaDot(18) , TauEff(18), SSDDot(18)
       real*8 :: DStress(6) 
 	  
-      real*8 :: ORI_ROT(3,3)
+      real*8 :: ORI_ROT(3,3), SPIN_TENSOR(3,3)
 	  
 c ------------------------------------------------	  
 C
@@ -145,7 +145,7 @@ c ---- N_CB
         call ROTATE_Vec(ORI_ROT,FCC_NCB0(1:3,ISLIPS),STATEV(NA:NB))
        END DO	      
 c ---- Rotate STIFFNESS TENSOR
-        ROTATE_COMTEN(ORI_ROT,PROPS(28:48),STATEV(164:184))
+        call ROTATE_COMTEN(ORI_ROT,PROPS(28:48),STATEV(164:184))
 
       ENDIF
 c --------------------------------
@@ -156,9 +156,9 @@ c ------------------------------------------------
 c NOW FOR THE MAIN STUFF
         call CalculateTauS(STRESS, TAU, TAUPE, TAUSE, TAUCB,
      +  STATEV(1:54), STATEV(55:108),
-     +  SLIP_SPE, SLIP_NPE, STATEV(185:196), STATEV(197:208),
-     +  SLIP_SSE, SLIP_NSE, STATEV(209:220), STATEV(221:232),
-     +  SLIP_SCB, SLIP_NCB STATEV(233:244), STATEV(245:256))	
+     +  STATEV(185:196), STATEV(197:208),
+     +  STATEV(209:220), STATEV(221:232),
+     +  STATEV(233:244), STATEV(245:256))	
 
         call GetRhoPFM(RhoP,RhoF,RhoM,
      1 STATEV(109:126),
@@ -214,3 +214,4 @@ c ------------------------------------------------
       include 'GetRhoSSDEvolve.f'
       include 'GetDSTRESS2.f'	
       include 'GetDDSDDEN.f'
+      include 'VectorProjections.f'

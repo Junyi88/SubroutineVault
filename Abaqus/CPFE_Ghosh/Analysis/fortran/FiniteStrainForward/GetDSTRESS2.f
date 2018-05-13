@@ -1,34 +1,15 @@
-      subroutine GetDSTRESS(DStress,GammaDot,DStrain,Stress,dTIME, 
+      subroutine GetDSTRESS(DStress,GammaDot,DStran,Stress,dTIME, 
      1 SLIP_S,SLIP_N,	   
      2 CinS)
 
 C Subroutine to calculate forest parallel and mobile dislocations
       
       implicit none
-      Integer, PARAMETER:: :: FULL2VOIGT(3,3) 
 
-      FULL2VOIGT=reshape([
-     1  1, 4, 5, 
-     1  4, 2, 6,
-     1  5, 6, 3	 
-     3  ], [3,3]
-     4 )
-
-      Integer, PARAMETER:: :: VOIGT2FULL(2,6) 
-
-      VOIGT2FULL=reshape([
-     1  1, 1,
-     1  2, 2,
-     1  3, 3,
-     1  1, 2,
-     1  1, 3,
-     1  2, 3	 
-     3  ], [2,6]
-     4 )	 
-	 
+      include 'ComplianceTensorMaps.f' 	 
 	 
       real*8,intent(in) :: dTIME 
-      real*8,intent(in) :: GammaDot(18),DStrain(6),Stress(6)
+      real*8,intent(in) :: GammaDot(18),DStran(6),Stress(6)
       real*8,intent(in) :: SLIP_S(54),SLIP_N(54)
 
       real*8,intent(out) :: DStress(6)
@@ -38,7 +19,26 @@ C Subroutine to calculate forest parallel and mobile dislocations
       real*8:: HYDROSTRAIN, DGA(18), DUM1
       integer ISLIPS, IVAL, ISYS, I, J, K, L, ICOR
 
-      HYDROSTRAIN=DSTRAIN(1)+DSTRAIN(2)+DSTRAIN(3)
+      Integer, PARAMETER::  FULL2VOIGT(3,3) =
+     1 reshape([
+     1  1, 4, 5, 
+     1  4, 2, 6,
+     1  5, 6, 3	 
+     3  ], [3,3]
+     4 )
+
+      Integer, PARAMETER::  VOIGT2FULL(2,6) =
+     1 reshape([
+     1  1, 1,
+     1  2, 2,
+     1  3, 3,
+     1  1, 2,
+     1  1, 3,
+     1  2, 3	 
+     3  ], [2,6]
+     4 )	 
+	  
+      HYDROSTRAIN=DSTRAN(1)+DSTRAN(2)+DSTRAN(3)
 	  
 	  
       DO ISLIPS=1,18

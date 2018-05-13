@@ -41,7 +41,7 @@ C Calculate Tau
      +   SLIP_N(2+I_OFF)*SLIP_S(1+I_OFF))*STRESS(4)+
      5 (SLIP_N(1+I_OFF)*SLIP_S(3+I_OFF)+
      +   SLIP_N(3+I_OFF)*SLIP_S(1+I_OFF))*STRESS(5)+
-     6 (SLIP_N(2+I_OFF)*SLIP_S(3,ISLIPS)+
+     6 (SLIP_N(2+I_OFF)*SLIP_S(3+I_OFF)+
      +   SLIP_N(3+I_OFF)*SLIP_S(2+I_OFF))*STRESS(6)
       END DO    
 

@@ -1,6 +1,4 @@
-      Integer, PARAMETER:: :: MFULL2LIST(3,3,3,3) 
-
-      MFULL2LIST=reshape([
+      Integer, PARAMETER:: MFULL2LIST(3,3,3,3) = reshape([
      1  1, 9, 10, 9, 7, 11, 10, 11, 8, 
      2  9, 4, 19, 4, 13, 20, 19, 20, 16, 
      3  10, 19, 5, 19, 14, 21, 5, 21, 17,  
@@ -14,9 +12,7 @@
      4 )
 	 
 
-      Integer, PARAMETER:: :: MLIST2FULL(4,21) 
-
-      MLIST2FULL=reshape([
+      Integer, PARAMETER:: MLIST2FULL(4,21)=reshape([
      1  1, 1, 1, 1, 
      2  2, 2, 2, 2, 
      3  3, 3, 3, 3, 
@@ -37,6 +33,6 @@
      8  3, 3, 2, 3, 
      9  1, 2, 1, 3, 
      z  1, 2, 2, 3,
-     1  1, 3, 2, 3,	 
+     1  1, 3, 2, 3	 
      3  ], [4,21]
      4 )
