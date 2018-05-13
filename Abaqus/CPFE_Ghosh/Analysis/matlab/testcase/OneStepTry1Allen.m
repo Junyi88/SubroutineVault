@@ -156,3 +156,28 @@ fstr='%.15e';
 dlmwrite(FileName,Pr,'precision',fstr);
 
 save AllenResult1;
+
+%% Pr2
+Pr2=zeros(30+49,1);
+Pr2(1)=1;
+Pr2(2)=0;
+Pr2(3)=0;
+Pr2(4)=0;
+Pr2(5)=1;
+Pr2(6)=0;
+Pr2(7)=0;
+Pr2(8)=0;
+Pr2(9)=1;
+
+Pr2(10:27)=rho0;
+
+Pr2(28:30)=C11;
+Pr2(31:33)=C44;
+
+Pr2([34 35 39])=C12;
+
+Pr2(50:79)=Pr;
+FileName='PROPS2.csv';
+fstr='%.15e';
+
+dlmwrite(FileName,Pr2,'precision',fstr);
