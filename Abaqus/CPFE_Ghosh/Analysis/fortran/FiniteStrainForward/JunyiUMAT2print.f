@@ -34,7 +34,10 @@ C
       Real*8:: FTINV(3,3),STRATE(3,3),VELGRD(3,3),AUX1(3,3),ONEMAT(3,3)
       PARAMETER (ONE=1.0D0,TWO=2.0D0,THREE=3.0D0,SIX=6.0D0)
       DATA NEWTON,TOLER/10,1.D-6/
-	  
+	
+
+c      print *, '*****************************************'
+	
       CALL ONEM(ONEMAT)     
       CALL ZEROM(FTINV)
       CALL ZEROM(AUX1)
@@ -181,11 +184,6 @@ c NOW FOR THE MAIN STUFF
      1 GammaDot, TauEff, SSDDot, RhoSSD, RhoF,      	   
      2 PROPS(70:75))
 
-c      DO ISLIPS=1,18
-c       GammaDot(ISLIPS)=0.0
-c      END DO	 
-
-	 
       call GetDSTRESS(DStress,GammaDot,dstran,Stress,dTIME, 
      1 STATEV(1:54),STATEV(55:108),   
      2 PROPS(28:48))
@@ -197,11 +195,20 @@ c ------------------------------------------------
 c UPDATE ALL
       DO ISLIPS=1,18
        STATEV(ISLIPS+108)=STATEV(ISLIPS+108)+DTIME*SSDDot(ISLIPS)	
-       STATEV(ISLIPS+144)=STATEV(ISLIPS+144)+DTIME*GammaDot(ISLIPS)
+       STATEV(ISLIPS+144)=STATEV(ISLIPS+144)+DTIM315E*GammaDot(ISLIPS)
        STATEV(163)=STATEV(163)+DTIME*GammaDot(ISLIPS)
       END DO
       DO ISLIPS=1,6
        Stress(ISLIPS)=Stress(ISLIPS)+DStress(ISLIPS)	
+      END DO
+c ------------------------------------------------	
+c Fill Additionals
+      DO ISLIPS=1,18
+       STATEV(ISLIPS+260)=GammaDot(ISLIPS)
+	   STATEV(ISLIPS+278)=Tau(ISLIPS)
+	   STATEV(ISLIPS+296)=TauPass(ISLIPS)
+	   STATEV(ISLIPS+314)=TauCut(ISLIPS)
+	   STATEV(ISLIPS+332)=TauEff(ISLIPS)
       END DO
 	  
 c ------------------------------------------------		 
@@ -217,6 +224,6 @@ c ------------------------------------------------
       include 'GetCSDHTauC.f' 
       include 'GetGammaDot.f'
       include 'GetRhoSSDEvolve.f'
-      include 'GetDSTRESS2N.f'	
+      include 'GetDSTRESS2.f'	
       include 'GetDDSDDEN.f'
       include 'VectorProjections.f'

@@ -38,6 +38,7 @@ C Subroutine to calculate forest parallel and mobile dislocations
      3  ], [2,6]
      4 )	 
 
+
       Integer, PARAMETER::  VOIGT2List(6,6) =
      1 reshape([
      1  1, 7, 8, 9 ,10, 11,
@@ -47,7 +48,7 @@ C Subroutine to calculate forest parallel and mobile dislocations
      5  10, 14, 17, 19 ,5, 21,
      6  11, 15, 18, 20 ,21, 6	 
      3  ], [6,6]
-     4 )
+     4 )	 
 	 
       HYDROSTRAIN=DSTRAN(1)+DSTRAN(2)+DSTRAN(3)
 	  
@@ -63,17 +64,10 @@ c        I = VOIGT2FULL(1,ISYS)
 c        J = VOIGT2FULL(2,ISYS)
 c        DO K=1,3
 c        DO L=1,3
-c        IF (K.EQ.L) THEN
 c          IVAL=FULL2VOIGT(K,L)
 c          DStress(ISYS)=DStress(ISYS)+
 c     1	     CinS(MFULL2LIST(I,J,K,L))*
 c     1	     dSTRAN(IVAL)	 
-c        else
-c          IVAL=FULL2VOIGT(K,L)
-c          DStress(ISYS)=DStress(ISYS)+
-c     1	     0.5*CinS(MFULL2LIST(I,J,K,L))*
-c     1	     dSTRAN(IVAL)			
-c        END IF
 c        END DO
 c        END DO		
 c      END DO
@@ -85,24 +79,25 @@ c      END DO
      1     CINS(VOIGT2List(ISYS,IVAL))*
      1     DSTRAN(IVAL)	 
         END DO		
-      END DO	
+      END DO	  
+	  
 C ----------------------------------------
-      DO ISYS=1,6
-        I = VOIGT2FULL(1,ISYS)
-        J = VOIGT2FULL(2,ISYS)
-        DO ISLIPS=1,18
-        ICOR=(ISLIPS-1)*3
-        DO K=1,3
-        DO L=1,3
-          IVAL=FULL2VOIGT(K,L)
-          DStress(ISYS)=DStress(ISYS)-
-     1	     CinS(MFULL2LIST(I,J,K,L))*
-     1       (SLIP_S(K+ICOR)*SLIP_N(L+ICOR))*
-     1	     DGA(IVAL)	 
-        END DO
-        END DO		
-        END DO		
-      END DO
+c      DO ISYS=1,6
+c        I = VOIGT2FULL(1,ISYS)
+c        J = VOIGT2FULL(2,ISYS)
+c        DO ISLIPS=1,18
+c        ICOR=(ISLIPS-1)*3
+c        DO K=1,3
+c        DO L=1,3
+c          IVAL=FULL2VOIGT(K,L)
+c          DStress(ISYS)=DStress(ISYS)-
+c     1	     CinS(MFULL2LIST(I,J,K,L))*
+c     1       (SLIP_S(K+ICOR)*SLIP_N(L+ICOR))*
+c     1	     DGA(IVAL)	 
+c        END DO
+c        END DO		
+c        END DO		
+c      END DO
 	  
 
 C xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
