@@ -1,4 +1,4 @@
-      subroutine RotateSlipSystems(GammaDot,dTIME,DSTRAN, SPIN_TENSOR
+      subroutine RotateSlipSystems(GammaDot,dTIME,DSTRAN, SPIN_TENSOR,
      1 SLIP_S,SLIP_N,
      2 SLIP_SPE,SLIP_NPE,
      2 SLIP_SSE,SLIP_NSE,

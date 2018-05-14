@@ -208,7 +208,7 @@ c ------------------------------------------------
 c Rotate The Slip Systems
 
 c ---- S
-      call RotateSlipSystems(GammaDot,dTIME,DSTRAN, SPIN_TENSOR,
+c      call RotateSlipSystems(GammaDot,dTIME,DSTRAN, SPIN_TENSOR,
      1 STATEV(1:54),STATEV(55:108),
      2 STATEV(185:196),STATEV(197:208),
      2 STATEV(209:220),STATEV(221:232),
@@ -232,4 +232,4 @@ c ------------------------------------------------
       include 'GetDSTRESS2Rotate.f'	
       include 'GetDDSDDEN.f'
       include 'VectorProjections.f'
-      include 'RotateSlipSystems.f'
+c      include 'RotateSlipSystems.f'
