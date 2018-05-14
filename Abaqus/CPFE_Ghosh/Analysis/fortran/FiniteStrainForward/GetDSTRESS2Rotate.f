@@ -16,7 +16,8 @@ C Subroutine to calculate forest parallel and mobile dislocations
 
       real*8,intent(in) :: CinS(21)
       
-      real*8:: HYDROSTRAIN, DGA(18), DUM1, MIU,OHM1,OHM2
+      real*8:: HYDROSTRAIN, DGA(18), DUM1 
+      real*8:: MIU,OHM1,OHM2, ST1,ST2
       integer ISLIPS, IVAL, ISYS, I, J, K, L, ICOR
 
       Integer, PARAMETER::  FULL2VOIGT(3,3) =
@@ -83,7 +84,8 @@ c      END DO
         DO IVAL=1,6
            DStress(ISYS)=DStress(ISYS)+
      1     CINS(VOIGT2List(ISYS,IVAL))*
-     1     DSTRAN(IVAL)	 
+     1     DSTRAN(IVAL)	
+     2     - HYDROSTRAIN*STRESS(ISYS)
         END DO		
       END DO	
 C ----------------------------------------
@@ -97,16 +99,23 @@ C ----------------------------------------
           IVAL=FULL2VOIGT(K,L)
           MIU=0.5*(SLIP_S(K+ICOR)*SLIP_N(L+ICOR)+
      1	     SLIP_S(L+ICOR)*SLIP_N(K+ICOR))
+          OHM1=0.5*(SLIP_S(I+ICOR)*SLIP_N(K+ICOR)-
+     1	     SLIP_S(K+ICOR)*SLIP_N(I+ICOR))	 
+          OHM2=0.5*(SLIP_S(J+ICOR)*SLIP_N(K+ICOR)-
+     1	     SLIP_S(K+ICOR)*SLIP_N(J+ICOR))
+	     ST1=STRESS(FULL2VOIGT(J,K))
+	     ST2=STRESS(FULL2VOIGT(I,K))
 
           DStress(ISYS)=DStress(ISYS)-
-     1	     CinS(MFULL2LIST(I,J,K,L))*
-     1       (MIU)*
+     1	     (CinS(MFULL2LIST(I,J,K,L))*MIU
+     1       +OHM1*ST1+OHM2*ST2)*
      1	     DGA(ISLIPS)	 
-
+       
         END DO
         END DO		
         END DO		
       END DO
+
 	  
 
 C xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
