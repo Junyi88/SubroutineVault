@@ -17,7 +17,7 @@ c
       include 'DeclareParameterSlipsO.f'
       
       INTEGER:: ISLIPS, I, J, NDUM1, NA, NB
-      real*8 :: TAU(18), TAUPE(12), TAUSE(12), TAUCB(12), SLIP_T(18)	  
+      real*8 :: TAU(18), TAUPE(12), TAUSE(12), TAUCB(12), SLIP_T(54)	  
       real*8 :: RhoP(18),RhoF(18),RhoM(18),RhoSSD(18)
       real*8 :: TauPass(18), TauCut(18), V0(18)
       real*8 :: H(12), RhoCSD(12), TAUC(18) 
@@ -72,7 +72,7 @@ c Perform Initialisation
        END DO
 	   
        DO ISLIPS=1,18
-          STATEV(ISLIPS+108)=PROPS(NPROPS+9)
+          STATEV(ISLIPS+108)=PROPS(ISLIPS+9)
        END DO
 
 c ---- S_SCHMID
@@ -91,13 +91,13 @@ c ---- S_SCHMID
 
 c ---- N_SCHMID
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+53)*3
+        NDUM1=(ISLIPS-1)*3+54
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_N0(1:3,ISLIPS),STATEV(NA:NB))
        END DO
        DO ISLIPS=1,6
-        NDUM1=(ISLIPS+65)*3
+        NDUM1=(ISLIPS+11)*3+54
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,CUBIC_N0(1:3,ISLIPS),STATEV(NA:NB))
@@ -105,14 +105,14 @@ c ---- N_SCHMID
 	   
 c ---- S_PE
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+183)*3
+        NDUM1=(ISLIPS-1)*3+184
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_SPE0(1:3,ISLIPS),STATEV(NA:NB))
        END DO
 c ---- N_PE
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+207)*3
+        NDUM1=(ISLIPS-1)*3+196
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_NPE0(1:3,ISLIPS),STATEV(NA:NB))
@@ -120,14 +120,14 @@ c ---- N_PE
 
 c ---- S_SE
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+219)*3
+        NDUM1=(ISLIPS-1)*3+208
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_SSE0(1:3,ISLIPS),STATEV(NA:NB))
        END DO
 c ---- N_SE
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+231)*3
+        NDUM1=(ISLIPS-1)*3+220
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_NSE0(1:3,ISLIPS),STATEV(NA:NB))
@@ -135,14 +135,14 @@ c ---- N_SE
 	   
 c ---- S_CB
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+243)*3
+        NDUM1=(ISLIPS-1)*3+232
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_SCB0(1:3,ISLIPS),STATEV(NA:NB))
        END DO
 c ---- N_CB
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+255)*3
+        NDUM1=(ISLIPS-1)*3+244
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_NCB0(1:3,ISLIPS),STATEV(NA:NB))
@@ -166,7 +166,7 @@ c NOW FOR THE MAIN STUFF
         call GetRhoPFM(RhoP,RhoF,RhoM,
      1 STATEV(109:126),
      2 STATEV(55:108),SLIP_T,
-     5 Coefficient1)
+     5 PROPS(50))
 	 
         call GetTauSlips(RhoP,RhoF,RhoM,
      1 TauPass, TauCut, V0,	  
@@ -181,7 +181,7 @@ c NOW FOR THE MAIN STUFF
      2 PROPS(67:69))	 	 
 
       call GetRhoSSDEvolve(Tau, TauPass, TauCut, V0, RhoM, 
-     1 GammaDot, TauEff, SSDDot, RhoSSD, RhoF,      	   
+     1 GammaDot, TauEff, SSDDot, STATEV(109:126), RhoF,      	   
      2 PROPS(70:75))
 
       call GetDSTRESS(DStress,GammaDot,dstran,Stress,dTIME, 
@@ -195,22 +195,39 @@ c ------------------------------------------------
 c UPDATE ALL
       DO ISLIPS=1,18
        STATEV(ISLIPS+108)=STATEV(ISLIPS+108)+DTIME*SSDDot(ISLIPS)	
-       STATEV(ISLIPS+144)=STATEV(ISLIPS+144)+DTIM315E*GammaDot(ISLIPS)
+       STATEV(ISLIPS+144)=STATEV(ISLIPS+144)+DTIME*GammaDot(ISLIPS)
        STATEV(163)=STATEV(163)+DTIME*GammaDot(ISLIPS)
       END DO
       DO ISLIPS=1,6
        Stress(ISLIPS)=Stress(ISLIPS)+DStress(ISLIPS)	
       END DO
+      DO ISLIPS=1,12
+       STATEV(ISLIPS+126)=RhoCSD(ISLIPS)	
+      END DO
 c ------------------------------------------------	
 c Fill Additionals
       DO ISLIPS=1,18
        STATEV(ISLIPS+260)=GammaDot(ISLIPS)
-	   STATEV(ISLIPS+278)=Tau(ISLIPS)
-	   STATEV(ISLIPS+296)=TauPass(ISLIPS)
-	   STATEV(ISLIPS+314)=TauCut(ISLIPS)
-	   STATEV(ISLIPS+332)=TauEff(ISLIPS)
+       STATEV(ISLIPS+278)=Tau(ISLIPS)
+       STATEV(ISLIPS+296)=TauPass(ISLIPS)
+       STATEV(ISLIPS+314)=TauCut(ISLIPS)
+       STATEV(ISLIPS+332)=TauEff(ISLIPS)
+	   
+       NDUM1=(ISLIPS-1)*3
+       STATEV(ISLIPS+380)=SLIP_T(NDUM1+1)
+       STATEV(ISLIPS+398)=SLIP_T(NDUM1+2)
+       STATEV(ISLIPS+416)=SLIP_T(NDUM1+3)
+	   
+       STATEV(ISLIPS+434)=RhoP(ISLIPS)
+       STATEV(ISLIPS+452)=RhoF(ISLIPS)
+       STATEV(ISLIPS+470)=RhoM(ISLIPS)
+	   
       END DO
-	  
+      DO ISLIPS=1,12
+       STATEV(ISLIPS+344)=TAUPE(ISLIPS)
+       STATEV(ISLIPS+356)=TAUSE(ISLIPS)
+       STATEV(ISLIPS+368)=TAUCB(ISLIPS)
+      END DO
 c ------------------------------------------------		 
 c ------------------------------------------------	 
       return

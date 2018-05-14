@@ -17,7 +17,7 @@ c
       include 'DeclareParameterSlipsO.f'
       
       INTEGER:: ISLIPS, I, J, NDUM1, NA, NB
-      real*8 :: TAU(18), TAUPE(12), TAUSE(12), TAUCB(12), SLIP_T(18)	  
+      real*8 :: TAU(18), TAUPE(12), TAUSE(12), TAUCB(12), SLIP_T(54)	  
       real*8 :: RhoP(18),RhoF(18),RhoM(18),RhoSSD(18)
       real*8 :: TauPass(18), TauCut(18), V0(18)
       real*8 :: H(12), RhoCSD(12), TAUC(18) 
@@ -34,7 +34,10 @@ C
       Real*8:: FTINV(3,3),STRATE(3,3),VELGRD(3,3),AUX1(3,3),ONEMAT(3,3)
       PARAMETER (ONE=1.0D0,TWO=2.0D0,THREE=3.0D0,SIX=6.0D0)
       DATA NEWTON,TOLER/10,1.D-6/
-	  
+	
+
+c      print *, '*****************************************'
+	
       CALL ONEM(ONEMAT)     
       CALL ZEROM(FTINV)
       CALL ZEROM(AUX1)
@@ -69,7 +72,7 @@ c Perform Initialisation
        END DO
 	   
        DO ISLIPS=1,18
-          STATEV(ISLIPS+108)=PROPS(NPROPS+9)
+          STATEV(ISLIPS+108)=PROPS(ISLIPS+9)
        END DO
 
 c ---- S_SCHMID
@@ -88,13 +91,13 @@ c ---- S_SCHMID
 
 c ---- N_SCHMID
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+53)*3
+        NDUM1=(ISLIPS-1)*3+54
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_N0(1:3,ISLIPS),STATEV(NA:NB))
        END DO
        DO ISLIPS=1,6
-        NDUM1=(ISLIPS+65)*3
+        NDUM1=(ISLIPS+11)*3+54
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,CUBIC_N0(1:3,ISLIPS),STATEV(NA:NB))
@@ -102,14 +105,14 @@ c ---- N_SCHMID
 	   
 c ---- S_PE
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+183)*3
+        NDUM1=(ISLIPS-1)*3+184
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_SPE0(1:3,ISLIPS),STATEV(NA:NB))
        END DO
 c ---- N_PE
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+207)*3
+        NDUM1=(ISLIPS-1)*3+196
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_NPE0(1:3,ISLIPS),STATEV(NA:NB))
@@ -117,14 +120,14 @@ c ---- N_PE
 
 c ---- S_SE
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+219)*3
+        NDUM1=(ISLIPS-1)*3+208
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_SSE0(1:3,ISLIPS),STATEV(NA:NB))
        END DO
 c ---- N_SE
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+231)*3
+        NDUM1=(ISLIPS-1)*3+220
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_NSE0(1:3,ISLIPS),STATEV(NA:NB))
@@ -132,14 +135,14 @@ c ---- N_SE
 	   
 c ---- S_CB
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+243)*3
+        NDUM1=(ISLIPS-1)*3+232
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_SCB0(1:3,ISLIPS),STATEV(NA:NB))
        END DO
 c ---- N_CB
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS+255)*3
+        NDUM1=(ISLIPS-1)*3+244
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_NCB0(1:3,ISLIPS),STATEV(NA:NB))
@@ -163,7 +166,7 @@ c NOW FOR THE MAIN STUFF
         call GetRhoPFM(RhoP,RhoF,RhoM,
      1 STATEV(109:126),
      2 STATEV(55:108),SLIP_T,
-     5 Coefficient1)
+     5 PROPS(50))
 	 
         call GetTauSlips(RhoP,RhoF,RhoM,
      1 TauPass, TauCut, V0,	  
@@ -178,14 +181,9 @@ c NOW FOR THE MAIN STUFF
      2 PROPS(67:69))	 	 
 
       call GetRhoSSDEvolve(Tau, TauPass, TauCut, V0, RhoM, 
-     1 GammaDot, TauEff, SSDDot, RhoSSD, RhoF,      	   
+     1 GammaDot, TauEff, SSDDot, STATEV(109:126), RhoF,      	   
      2 PROPS(70:75))
 
-c      DO ISLIPS=1,18
-c       GammaDot(ISLIPS)=0.0
-c      END DO	 
-
-	 
       call GetDSTRESS(DStress,GammaDot,dstran,Stress,dTIME, 
      1 STATEV(1:54),STATEV(55:108),   
      2 PROPS(28:48))
@@ -203,7 +201,12 @@ c UPDATE ALL
       DO ISLIPS=1,6
        Stress(ISLIPS)=Stress(ISLIPS)+DStress(ISLIPS)	
       END DO
-	  
+      DO ISLIPS=1,12
+       STATEV(ISLIPS+126)=RhoCSD(ISLIPS)	
+      END DO
+c ------------------------------------------------	
+
+
 c ------------------------------------------------		 
 c ------------------------------------------------	 
       return
@@ -217,6 +220,6 @@ c ------------------------------------------------
       include 'GetCSDHTauC.f' 
       include 'GetGammaDot.f'
       include 'GetRhoSSDEvolve.f'
-      include 'GetDSTRESS2N.f'	
+      include 'GetDSTRESS2.f'	
       include 'GetDDSDDEN.f'
       include 'VectorProjections.f'

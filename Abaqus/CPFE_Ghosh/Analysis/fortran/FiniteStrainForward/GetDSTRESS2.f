@@ -95,10 +95,17 @@ C ----------------------------------------
         DO K=1,3
         DO L=1,3
           IVAL=FULL2VOIGT(K,L)
+           IF (K.EQ.L) THEN
           DStress(ISYS)=DStress(ISYS)-
      1	     CinS(MFULL2LIST(I,J,K,L))*
      1       (SLIP_S(K+ICOR)*SLIP_N(L+ICOR))*
-     1	     DGA(IVAL)	 
+     1	     DGA(ISLIPS)	 
+        ELSE
+          DStress(ISYS)=DStress(ISYS)-0.5*
+     1	     CinS(MFULL2LIST(I,J,K,L))*
+     1       (SLIP_S(K+ICOR)*SLIP_N(L+ICOR))*
+     1	     DGA(ISLIPS)	 		
+        END IF
         END DO
         END DO		
         END DO		
