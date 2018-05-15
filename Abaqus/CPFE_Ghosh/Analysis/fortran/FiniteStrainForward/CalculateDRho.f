@@ -46,6 +46,7 @@ c-------------------------
         END DO
         END DO
 c-----------		
+c-----------		
        call MutexLock( 1 )      ! lock Mutex #1 
       DO i=1,3                                                      
           kFp(noel,npt,i)= SVARS(I)
@@ -61,9 +62,8 @@ c-----------
                  SVARSFULL(i + 6*(kint-1)) = kFp(noel,kint,i)         
              END DO
          END DO
-c-------------------------	 		
-		
-        call VectorCurl(SVARSFULL,xnat8,gauss,gausscoords) 
+c-------------------------	 
+       call VectorCurl(SVARSFULL,xnat8,gauss,gausscoords) 
 c---------------
       call MutexLock( 3 )      ! lock Mutex #1 
       DO kint =1, 8
@@ -74,25 +74,29 @@ c---------------
       call MutexUnlock( 3 )      ! lock Mutex #1 
       DO i=1,3
           svars(I+3) = kcurlfp(noel,npt,i)
-      END DO	  
-
-c-------------
+      END DO		  
+c---------------	  
+	  
         DO I=1,3
 		CURLCOM(ICOR+I)=svars(I+3)
         END DO
-
-		      
+	  
+	  
+	  
+c---------------
       END DO
+c-------------------------	 		
 c-------------------------	  
       DO ISLIPS=1,18
 	    ICOR=(ISLIPS-1)*3
         DO I=1,3
-         dRhoS(ICOR)=dRhoS(ICOR)+CURLCOM(ICOR+I)*SLIP_S(ICOR+I)*BurgersI
-		 dRhoET(ICOR)=dRhoET(ICOR)+CURLCOM(ICOR+I)*SLIP_T(ICOR+I)*BurgersI
-		 dRhoEN(ICOR)=dRhoEN(ICOR)+CURLCOM(ICOR+I)*SLIP_N(ICOR+I)*BurgersI
+         dRhoS(ISLIPS)=dRhoS(ISLIPS)+CURLCOM(ICOR+I)*SLIP_S(ICOR+I)*BurgersI
+		 dRhoET(ISLIPS)=dRhoET(ISLIPS)+CURLCOM(ICOR+I)*SLIP_T(ICOR+I)*BurgersI
+		 dRhoEN(ISLIPS)=dRhoEN(ISLIPS)+CURLCOM(ICOR+I)*SLIP_N(ICOR+I)*BurgersI
         END DO
     
-      END DO	  
+      END DO			
+ 
 	  
 	  
       return

@@ -2,7 +2,7 @@
      1 dRhoS,dRhoET,dRhoEN,Burgers,gausscoords,noel,npt)
 	  
       real*8,intent(in) :: dTIME, BURGERS 
-      real*8,intent(in) :: GammaDot(18)
+      real*8,intent(in) :: GammaDot(18),FP(9)
       real*8,intent(in) :: SLIP_S(54),SLIP_N(54),SLIP_T(54)	  
       real*8,intent(out) :: dRhoS(18),dRhoET(18),dRhoEN(18)
 	  integer, intent(in) :: noel, npt
@@ -42,7 +42,7 @@ c-------------------------
 		
         DO I=1,3
         DO J=1,3
-		SVARS(I)=SVARS(I)+DGA(ISLIPS)*FP(3*(I-1)+J)*SLIPN(ICOR+J)
+		SVARS(I)=SVARS(I)+DGA(ISLIPS)*FP(3*(I-1)+J)*SLIP_N(ICOR+J)
         END DO
         END DO
 c-----------		
@@ -63,7 +63,7 @@ c-----------
          END DO
 c-------------------------	 		
 		
-        call VectorCurl(svars,xnat8,gauss,gausscoords) 
+        call VectorCurl(SVARSFULL,xnat8,gauss,gausscoords) 
 c---------------
       call MutexLock( 3 )      ! lock Mutex #1 
       DO kint =1, 8
