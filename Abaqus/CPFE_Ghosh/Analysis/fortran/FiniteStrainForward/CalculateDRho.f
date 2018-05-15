@@ -63,7 +63,7 @@ c-----------
          END DO
 c-------------------------	 		
 		
-        call VectorCurl(svars,xnat8,gauss,gausscoords) 
+        call VectorCurl(SVARSFULL,xnat8,gauss,gausscoords) 
 c---------------
       call MutexLock( 3 )      ! lock Mutex #1 
       DO kint =1, 8

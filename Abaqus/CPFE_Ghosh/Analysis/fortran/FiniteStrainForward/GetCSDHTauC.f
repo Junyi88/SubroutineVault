@@ -9,7 +9,7 @@ C Subroutine to calculate forest parallel and mobile dislocations
       real*8 :: TAUPE(12),TAUSE(12),TAUCB(12)
       real*8,intent(out) ::  H(12), RhoCSD(12), TAUC(18)
 
-      real*8,intent(in) :: CinS(11)
+      real*8,intent(in) :: CinS(13)
       real*8 :: DUM1
       integer ISLIPS
 

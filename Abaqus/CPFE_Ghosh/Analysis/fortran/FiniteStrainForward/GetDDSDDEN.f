@@ -8,7 +8,7 @@ C Subroutine to calculate forest parallel and mobile dislocations
 
       real*8,intent(in) :: Stress(6)
       real*8,intent(inout) :: DDSDDE(6,6)
-      real*8:: CinS(3)
+      real*8:: CinS(21)
  	  
 C ------------------------------------------------------	
       DDSDDE(1,1)=CINS(1)

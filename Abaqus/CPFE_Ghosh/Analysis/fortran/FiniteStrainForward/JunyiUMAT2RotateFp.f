@@ -116,7 +116,7 @@ c ---- S_PE
        END DO
 c ---- N_PE
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS-1)*3+196
+        NDUM1=(ISLIPS-1)*3+220
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_NPE0(1:3,ISLIPS),STATEV(NA:NB))
@@ -124,14 +124,14 @@ c ---- N_PE
 
 c ---- S_SE
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS-1)*3+208
+        NDUM1=(ISLIPS-1)*3+256
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_SSE0(1:3,ISLIPS),STATEV(NA:NB))
        END DO
 c ---- N_SE
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS-1)*3+220
+        NDUM1=(ISLIPS-1)*3+292
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_NSE0(1:3,ISLIPS),STATEV(NA:NB))
@@ -139,14 +139,14 @@ c ---- N_SE
 	   
 c ---- S_CB
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS-1)*3+232
+        NDUM1=(ISLIPS-1)*3+328
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_SCB0(1:3,ISLIPS),STATEV(NA:NB))
        END DO
 c ---- N_CB
        DO ISLIPS=1,12
-        NDUM1=(ISLIPS-1)*3+244
+        NDUM1=(ISLIPS-1)*3+364
         NA=NDUM1+1
         NB=NDUM1+3		        
         call ROTATE_Vec(ORI_ROT,FCC_NCB0(1:3,ISLIPS),STATEV(NA:NB))
@@ -155,21 +155,21 @@ c ---- Rotate STIFFNESS TENSOR
         call ROTATE_COMTEN(ORI_ROT,PROPS(28:48),STATEV(164:184))
 
 c--- Do Stuff
-       STATEV(257)=1.0
-       STATEV(261)=1.0
-       STATEV(265)=1.0
+       STATEV(401)=1.0
+       STATEV(405)=1.0
+       STATEV(409)=1.0
 
 c XDANGER
-       DO ISLIPS=1,12
-        STATEV(265+ISLIPS)=1.0e5
-        STATEV(283+ISLIPS)=1.0e5
-        STATEV(301+ISLIPS)=1.0e5    
+       DO ISLIPS=1,18
+        STATEV(409+ISLIPS)=1.0e5
+        STATEV(429+ISLIPS)=1.0e5
+        STATEV(447+ISLIPS)=1.0e5    
        END DO	 
-       DO ISLIPS=1,6
-        STATEV(271+ISLIPS)=0.0
-        STATEV(289+ISLIPS)=0.0
-        STATEV(307+ISLIPS)=0.0   
-       END DO	
+c      DO ISLIPS=1,6
+c        STATEV(271+ISLIPS)=0.0
+c        STATEV(289+ISLIPS)=0.0
+c        STATEV(307+ISLIPS)=0.0   
+c       END DO	
 	   
       call MutexLock( 2 )      ! lock Mutex #2      
       ! use original co-ordinates X     
@@ -187,14 +187,14 @@ c ------------------------------------------------
 c NOW FOR THE MAIN STUFF
         call CalculateTauS(STRESS, TAU, TAUPE, TAUSE, TAUCB,
      +  STATEV(1:54), STATEV(55:108),
-     +  STATEV(185:196), STATEV(197:208),
-     +  STATEV(209:220), STATEV(221:232),
-     +  STATEV(233:244), STATEV(245:256))	
+     +  STATEV(185:220), STATEV(221:256),
+     +  STATEV(257:292), STATEV(293:328),
+     +  STATEV(329:364), STATEV(365:400))	
 
        call GetRhoPFMGND(RhoP,RhoF,RhoM,
      1 STATEV(109:126),
      2 STATEV(1:54),STATEV(55:108),SLIP_T,
-     2 RhoS,RhoET,RhoEN,
+     2 STATEV(410:429),STATEV(430:447),STATEV(448:465),
      5 PROPS(50))
 	 
         call GetTauSlips(RhoP,RhoF,RhoM,
@@ -239,11 +239,9 @@ c Rotate The Slip Systems
 c ---- S
       call RotateSlipSystems(GammaDot,dTIME,DSTRAN, SPIN_TENSOR,
      1 STATEV(1:54),STATEV(55:108),
-     2 STATEV(185:196),STATEV(197:208),
-     2 STATEV(209:220),STATEV(221:232),
-     2 STATEV(233:244),STATEV(245:256))
-
-
+     +  STATEV(185:220), STATEV(221:256),
+     +  STATEV(257:292), STATEV(293:328),
+     +  STATEV(329:364), STATEV(365:400))
 
 c ------------------------------------------------	
          DO kint =1,8 
@@ -252,18 +250,18 @@ c ------------------------------------------------
              END DO 
          END DO
 
-      call CalculateDRho(STATEV(257:265),dtime,
-     1 gammadot,STATEV(1:54),STATEV(55:108),STATEV(109:126),
+      call CalculateDRho(STATEV(401:409),dtime,
+     1 gammadot,STATEV(1:54),STATEV(55:108),SLIP_T,
      1 dRhoS,dRhoET,dRhoEN,PROPS(69),gausscoords,noel,npt)
 		 
          DO ISLIPS=1,9
-		     STATEV(256+ISLIPS)=STATEV(256+ISLIPS)+dFP(ISLIPS)
+		     STATEV(400+ISLIPS)=STATEV(400+ISLIPS)+dFP(ISLIPS)
          END DO		 
 
          DO ISLIPS=1,18
-		   STATEV(265+ISLIPS)=STATEV(265+ISLIPS)+dRhoS(ISLIPS)
-		   STATEV(283+ISLIPS)=STATEV(283+ISLIPS)+dRhoET(ISLIPS)
-		   STATEV(301+ISLIPS)=STATEV(301+ISLIPS)+dRhoEN(ISLIPS)		   
+		   STATEV(409+ISLIPS)=STATEV(409+ISLIPS)+dRhoS(ISLIPS)
+		   STATEV(429+ISLIPS)=STATEV(429+ISLIPS)+dRhoET(ISLIPS)
+		   STATEV(447+ISLIPS)=STATEV(447+ISLIPS)+dRhoEN(ISLIPS)		   
          END DO		
 		 
 c ------------------------------------------------	 

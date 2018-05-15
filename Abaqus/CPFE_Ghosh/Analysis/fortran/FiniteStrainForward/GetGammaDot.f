@@ -11,7 +11,7 @@ C Subroutine to calculate forest parallel and mobile dislocations
       real*8,intent(out) :: Vs(18), GammaDot(18), TauEff(18)
 
       real*8,intent(in) :: CinS(3)
-
+      real*8,PARAMETER :: ONNE=1.0
       integer ISLIPS
 
 C ------------------------------------------------------	
@@ -32,7 +32,7 @@ C ------------------------------------------------------
        IF (TauEff(ISLIPS).GE.TauC(ISLIPS)) THEN
        Vs(ISLIPS)=V0(ISLIPS)*CINS(1)*
      1	SINH((TauEff(ISLIPS)/TauCut(ISLIPS))**CINS(2))*
-     1	SIGN(1.0,TAU(ISLIPS))
+     1	SIGN(ONNE,TAU(ISLIPS))
 	 
        GAMMADOT(ISLIPS)=RhoM(ISLIPS)*CINS(3)*Vs(ISLIPS)
        END IF
