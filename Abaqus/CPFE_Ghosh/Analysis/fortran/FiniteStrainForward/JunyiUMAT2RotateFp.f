@@ -31,14 +31,16 @@ C
 C     CALCULATE VELOCITY GRADIENT FROM DEFORMATION GRADIENT.
 C     REFERENCE: Li & al. Acta Mater. 52 (2004) 4859-4875
 C     
+      integer, parameter :: TOTALELEMENTNUM=1000
       Real*8:: FTINV(3,3),STRATE(3,3),VELGRD(3,3),AUX1(3,3),ONEMAT(3,3)
       PARAMETER (ONE=1.0D0,TWO=2.0D0,THREE=3.0D0,SIX=6.0D0)
       DATA NEWTON,TOLER/10,1.D-6/
       Real*8:: gausscoords(3,8)
-	  real*8 :: kgausscoords, kFp, kcurlFp
+      real*8 :: kgausscoords, kFp, kcurlFp
 c XDANGER
-      COMMON/UMPS/kgausscoords(1,8,3),kFp(1,8, 3),
-     1 kcurlFp(1, 8, 3)
+      COMMON/UMPS/kgausscoords(TOTALELEMENTNUM,8,3),
+     1 kFp(TOTALELEMENTNUM,8, 3),
+     1 kcurlFp(TOTALELEMENTNUM, 8, 3)
 	  
 c      print *, '*****************************************'
 	
@@ -194,7 +196,7 @@ c NOW FOR THE MAIN STUFF
        call GetRhoPFMGND(RhoP,RhoF,RhoM,
      1 STATEV(109:126),
      2 STATEV(1:54),STATEV(55:108),SLIP_T,
-     2 STATEV(410:429),STATEV(430:447),STATEV(448:465),
+     2 STATEV(410:427),STATEV(430:447),STATEV(448:465),
      5 PROPS(50))
 	 
         call GetTauSlips(RhoP,RhoF,RhoM,
@@ -214,7 +216,7 @@ c NOW FOR THE MAIN STUFF
      2 PROPS(70:75))
 
       call GetDSTRESSFP(DStress,GammaDot,dstran,Stress,dTIME, 
-     1 STATEV(1:54),STATEV(55:108), dFP,
+     1 STATEV(1:54),STATEV(55:108), dFP, STATEV(401:409),
      2 PROPS(28:48))
 
       call GetDDSDDE(DDSDDE,Stress,	   

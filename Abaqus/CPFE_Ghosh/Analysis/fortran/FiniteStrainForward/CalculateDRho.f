@@ -11,16 +11,21 @@
       integer ISLIPS, IVAL, ISYS, I, J, K, L, ICOR
       real*8 :: BurgersI
       real*8 :: gausscoords(3,8)
-	 
+
+      integer, parameter :: TOTALELEMENTNUM=1000
+
       real*8:: xnat8(8,3),xnat(20,3),gauss(8,3)
-	  real*8 :: kgausscoords, kFp, kcurlFp
+      real*8 :: kgausscoords, kFp, kcurlFp
 c XDANGER
-      COMMON/UMPS/kgausscoords(1,8,3),kFp(1,8, 3),
-     1 kcurlFp(1, 8, 3)	  	  
+      COMMON/UMPS/kgausscoords(TOTALELEMENTNUM,8,3),
+     1 kFp(TOTALELEMENTNUM,8, 3),
+     1 kcurlFp(TOTALELEMENTNUM, 8, 3)	  
 	  
       INCLUDE 'kgauss.f'     	  
       xnat8 = xnat(1:8,:) 
       
+
+	  
 	  BurgersI=1.0/Burgers
 c-------------------------
       DO ISLIPS=1,18

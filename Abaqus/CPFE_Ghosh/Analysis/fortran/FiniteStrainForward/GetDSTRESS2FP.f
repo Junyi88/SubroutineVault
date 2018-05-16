@@ -1,5 +1,5 @@
       subroutine GetDSTRESSFP(DStress,GammaDot,DStran,Stress,dTIME, 
-     1 SLIP_S,SLIP_N, dFP,	   
+     1 SLIP_S,SLIP_N, dFP, FP,	   
      2 CinS)
 
 C Subroutine to calculate forest parallel and mobile dislocations
@@ -12,7 +12,7 @@ C Subroutine to calculate forest parallel and mobile dislocations
       real*8,intent(in) :: GammaDot(18),DStran(6),Stress(6)
       real*8,intent(in) :: SLIP_S(54),SLIP_N(54)
 
-      real*8,intent(out) :: DStress(6),dFP(9)
+      real*8,intent(out) :: DStress(6),dFP(9),FP(9)
 
       real*8,intent(in) :: CinS(21)
       
@@ -84,7 +84,7 @@ c        END DO
 c      END DO
 	  
       DO ISYS=1,6
-        DStress(ISYS)=0.0
+        DStress(ISYS)=-STRESS(ISYS)*HYDROSTRAIN
         DO IVAL=1,6
            DStress(ISYS)=DStress(ISYS)+
      1     CINS(VOIGT2List(ISYS,IVAL))*
@@ -118,7 +118,8 @@ c--------------------------------------
         DO I=1,3
         DO J=1,3
         IVAL=3*(J-1)+I
-        DFP(IVAL)=DFP(IVAL)+SLIP_S(I+ICOR)*SLIP_N(J+ICOR)*DGA(ISLIPS)
+        DFP(IVAL)=DFP(IVAL)+SLIP_S(I+ICOR)*SLIP_N(J+ICOR)*
+     1   DGA(ISLIPS)*FP(IVAL)
         END DO
         END DO		  
 	        
