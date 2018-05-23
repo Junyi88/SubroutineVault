@@ -9,7 +9,7 @@ C ******************************************************************************
        INCLUDE 'ABA_PARAM.INC'
 
       integer, parameter:: K=3,M=3,N=8,nnodes=8
-      real*8,parameter  :: zero=1.0e-6,xgauss = 0.577350269189626
+      real*8,parameter  :: zero=1.0e-8,xgauss = 0.577350269189626
 
       !scalars
       integer,intent(in) :: nsvars,knsdv

@@ -45,8 +45,8 @@ C
       real*8 :: kgausscoords, kFp, kcurlFp
 c XDANGER
       COMMON/UMPS/kgausscoords(TOTALELEMENTNUM,8,3),
-     1 kFp(TOTALELEMENTNUM,8, 3),
-     1 kcurlFp(TOTALELEMENTNUM, 8, 3)
+     1 kFp(TOTALELEMENTNUM,8, 9),
+     1 kcurlFp(TOTALELEMENTNUM, 8, 9)
 	  
 c      print *, '*****************************************'
 	
@@ -256,20 +256,13 @@ c     +  STATEV(257:292), STATEV(293:328),
 c     +  STATEV(329:364), STATEV(365:400))
 
 c ------------------------------------------------	
-         DO kint =1,8 
-             DO i=1,3         
-                 gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
-             END DO 
-         END DO
-
-		 
          DO ISLIPS=1,9
 		     STATEV(400+ISLIPS)=STATEV(400+ISLIPS)+dFP(ISLIPS)
          END DO		 
 c-----------------------------------------
       INCLUDE 'kgauss.f'     
       xnat8 = xnat(1:8,:) 	
-
+c
       call MutexLock( 1 )      ! lock Mutex #1 
       DO i=1,9                                                      
           kFp(noel,npt,i)= statev(400+i)
@@ -283,7 +276,7 @@ c-----------------------------------------
              END DO
          
              DO i=1,9          
-                 svars(i + 6*(kint-1)) = kFp(noel,kint,i)         
+                 svars(i + 18*(kint-1)) = kFp(noel,kint,i)         
              END DO
          END DO	 
       CALL kcurl(nsvars,svars,knsdv,xnat8,gauss,gausscoords)		 
@@ -297,17 +290,21 @@ c-----------------------------------------
       call MutexUnlock( 3 )      ! lock Mutex #1 
 	  
       DO i=1,9
-          statev(517+i) = kcurlfp(noel,npt,i)
+          statev(519+i) = kcurlfp(noel,npt,i)
       END DO
 	  
-c      call GetGNDs(statev(517:528),PROPS(69),STATEV(1:54),
-c     1 STATEV(55:108),SLIP_T,
-c     1 dRhoS,dRhoET,dRhoEN)	  
+      call GetGNDs(statev(520:528),PROPS(69),STATEV(1:54),
+     1 STATEV(55:108),SLIP_T,
+     1 dRhoS,dRhoET,dRhoEN)	  
 c-------------------------------------------------------	
          DO ISLIPS=1,18
 		     STATEV(409+ISLIPS)=STATEV(465+ISLIPS)+dRhoS(ISLIPS)
 		     STATEV(429+ISLIPS)=STATEV(483+ISLIPS)+dRhoET(ISLIPS)
-		     STATEV(447+ISLIPS)=STATEV(501+ISLIPS)+dRhoEN(ISLIPS)				 
+		     STATEV(447+ISLIPS)=STATEV(501+ISLIPS)+dRhoEN(ISLIPS)			
+
+		     STATEV(528+ISLIPS)=dRhoS(ISLIPS)
+		     STATEV(546+ISLIPS)=dRhoET(ISLIPS)
+		     STATEV(564+ISLIPS)=dRhoEN(ISLIPS)				 
          END DO		
 c-------------------------------------------------------
 
