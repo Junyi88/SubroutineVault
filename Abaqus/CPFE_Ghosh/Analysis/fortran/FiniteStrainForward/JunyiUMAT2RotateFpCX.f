@@ -32,8 +32,6 @@ C
 C     CALCULATE VELOCITY GRADIENT FROM DEFORMATION GRADIENT.
 C     REFERENCE: Li & al. Acta Mater. 52 (2004) 4859-4875
 C     
-      real*8,parameter  :: zero=1.0e-16,xgauss = 0.577350269189626
-      real*8,parameter  :: xweight = 1.0
       integer, parameter :: TOTALELEMENTNUM=1000
       Real*8:: FTINV(3,3),STRATE(3,3),VELGRD(3,3),AUX1(3,3),ONEMAT(3,3)
       PARAMETER (ONE=1.0D0,TWO=2.0D0,THREE=3.0D0,SIX=6.0D0)
@@ -166,9 +164,9 @@ c--- Do Stuff
 
 c XDANGER
        DO ISLIPS=1,18
-        STATEV(409+ISLIPS)=1.0e9
-        STATEV(429+ISLIPS)=1.0e9
-        STATEV(447+ISLIPS)=1.0e9    
+        STATEV(409+ISLIPS)=1.0e5
+        STATEV(429+ISLIPS)=1.0e5
+        STATEV(447+ISLIPS)=1.0e5    
        END DO	 
 c      DO ISLIPS=1,6
 c        STATEV(271+ISLIPS)=0.0
@@ -255,48 +253,25 @@ c ------------------------------------------------
              END DO 
          END DO
 
-c      call CalculateDRho(STATEV(401:409),dtime,
-c     1 gammadot,STATEV(1:54),STATEV(55:108),SLIP_T,
-c     1 dRhoS,dRhoET,dRhoEN,PROPS(69),gausscoords,noel,npt)
+      call CalculateDRho(STATEV(401:409),dtime,
+     1 gammadot,STATEV(1:54),STATEV(55:108),SLIP_T,
+     1 dRhoS,dRhoET,dRhoEN,PROPS(69),gausscoords,noel,npt)
 
-      call CalculateDRhoDBG(STATEV(401:409),
-     1 dtime,
-     1  gammadot,STATEV(1:54),STATEV(55:108), 
-     1 SLIP_T,
-     1  dRhoS,dRhoET,dRhoEN,PROPS(69),gausscoords,
-     1  noel,npt,
-     1  STATEV(471:621))
 	 
          DO ISLIPS=1,9
 		     STATEV(400+ISLIPS)=STATEV(400+ISLIPS)+dFP(ISLIPS)
          END DO		 
 
-         DO ISLIPS=1,6
+         DO ISLIPS=1,18
 		     STATEV(409+ISLIPS)=STATEV(409+ISLIPS)+dRhoS(ISLIPS)
 		     STATEV(429+ISLIPS)=STATEV(429+ISLIPS)+dRhoET(ISLIPS)
-		     STATEV(447+ISLIPS)=STATEV(447+ISLIPS)+dRhoEN(ISLIPS)		
-
-		     IF (STATEV(409+ISLIPS).LE.0.0) THEN
-		        STATEV(409+ISLIPS)=0.0
-		     ENDIF
-		     IF (STATEV(429+ISLIPS).LE.0.0) THEN
-		        STATEV(429+ISLIPS)=0.0
-		     ENDIF
-		     IF (STATEV(447+ISLIPS).LE.0.0) THEN
-		        STATEV(447+ISLIPS)=0.0
-		     ENDIF			 
-			 
-		     STATEV(621+ISLIPS)=dRhoS(ISLIPS)
-		     STATEV(627+ISLIPS)=dRhoET(ISLIPS)
-		     STATEV(633+ISLIPS)=dRhoEN(ISLIPS)				 
+		     STATEV(447+ISLIPS)=STATEV(447+ISLIPS)+dRhoEN(ISLIPS)		   
          END DO		
-         DO ISLIPS=1,54
-		     STATEV(525+ISLIPS)=SLIP_T(ISLIPS)			 
-         END DO	
+
 c  -----------------------------------
       DO ISLIPS=1,6
-       IF ((ABS(DStress(ISLIPS)).GT.5.0e7)) THEN
-         PNEWDT=0.5
+       IF (ABS(DStress(ISLIPS)).GT.1.0e7) THEN
+         PNEWDT=0.25
        END IF	   
       END DO		 
 c ------------------------------------------------	 
@@ -317,7 +292,6 @@ c ------------------------------------------------
       include 'RotateSlipSystems.f'
 	  
       include 'VectorCurl.f'	  	  
-      include 'CalculateDRhoDBG.f'	  
+      include 'CalculateDRho.f'	  
       include 'kshapes.f'
       include 'utils.f'
-      include 'uexternaldb.f'

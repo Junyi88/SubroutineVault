@@ -61,19 +61,22 @@ C
 C     SET UP JACOBIAN           
 C  
       xj = matmul(gausscoords,dndloc)
-!      write(6,*)"xj"
-!      write(6,*)xj
-!      write(6,*)"xj"
-!      write(6,*)xj
+c      write(6,*)"---------------------------"
+c      write(6,*)"gausscoords"
+c      write(6,*)gausscoords
+c      write(6,*)"xj"
+c      write(6,*)xj
+
 C
 C    AND ITS INVERSE
 C
       call KDETER(xj,det)
-      
+c      write(6,*)"DET0=",abs(det)      
 !      write(6,*)"kint2,det",kint2,det
       
-      if (abs(det) <= 1.0e-6 .or. det /= det) then !last part true if det=NaN
+      if (abs(det) <= zero .or. det /= det) then !last part true if det=NaN
          dmout = 0.0
+         
       else  
          call lapinverse(xj,3,info,xjinv)
 !         if(info /= 0) write(6,*) "inverse failure: xj in kcurl"
