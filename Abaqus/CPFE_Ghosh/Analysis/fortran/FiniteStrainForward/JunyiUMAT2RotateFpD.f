@@ -271,7 +271,7 @@ c     1 dRhoS,dRhoET,dRhoEN,PROPS(69),gausscoords,noel,npt)
 		     STATEV(400+ISLIPS)=STATEV(400+ISLIPS)+dFP(ISLIPS)
          END DO		 
 
-         DO ISLIPS=1,18
+         DO ISLIPS=1,6
 		     STATEV(409+ISLIPS)=STATEV(409+ISLIPS)+dRhoS(ISLIPS)
 		     STATEV(429+ISLIPS)=STATEV(429+ISLIPS)+dRhoET(ISLIPS)
 		     STATEV(447+ISLIPS)=STATEV(447+ISLIPS)+dRhoEN(ISLIPS)		
@@ -286,7 +286,9 @@ c     1 dRhoS,dRhoET,dRhoEN,PROPS(69),gausscoords,noel,npt)
 		        STATEV(447+ISLIPS)=0.0
 		     ENDIF			 
 			 
-			 
+		     STATEV(621+ISLIPS)=dRhoS(ISLIPS)
+		     STATEV(627+ISLIPS)=dRhoET(ISLIPS)
+		     STATEV(633+ISLIPS)=dRhoEN(ISLIPS)				 
          END DO		
          DO ISLIPS=1,54
 		     STATEV(525+ISLIPS)=SLIP_T(ISLIPS)			 

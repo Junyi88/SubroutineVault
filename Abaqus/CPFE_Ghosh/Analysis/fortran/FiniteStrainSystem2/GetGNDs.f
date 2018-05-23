@@ -48,6 +48,7 @@ c        rhoGND = 0. !;gndab  = 0.;gndapr = 0.;gndapy = 0.
             ICOREND=I*3	
             burgX = SLIP_S(ICORStart:ICOREND)!slip direction
             burgX = burgX*burger       
+			burgX = burgX
             sslip = SLIP_S(ICORStart:ICOREND)
             nnorm = SLIP_N(ICORStart:ICOREND)
             tnorm = SLIP_T(ICORStart:ICOREND)      

@@ -298,13 +298,13 @@ c
      1 dRhoS,dRhoET,dRhoEN)	  
 c-------------------------------------------------------	
          DO ISLIPS=1,18
-		     STATEV(409+ISLIPS)=STATEV(465+ISLIPS)+dRhoS(ISLIPS)
-		     STATEV(429+ISLIPS)=STATEV(483+ISLIPS)+dRhoET(ISLIPS)
-		     STATEV(447+ISLIPS)=STATEV(501+ISLIPS)+dRhoEN(ISLIPS)			
+		     STATEV(409+ISLIPS)=STATEV(465+ISLIPS)+abs(dRhoS(ISLIPS))
+		     STATEV(429+ISLIPS)=STATEV(483+ISLIPS)+abs(dRhoET(ISLIPS))
+		     STATEV(447+ISLIPS)=STATEV(501+ISLIPS)+abs(dRhoEN(ISLIPS))		
 
-		     STATEV(528+ISLIPS)=dRhoS(ISLIPS)
-		     STATEV(546+ISLIPS)=dRhoET(ISLIPS)
-		     STATEV(564+ISLIPS)=dRhoEN(ISLIPS)				 
+		     STATEV(528+ISLIPS)=abs(dRhoS(ISLIPS))
+		     STATEV(546+ISLIPS)=abs(dRhoET(ISLIPS))
+		     STATEV(564+ISLIPS)=abs(dRhoEN(ISLIPS))				 
          END DO		
 c-------------------------------------------------------
 

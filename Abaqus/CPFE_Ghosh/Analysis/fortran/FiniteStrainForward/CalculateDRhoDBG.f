@@ -9,7 +9,7 @@
       real*8,intent(in) :: SLIP_S(54),SLIP_N(54)
       real*8,intent(in) ::  SLIP_T(54)	  
       real*8,intent(out) :: dRhoS(18),dRhoET(18),dRhoEN(18)
-	  integer, intent(in) :: noel, npt
+      integer, intent(in) :: noel, npt
       real*8,intent(out) :: DBGOUT(150)
 	  
       real*8 :: CURLCOM(54), SVARS(6), DGA(18),SVARSFULL(48)
