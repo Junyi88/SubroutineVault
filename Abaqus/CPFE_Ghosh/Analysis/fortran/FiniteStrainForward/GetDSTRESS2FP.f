@@ -84,7 +84,7 @@ c        END DO
 c      END DO
 	  
       DO ISYS=1,6
-        DStress(ISYS)=-STRESS(ISYS)*HYDROSTRAIN
+c        DStress(ISYS)=-STRESS(ISYS)*HYDROSTRAIN
         DO IVAL=1,6
            DStress(ISYS)=DStress(ISYS)+
      1     CINS(VOIGT2List(ISYS,IVAL))*
