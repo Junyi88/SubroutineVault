@@ -375,7 +375,7 @@ c  -----------------------------------
       END DO		
 
       DO ISLIPS=1,18
-       IF ((ABS(DGA(ISLIPS)).LT.1.0e-3)) THEN
+       IF ((ABS(DGA(ISLIPS)).LT.1.0e-5)) THEN
        ELSE
          PNEWDT=0.5
        END IF	   

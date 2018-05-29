@@ -10,9 +10,9 @@ C Subroutine to calculate forest parallel and mobile dislocations
 	 
       real*8,intent(in) :: dTIME 
       real*8,intent(in) :: GammaDot(18),DStran(6),Stress(6)
-      real*8,intent(in) :: SLIP_S(54),SLIP_N(54),FP(9)
+      real*8,intent(in) :: SLIP_S(54),SLIP_N(54)
 
-      real*8,intent(out) :: DStress(6),dFP(9)
+      real*8,intent(out) :: DStress(6),dFP(9),FP(9)
 
       real*8,intent(in) :: CinS(21)
       
@@ -92,33 +92,33 @@ c        DStress(ISYS)=-STRESS(ISYS)*HYDROSTRAIN
         END DO		
       END DO	
 C ----------------------------------------
-      DO ISYS=1,6
-        I = VOIGT2FULL(1,ISYS)
-        J = VOIGT2FULL(2,ISYS)
-        DO ISLIPS=1,18
-        ICOR=(ISLIPS-1)*3
-        DO K=1,3
-        DO L=1,3
-          IVAL=FULL2VOIGT(K,L)
-          MIU=0.5*(SLIP_S(K+ICOR)*SLIP_N(L+ICOR)+
-     1	     SLIP_S(L+ICOR)*SLIP_N(K+ICOR))
+c      DO ISYS=1,6
+c        I = VOIGT2FULL(1,ISYS)
+c        J = VOIGT2FULL(2,ISYS)
+c        DO ISLIPS=1,18
+c        ICOR=(ISLIPS-1)*3
+c        DO K=1,3
+c        DO L=1,3
+c          IVAL=FULL2VOIGT(K,L)
+c          MIU=0.5*(SLIP_S(K+ICOR)*SLIP_N(L+ICOR)+
+c     1	     SLIP_S(L+ICOR)*SLIP_N(K+ICOR))c
 
-        IF (K.NE.L) THEN
-          DStress(ISYS)=DStress(ISYS)-
-     1	     CinS(MFULL2LIST(I,J,K,L))*
-     1       (MIU)*
-     1	     DGA(ISLIPS)	 
-        ELSE
-          DStress(ISYS)=DStress(ISYS)-
-     1	     CinS(MFULL2LIST(I,J,K,L))*
-     1       (MIU)*
-     1	     DGA(ISLIPS)/2.0	 		
+c        IF (K.NE.L) THEN
+c          DStress(ISYS)=DStress(ISYS)-
+c     1	     CinS(MFULL2LIST(I,J,K,L))*
+c     1       (MIU)*
+c     1	     DGA(ISLIPS)	 
+c        ELSE
+c          DStress(ISYS)=DStress(ISYS)-
+c     1	     CinS(MFULL2LIST(I,J,K,L))*
+c     1       (MIU)*
+c     1	     DGA(ISLIPS)/2.0	 		
 		
-        END IF
-        END DO
-        END DO		
-        END DO		
-      END DO
+c        END IF
+c        END DO
+c        END DO		
+c        END DO		
+c      END DO
 c--------------------------------------
       DO ISLIPS=1,18
         ICOR=(ISLIPS-1)*3
