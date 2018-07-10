@@ -17,7 +17,7 @@
       real*8 :: BurgersI
       real*8 :: gausscoords(3,8)
 
-      integer, parameter :: TOTALELEMENTNUM=216
+      integer, parameter :: TOTALELEMENTNUM=1728
       real*8,parameter  :: xgauss = 0.577350269189626
       integer :: kint
 	  

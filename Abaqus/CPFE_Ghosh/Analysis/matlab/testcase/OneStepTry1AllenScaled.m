@@ -6,19 +6,19 @@ theta=273.15+25;
 
 Stress=[0 0 0;...
     0 0 0;...
-    0 0 800e6];
+    0 0 800e6].*(1e-6);
 ttx=0;
 R=[cosd(ttx) -sind(ttx) 0; sind(ttx) cosd(ttx) 0; 0 0 1];
 Stress=R.'*Stress.*R;
 
-dStress=[1e-2 0 0;0 0 0; 0 0 0];
-rhoSSD=7.5e9-(8.36e6).*theta;
+dStress=[1e-2 0 0;0 0 0; 0 0 0].*(1e-6);
+rhoSSD=(7.5e9-(8.36e6).*theta).*(1e-12);
 
 %% Setup Elastic
 
-C11=1e9.*(325-0.096.*theta);
-C12=1e9.*(209-0.035.*theta);
-C44=1e9.*(144-0.057.*theta);
+C11=1e9.*(325-0.096.*theta).*(1e-6);
+C12=1e9.*(209-0.035.*theta).*(1e-6);
+C44=1e9.*(144-0.057.*theta).*(1e-6);
 
 CVoigt=zeros(6,6);
 
@@ -60,14 +60,14 @@ load SlipSystemsAllen;
 
 %%
 c10=25;
-kB=(1.38064852e-23);
+kB=(1.38064852e-23).*(1e12);
 G=C44;
-b=2.49e-10; % meters 
+b=(2.49e-10).*(1e6); % meters 
 
 [rhoP,rhoF,rhoM]=CalculateRhoPFMAllen(rhoSSD,c10,kB,theta,G,b,FCCSlips,CubicSlips);
 
 %%
-c1=1.7e16;
+c1=1.7e16.*(1e-6);
 c2=-3.77;
 c3=4.0;
 c4=100;
@@ -80,7 +80,7 @@ Ga010=0.3;
 h=0.3;
 k1=0.5;
 k2=0.2;
-Gx=142.2e9;
+Gx=142.2e9.*(1e-6);
 [H,tPE,tSE,tCB,Inx]=GetHForABS(TauPE,TauSE,TauCB,b,Ga111,Ga010,Gx,h,k1,k2);
 
 
@@ -88,14 +88,14 @@ Gx=142.2e9;
 xi0=2.1;
 thetaC=1400;
 A=325;
-TauCC=330e6;
-rho0=5e15;
+TauCC=(330e6).*(1e-6);
+rho0=(5e15).*(1e-12);
 Gxx=Gx;
 [rhoCSD,TauC,xi]=GetRhoCSDTauC(theta,H,xi0,thetaC,A,kB,TauCC,Gxx,rho0,b);
 %TauC=TauC.*0-1000; %HACK
 
 %%
-Q=1.1e-20;
+Q=(1.1e-20).*(1e12);
 P=0.5;
 [GammaDot,v]=GetFlowRule(rhoM,v0,Tau,theta,...
     TauPass,TauCut,TauC,Q,kB,P,b);
@@ -150,12 +150,12 @@ Pr(28)=C12;
 Pr(29)=C44;
 Pr(30)=rhoSSD;
 
-FileName='PROPS.csv';
+FileName='PROPSSCALED.csv';
 fstr='%.15e';
 
 dlmwrite(FileName,Pr,'precision',fstr);
 
-save AllenResult1;
+save AllenResult1Scaled;
 
 %% Pr2
 Pr2=zeros(30+49,1);
@@ -177,7 +177,7 @@ Pr2(31:33)=C44;
 Pr2([34 35 39])=C12;
 
 Pr2(50:79)=Pr;
-FileName='PROPS2.csv';
+FileName='PROPS2SCALED.csv';
 fstr='%.15e';
 
 dlmwrite(FileName,Pr2,'precision',fstr);

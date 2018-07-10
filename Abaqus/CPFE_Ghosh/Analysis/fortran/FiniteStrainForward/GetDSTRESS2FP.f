@@ -16,7 +16,7 @@ C Subroutine to calculate forest parallel and mobile dislocations
 
       real*8,intent(in) :: CinS(21)
       
-      real*8:: HYDROSTRAIN, DGA(18), DUM1, MIU,OHM1,OHM2
+      real*8:: HYDROSTRAIN, DGA(18), DUM1, MIU,OHM1,OHM2, LP(9)
       integer ISLIPS, IVAL, ISYS, I, J, K, L, ICOR
 
       Integer, PARAMETER::  FULL2VOIGT(3,3) =
@@ -58,6 +58,7 @@ C Subroutine to calculate forest parallel and mobile dislocations
 
       DO ISLIPS=1,9
 	        dFP(ISLIPS)=0.0
+			LP(ISLIPS)=0.0
       END DO	  
 
 C XXX	  
@@ -125,13 +126,24 @@ c--------------------------------------
         DO I=1,3
         DO J=1,3
         IVAL=3*(J-1)+I
-        DFP(IVAL)=DFP(IVAL)+SLIP_S(I+ICOR)*SLIP_N(J+ICOR)*
-     1   DGA(ISLIPS)*FP(IVAL)
+        LP(IVAL)=LP(IVAL)+SLIP_S(I+ICOR)*SLIP_N(J+ICOR)*DGA(ISLIPS)
         END DO
         END DO		  
 	        
       END DO	  
 
+
+        DO I=1,3
+        DO J=1,3
+        DO K=1,3
+		ISYS=3*(J-1)+I
+        IVAL=3*(K-1)+I
+		ICOR=3*(J-1)+K
+        DFP(ISYS)=DFP(ISYS)+LP(IVAL)*FP(ICOR)
+        END DO
+        END DO		  
+        END DO		         
+	  
 C xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
       return

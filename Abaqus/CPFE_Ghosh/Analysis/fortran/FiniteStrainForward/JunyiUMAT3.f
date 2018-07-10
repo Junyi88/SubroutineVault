@@ -6,7 +6,6 @@
 	 
       include 'aba_param.inc'
 c
-#include <SMAAspUserSubroutines.hdr>
       CHARACTER*8 CMNAME
       EXTERNAL F
 
@@ -35,7 +34,7 @@ C     REFERENCE: Li & al. Acta Mater. 52 (2004) 4859-4875
 C     
       real*8,parameter  :: zero=1.0e-16,xgauss = 0.577350269189626
       real*8,parameter  :: xweight = 1.0
-      integer, parameter :: TOTALELEMENTNUM=1728
+      integer, parameter :: TOTALELEMENTNUM=1000
       Real*8:: FTINV(3,3),STRATE(3,3),VELGRD(3,3),AUX1(3,3),ONEMAT(3,3)
       PARAMETER (ONE=1.0D0,TWO=2.0D0,THREE=3.0D0,SIX=6.0D0)
       DATA NEWTON,TOLER/10,1.D-6/
@@ -169,9 +168,9 @@ c--- Do Stuff
 
 c XDANGER
        DO ISLIPS=1,18
-        STATEV(409+ISLIPS)=(1.0e9)*(1.0e-12)
-        STATEV(429+ISLIPS)=(1.0e9)*(1.0e-12)
-        STATEV(447+ISLIPS)=(1.0e9)*(1.0e-12) 
+        STATEV(409+ISLIPS)=1.0e9
+        STATEV(429+ISLIPS)=1.0e9
+        STATEV(447+ISLIPS)=1.0e9    
        END DO	 
 c      DO ISLIPS=1,6
 c        STATEV(271+ISLIPS)=0.0
@@ -186,12 +185,11 @@ c       END DO
       end do
       call MutexUnlock( 2 )   ! unlock Mutex #2
 		
-		
       ENDIF
 c --------------------------------
 C Calculate som common values
         call Get_TfromSN(STATEV(1:54),STATEV(55:108),SLIP_T)
-
+	  
 c ------------------------------------------------	
 c NOW FOR THE MAIN STUFF
         call CalculateTauS(STRESS, TAU, TAUPE, TAUSE, TAUCB,
@@ -270,7 +268,7 @@ c ------------------------------------------------
 
 c--------------------------------------------------
 c Calculate dRHO  
-      INCLUDE 'kgauss2.f'     
+      INCLUDE 'kgauss.f'     
       xnat8 = xnat(1:8,:) 			 
       IBURG=1.0/PROPS(69)
 	  
@@ -325,19 +323,19 @@ c       write(6,*) "CP5"
           KCURLLOCAL(3+I) = kcurlFp(noel,npt,i)
 		  KCURLLOCAL(I) = kFp(noel,npt,i) 
 
-		  ICOR=(ISLIPS-1)*6
-		  STATEV(I+522+ICOR)= kcurlFp(noel,npt,i) 
-		  STATEV(I+519+ICOR)= kFp(noel,npt,i) 		  
+c		  ICOR=(ISLIPS-1)*6
+c		  STATEV(I+468+ICOR)= kcurlFp(noel,npt,i) 
+c		  STATEV(I+465+ICOR)= kFp(noel,npt,i) 		  
       END DO
 c       write(6,*) "CP6"		
       DO i=1,3	  
 	      ICOR=3*(ISLIPS-1)+I
           dRhoS(ISLIPS)=dRhoS(ISLIPS)+
-     1 abs(STATEV(ICOR)*KCURLLOCAL(3+I))
+     1 STATEV(ICOR)*KCURLLOCAL(3+I)
           dRhoET(ISLIPS)=dRhoET(ISLIPS)+
-     1 abs(SLIP_T(ICOR)*KCURLLOCAL(3+I))
+     1 SLIP_T(ICOR)*KCURLLOCAL(3+I)
           dRhoEN(ISLIPS)=dRhoEN(ISLIPS)+
-     1 abs(STATEV(ICOR+54)*KCURLLOCAL(3+I))
+     1 STATEV(ICOR+54)*KCURLLOCAL(3+I)
       END DO	  
 c       write(6,*) "CP7=",ISLIPS
       END DO
@@ -348,24 +346,9 @@ c--------------------------------------------------
          END DO		 
 
          DO ISLIPS=1,18
-		     STATEV(409+ISLIPS)=STATEV(409+ISLIPS)+dRhoS(ISLIPS)
-		     STATEV(429+ISLIPS)=STATEV(429+ISLIPS)+dRhoET(ISLIPS)
-		     STATEV(447+ISLIPS)=STATEV(447+ISLIPS)+dRhoEN(ISLIPS)		
-
-		     IF (STATEV(409+ISLIPS).LE.0.0) THEN
-		        STATEV(409+ISLIPS)=0.0
-		     ENDIF
-		     IF (STATEV(429+ISLIPS).LE.0.0) THEN
-		        STATEV(429+ISLIPS)=0.0
-		     ENDIF
-		     IF (STATEV(447+ISLIPS).LE.0.0) THEN
-		        STATEV(447+ISLIPS)=0.0
-		     ENDIF			 
-		     STATEV(465+ISLIPS)=STATEV(465+ISLIPS)+dRhoS(ISLIPS)
-		     STATEV(483+ISLIPS)=STATEV(483+ISLIPS)+dRhoET(ISLIPS)
-		     STATEV(501+ISLIPS)=STATEV(501+ISLIPS)+dRhoEN(ISLIPS)		
-
-			 
+		     STATEV(409+ISLIPS)=STATEV(409+ISLIPS)+abs(dRhoS(ISLIPS))
+		     STATEV(429+ISLIPS)=STATEV(429+ISLIPS)+abs(dRhoET(ISLIPS))
+		     STATEV(447+ISLIPS)=STATEV(447+ISLIPS)+abs(dRhoEN(ISLIPS))		 
          END DO		
 
 c  -----------------------------------
@@ -377,22 +360,12 @@ c  -----------------------------------
       END DO		
 
       DO ISLIPS=1,18
-       IF ((ABS(DGA(ISLIPS)).LT.1.0e-4)) THEN
+       IF ((ABS(DGA(ISLIPS)).LT.1.0e-7)) THEN
        ELSE
          PNEWDT=0.5
        END IF	   
       END DO		  
 c ------------------------------------------------	 
-
-
-      DO ISLIPS=1,18  
-		STATEV(530+ISLIPS)=TAU(ISLIPS)
-		STATEV(549+ISLIPS)=TAUC(ISLIPS)
-		STATEV(567+ISLIPS)=TAUPASS(ISLIPS)
-		STATEV(585+ISLIPS)=TAUCUT(ISLIPS)
-		STATEV(603+ISLIPS)=TAUEFF(ISLIPS)
-      END DO	
-
       return
       end subroutine UMAT
 

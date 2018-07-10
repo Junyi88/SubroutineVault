@@ -6,7 +6,6 @@
 	 
       include 'aba_param.inc'
 c
-#include <SMAAspUserSubroutines.hdr>
       CHARACTER*8 CMNAME
       EXTERNAL F
 
@@ -35,7 +34,7 @@ C     REFERENCE: Li & al. Acta Mater. 52 (2004) 4859-4875
 C     
       real*8,parameter  :: zero=1.0e-16,xgauss = 0.577350269189626
       real*8,parameter  :: xweight = 1.0
-      integer, parameter :: TOTALELEMENTNUM=1728
+      integer, parameter :: TOTALELEMENTNUM=4096
       Real*8:: FTINV(3,3),STRATE(3,3),VELGRD(3,3),AUX1(3,3),ONEMAT(3,3)
       PARAMETER (ONE=1.0D0,TWO=2.0D0,THREE=3.0D0,SIX=6.0D0)
       DATA NEWTON,TOLER/10,1.D-6/
@@ -186,12 +185,11 @@ c       END DO
       end do
       call MutexUnlock( 2 )   ! unlock Mutex #2
 		
-		
       ENDIF
 c --------------------------------
 C Calculate som common values
         call Get_TfromSN(STATEV(1:54),STATEV(55:108),SLIP_T)
-
+	  
 c ------------------------------------------------	
 c NOW FOR THE MAIN STUFF
         call CalculateTauS(STRESS, TAU, TAUPE, TAUSE, TAUCB,
@@ -270,7 +268,7 @@ c ------------------------------------------------
 
 c--------------------------------------------------
 c Calculate dRHO  
-      INCLUDE 'kgauss2.f'     
+      INCLUDE 'kgauss.f'     
       xnat8 = xnat(1:8,:) 			 
       IBURG=1.0/PROPS(69)
 	  
@@ -347,7 +345,7 @@ c--------------------------------------------------
 		     STATEV(400+ISLIPS)=STATEV(400+ISLIPS)+dFP(ISLIPS)
          END DO		 
 
-         DO ISLIPS=1,18
+         DO ISLIPS=1,6
 		     STATEV(409+ISLIPS)=STATEV(409+ISLIPS)+dRhoS(ISLIPS)
 		     STATEV(429+ISLIPS)=STATEV(429+ISLIPS)+dRhoET(ISLIPS)
 		     STATEV(447+ISLIPS)=STATEV(447+ISLIPS)+dRhoEN(ISLIPS)		
@@ -377,7 +375,7 @@ c  -----------------------------------
       END DO		
 
       DO ISLIPS=1,18
-       IF ((ABS(DGA(ISLIPS)).LT.1.0e-4)) THEN
+       IF ((ABS(DGA(ISLIPS)).LT.1.0e-7)) THEN
        ELSE
          PNEWDT=0.5
        END IF	   
@@ -392,7 +390,7 @@ c ------------------------------------------------
 		STATEV(585+ISLIPS)=TAUCUT(ISLIPS)
 		STATEV(603+ISLIPS)=TAUEFF(ISLIPS)
       END DO	
-
+	  
       return
       end subroutine UMAT
 
