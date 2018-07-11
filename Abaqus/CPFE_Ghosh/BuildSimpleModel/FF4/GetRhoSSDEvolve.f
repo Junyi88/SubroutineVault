@@ -33,7 +33,7 @@ C ------------------------------------------------------
       SSDDot(ISLIPS)=SSDDot(ISLIPS)*GAMMADOT(ISLIPS)
 	  
       SSDDot(ISLIPS)=SSDDot(ISLIPS)-CinS(4)*(RhoSSD(ISLIPS)**2.0)*
-     1 abs(TAU(ISLIPS))*(GAMMADOT(ISLIPS)**CinS(5))	  
+     1 abs(TAU(ISLIPS))*((GAMMADOT(ISLIPS)/CinS(6))**CinS(5))	  
       ELSE
       SSDDot(ISLIPS)=0.0
       END IF  

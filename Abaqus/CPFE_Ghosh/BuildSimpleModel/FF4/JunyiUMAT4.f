@@ -49,7 +49,89 @@ c XDANGER
      1 kcurlFp(TOTALELEMENTNUM, 8, 3)
 	  
 c      print *, '*****************************************'
-	
+
+C +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+c PROPS  Definitions
+c
+c PROPS(1->9) :: Orientation Matrix
+c PROPS(1->27) :: Rho_SSD Initial
+c PROPS(28->48) :: Compliance Matrix in Voigt Notation
+
+c PROPS(49) :: TYPE (NOT USED)
+
+c Note that these properties were precalculated so they don't have to be repeatedly calculated
+
+c GetRhoPFMGND
+c PROPS(50) :: (1) :: c_10 * kB * Theta / (G * b^2)
+
+c GetTauSlips
+c PROPS(51) :: (1) :: c_3 * G * b
+c PROPS(52) :: (2) :: c_4 * kB * Theta/ (b^2)
+c PROPS(53) :: (3) :: c_1 * (Theta ^ (c_2))
+
+c GetCSDHTauC
+c PROPS(54) :: (1) :: b / Gamma_111
+c PROPS(55) :: (2) :: G * b^3 / (4 * pi)
+c PROPS(56) :: (3) :: G * b^2 / (2 * pi * Gamma_111)
+c PROPS(57) :: (4) ::  xi * G * b = xi_0 * exp(A/(Theta-Theta_c)) * G * b
+c PROPS(58) :: (5) :: tau_cc
+c PROPS(59) :: (6) :: C_H
+c PROPS(60) :: (7) ::  h
+c PROPS(61) :: (8) :: k_1
+c PROPS(62) :: (9) :: k_2
+c PROPS(63) :: (10) :: (1/sqrt(3)) - Gamma_010 / Gamma_111
+c PROPS(64) :: (11) :: b / B
+c PROPS(65) :: (12) :: rho_0
+c PROPS(66) :: (13) :: kB * Theta 
+
+c GetGammaDot
+c PROPS(67) :: (1) :: exp(-Q / (kB * Theta))
+c PROPS(68) :: (2) :: p
+c PROPS(69) :: (3) :: b
+ 
+c GetRhoSSDEvolve
+c PROPS(70) :: (1) :: c_5 / b
+c PROPS(71) :: (2) :: (c_6 / b) * (sqrt(3) * G * b)/ (16 * (1-nu))
+c PROPS(72) :: (3) :: c_7
+c PROPS(73) :: (4) :: c_8 * ( (D_0 b^3) / (kB * Theta) ) * exp(- Q_Bulk / (kB * Theta)))
+c PROPS(74) :: (5) :: c_9
+c PROPS(75) :: (6) :: gamma_dot_ref
+
+c No Longer In Use
+c PROPS(76) :: (1) :: c_11
+c PROPS(77) :: (2) :: c_12
+c PROPS(78) :: (3) :: c_44
+
+c No Longer In Use
+c PROPS(79) :: (1) :: rho_ssd 
+
+C +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+c SDV  Definitions
+c
+C SDV(1->54) :: Slip direction ((ISLIP-1)*3+COMPONENT)
+C SDV(55->108) :: Slip normals ((ISLIP-1)*3+COMPONENT)+OFFSET
+C SDV(109->126) :: Rho SSD (ISLIP)
+C SDV(127->144) :: Rho CSD (ISLIP)
+
+C SDV(145->162) :: Gamma Slip cumulative
+c SDV(163) :: Cumulative gamma slip
+c SDV(164->184) :: Compliance Matrix
+
+c SDV(185->220) ::  Slip direction PE ((ISLIP-1)*3+COMPONENT)+OFFSET
+c SDV(221->256) ::  Slip normals PE ((ISLIP-1)*3+COMPONENT)+OFFSET
+c SDV(257->292) ::  Slip direction SE ((ISLIP-1)*3+COMPONENT)+OFFSET
+c SDV(293->328) ::  Slip normals SE ((ISLIP-1)*3+COMPONENT)+OFFSET
+c SDV(329->364) ::  Slip direction CB ((ISLIP-1)*3+COMPONENT)+OFFSET
+c SDV(365->400) ::  Slip normals CB ((ISLIP-1)*3+COMPONENT)+OFFSET
+
+c SDV(401->409) :: Plastic Deformation Tensor
+c SDV(410->427) :: Rho GND S (SLIP)
+c SDV(428->429) :: Nothing Made a mistake here previously
+c SDV(430->447) :: Rho GND ET (SLIP)
+c SDV(448->465) :: Rho GND EN (SLIP)
+
+c *********************************************
+c Code starts here	
       CALL ONEM(ONEMAT)     
       CALL ZEROM(FTINV)
       CALL ZEROM(AUX1)
@@ -243,7 +325,7 @@ c UPDATE ALL
       DO ISLIPS=1,18
        STATEV(ISLIPS+108)=STATEV(ISLIPS+108)+DTIME*SSDDot(ISLIPS)
        STATEV(ISLIPS+144)=STATEV(ISLIPS+144)+DGA(ISLIPS)
-       STATEV(163)=STATEV(163)+DGA(ISLIPS)
+       STATEV(163)=STATEV(163)+abs(DGA(ISLIPS))
       END DO
       DO ISLIPS=1,6
        Stress(ISLIPS)=Stress(ISLIPS)+DStress(ISLIPS)	
@@ -320,24 +402,26 @@ c       write(6,*) "CP4"
           END DO
       END DO
       call MutexUnlock( 3 )      ! lock Mutex #1 
+	  
 c       write(6,*) "CP5"		
       DO i=1,3
           KCURLLOCAL(3+I) = kcurlFp(noel,npt,i)
 		  KCURLLOCAL(I) = kFp(noel,npt,i) 
 
-		  ICOR=(ISLIPS-1)*6
-		  STATEV(I+522+ICOR)= kcurlFp(noel,npt,i) 
-		  STATEV(I+519+ICOR)= kFp(noel,npt,i) 		  
+c		  ICOR=(ISLIPS-1)*6
+c		  STATEV(I+522+ICOR)= kcurlFp(noel,npt,i) 
+c		  STATEV(I+519+ICOR)= kFp(noel,npt,i) 		  
       END DO
 c       write(6,*) "CP6"		
+
       DO i=1,3	  
 	      ICOR=3*(ISLIPS-1)+I
           dRhoS(ISLIPS)=dRhoS(ISLIPS)+
-     1 abs(STATEV(ICOR)*KCURLLOCAL(3+I))
+     1 (STATEV(ICOR)*KCURLLOCAL(3+I))
           dRhoET(ISLIPS)=dRhoET(ISLIPS)+
-     1 abs(SLIP_T(ICOR)*KCURLLOCAL(3+I))
+     1 (SLIP_T(ICOR)*KCURLLOCAL(3+I))
           dRhoEN(ISLIPS)=dRhoEN(ISLIPS)+
-     1 abs(STATEV(ICOR+54)*KCURLLOCAL(3+I))
+     1 (STATEV(ICOR+54)*KCURLLOCAL(3+I))
       END DO	  
 c       write(6,*) "CP7=",ISLIPS
       END DO
@@ -361,16 +445,16 @@ c--------------------------------------------------
 		     IF (STATEV(447+ISLIPS).LE.0.0) THEN
 		        STATEV(447+ISLIPS)=0.0
 		     ENDIF			 
-		     STATEV(465+ISLIPS)=STATEV(465+ISLIPS)+dRhoS(ISLIPS)
-		     STATEV(483+ISLIPS)=STATEV(483+ISLIPS)+dRhoET(ISLIPS)
-		     STATEV(501+ISLIPS)=STATEV(501+ISLIPS)+dRhoEN(ISLIPS)		
+c		     STATEV(465+ISLIPS)=STATEV(465+ISLIPS)+dRhoS(ISLIPS)
+c		     STATEV(483+ISLIPS)=STATEV(483+ISLIPS)+dRhoET(ISLIPS)
+c		     STATEV(501+ISLIPS)=STATEV(501+ISLIPS)+dRhoEN(ISLIPS)		
 
 			 
          END DO		
 
 c  -----------------------------------
       DO ISLIPS=1,6
-       IF ((ABS(DStress(ISLIPS)).LT.5.0e6)) THEN
+       IF ((ABS(DStress(ISLIPS)).LT.5.0e1)) THEN
        ELSE
          PNEWDT=0.5
        END IF	   
@@ -385,13 +469,13 @@ c  -----------------------------------
 c ------------------------------------------------	 
 
 
-      DO ISLIPS=1,18  
-		STATEV(530+ISLIPS)=TAU(ISLIPS)
-		STATEV(549+ISLIPS)=TAUC(ISLIPS)
-		STATEV(567+ISLIPS)=TAUPASS(ISLIPS)
-		STATEV(585+ISLIPS)=TAUCUT(ISLIPS)
-		STATEV(603+ISLIPS)=TAUEFF(ISLIPS)
-      END DO	
+c      DO ISLIPS=1,18  
+c		STATEV(530+ISLIPS)=TAU(ISLIPS)
+c		STATEV(549+ISLIPS)=TAUC(ISLIPS)
+c		STATEV(567+ISLIPS)=TAUPASS(ISLIPS)
+c		STATEV(585+ISLIPS)=TAUCUT(ISLIPS)
+c		STATEV(603+ISLIPS)=TAUEFF(ISLIPS)
+c      END DO	
 
       return
       end subroutine UMAT

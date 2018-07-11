@@ -83,6 +83,10 @@ c        END IF
 c        END DO
 c        END DO		
 c      END DO
+
+      DO ISYS=1,6
+        DStress(ISYS)=0.0
+      END DO	
 	  
       DO ISYS=1,6
 c        DStress(ISYS)=-STRESS(ISYS)*HYDROSTRAIN
@@ -104,18 +108,24 @@ C ----------------------------------------
           MIU=0.5*(SLIP_S(K+ICOR)*SLIP_N(L+ICOR)+
      1	     SLIP_S(L+ICOR)*SLIP_N(K+ICOR))
 
-        IF (K.NE.L) THEN
           DStress(ISYS)=DStress(ISYS)-
      1	     CinS(MFULL2LIST(I,J,K,L))*
      1       (MIU)*
      1	     DGA(ISLIPS)	 
-        ELSE
-          DStress(ISYS)=DStress(ISYS)-
-     1	     CinS(MFULL2LIST(I,J,K,L))*
-     1       (MIU)*
-     1	     DGA(ISLIPS)/2.0	 		
+
+c -------------------------------------------------	 
+c        IF (K.NE.L) THEN
+c          DStress(ISYS)=DStress(ISYS)-
+c     1	     CinS(MFULL2LIST(I,J,K,L))*
+c     1       (MIU)*
+c     1	     DGA(ISLIPS)	 
+c        ELSE
+c          DStress(ISYS)=DStress(ISYS)-
+c     1	     CinS(MFULL2LIST(I,J,K,L))*
+c     1       (MIU)*
+c     1	     DGA(ISLIPS)/2.0	 		
 		
-        END IF
+c        END IF
         END DO
         END DO		
         END DO		
