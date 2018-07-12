@@ -75,8 +75,12 @@ c4=100;
 [v0,TauPass,TauCut]=GetV0TauP(theta,rhoP,rhoF,rhoM,c1,c2,c3,c4,kB,G,b);
 
 %%
-Ga111=0.083;
-Ga010=0.3;
+% Ga111=0.083;
+% Ga010=0.3;
+
+Ga010=0.083;
+Ga111=0.3;
+
 h=0.3;
 k1=0.5;
 k2=0.2;

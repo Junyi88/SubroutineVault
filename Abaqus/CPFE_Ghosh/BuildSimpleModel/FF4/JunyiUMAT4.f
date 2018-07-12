@@ -73,15 +73,15 @@ c GetCSDHTauC
 c PROPS(54) :: (1) :: b / Gamma_111
 c PROPS(55) :: (2) :: G * b^3 / (4 * pi)
 c PROPS(56) :: (3) :: G * b^2 / (2 * pi * Gamma_111)
-c PROPS(57) :: (4) ::  xi * G * b = xi_0 * exp(A/(Theta-Theta_c)) * G * b
-c PROPS(58) :: (5) :: tau_cc
+c ** PROPS(57) :: (4) ::  xi * G * b = xi_0 * exp(A/(Theta-Theta_c)) * G * b
+c ** PROPS(58) :: (5) :: tau_cc
 c PROPS(59) :: (6) :: C_H
 c PROPS(60) :: (7) ::  h
 c PROPS(61) :: (8) :: k_1
 c PROPS(62) :: (9) :: k_2
 c PROPS(63) :: (10) :: (1/sqrt(3)) - Gamma_010 / Gamma_111
-c PROPS(64) :: (11) :: b / B
-c PROPS(65) :: (12) :: rho_0
+c ** PROPS(64) :: (11) :: b / B
+c ** PROPS(65) :: (12) :: rho_0
 c PROPS(66) :: (13) :: kB * Theta 
 
 c GetGammaDot
