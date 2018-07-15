@@ -45,7 +45,7 @@ C
       real*8:: svars(48)
 c XDANGER
       COMMON/UMPS/kgausscoords(TOTALELEMENTNUM,8,3),
-     1 kFp(TOTALELEMENTNUM,8, 3),
+     1 kFp(TOTALELEMENTNUM,8, 9),
      1 kcurlFp(TOTALELEMENTNUM, 8, 3)
 	  
 c      print *, '*****************************************'
@@ -374,22 +374,13 @@ c calculate GammadotFPnalpha
  
       DO ISLIPS=1,18  
 c       write(6,*) "CP1---------------------------"
-       call MutexLock( 1 )      ! lock Mutex #1 
-       DO i=1,3                                                      
-        kFp(noel,npt,i)= 0.0
-       END DO
-	   
-       DO i=1,3      
-       DO j=1,3  	   
-c	    ICOR=400+(J-1)*3+I
-	    ICOR=400+(I-1)*3+J
-		ISL=(ISLIPS-1)*3+J+54
-        kFp(noel,npt,i)= kFp(noel,npt,i)+DGA(ISLIPS)*
-     1   IBURG*STATEV(ICOR)*STATEV(ISL)
-       END DO	 
-       END DO
-	   
-        call MutexUnlock( 1 )      ! lock Mutex #1 
+c       call MutexLock( 1 )      ! lock Mutex #1 
+         DO kint =1,8 
+            DO i=1,3          
+                 svars(i + 6*(kint-1)) = 0.0       
+             END DO	  
+       END DO			 
+c        call MutexUnlock( 1 )      ! lock Mutex #1 
         call MutexLock( 2)   		
 c       write(6,*) "CP2"		
          DO kint =1,8 
@@ -397,8 +388,13 @@ c       write(6,*) "CP2"
                  gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
              END DO
          
-             DO i=1,3          
-                 svars(i + 6*(kint-1)) = kFp(noel,kint,i)         
+             DO i=1,3      
+             DO j=1,3          
+              ICOR=(J-1)*3+I
+              ISL=(ISLIPS-1)*3+J+54			 
+                 svars(i + 6*(kint-1)) = svars(i + 6*(kint-1))+
+     1              kFp(noel,kint,iCOR)*DGA(ISLIPS)*IBURG*STATEV(ISL)         
+             END DO	 
              END DO
          END DO	 		
 c       write(6,*) "CP3"	
@@ -415,12 +411,12 @@ c       write(6,*) "CP4"
 	  
 c       write(6,*) "CP5"		
       DO i=1,3
-          KCURLLOCAL(3+I) = kcurlFp(noel,npt,i)
-		  KCURLLOCAL(I) = kFp(noel,npt,i) 
+          KCURLLOCAL(3+I) = svars(3+i + 6*(npt-1))
+		  KCURLLOCAL(I) =svars(i + 6*(npt-1))
 
 c		  ICOR=(ISLIPS-1)*6
-		  STATEV(I+560)=STATEV(I+560)+ kcurlFp(noel,npt,i) 
-		  STATEV(I+570)=STATEV(I+570)+ kFp(noel,npt,i) 		  
+		  STATEV(I+560)=STATEV(I+560)+ KCURLLOCAL(I) 
+		  STATEV(I+570)=STATEV(I+570)+ KCURLLOCAL(3+I)		  
       END DO
 c       write(6,*) "CP6"		
 
@@ -441,6 +437,18 @@ c--------------------------------------------------
 		     STATEV(400+ISLIPS)=STATEV(400+ISLIPS)+dFP(ISLIPS)
          END DO		 
 
+       call MutexLock( 1 )      ! lock Mutex #1 
+   
+       DO i=1,3      
+       DO j=1,3  	   
+		ICOR=(J-1)*3+I
+        kFp(noel,npt,iCOR)= STATEV(400+ICOR)
+	 
+       END DO	 
+       END DO	   
+	   
+       call MutexunLock( 1 ) 
+		 
          DO ISLIPS=1,18
 		     STATEV(409+ISLIPS)=STATEV(409+ISLIPS)+dRhoS(ISLIPS)
 		     STATEV(429+ISLIPS)=STATEV(429+ISLIPS)+dRhoET(ISLIPS)
@@ -531,7 +539,7 @@ c H, RhoCSD, TAUC
       include 'RotateSlipSystems.f'
 	  
       include 'VectorCurl.f'	  	  
-      include 'CalculateDRhoDBG.f'	  
+c      include 'CalculateDRhoDBG.f'	  
       include 'kshapes.f'
       include 'utils.f'
       include 'uexternaldb.f'

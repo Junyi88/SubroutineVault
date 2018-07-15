@@ -37,20 +37,20 @@ c --- SSD
         RhoF(nA)=RhoF(nA)+CosProjection*(RhoSSD(nB))
         RhoP(nA)=RhoP(nA)+SinProjection*(RhoSSD(nB))
 c --- RhoET		
-        RhoF(nA)=RhoF(nA)+CosProjection*(RhoET(nB))
-        RhoP(nA)=RhoP(nA)+SinProjection*(RhoET(nB))		
+        RhoF(nA)=RhoF(nA)+CosProjection*(abs(RhoET(nB)))
+        RhoP(nA)=RhoP(nA)+SinProjection*(abs(RhoET(nB)))		
 c --- RhoS		
         call VectorProjections(CosProjection,SinProjection,
      1 SLIP_N(nSTARTA:nFinA),SLIP_S(NSTARTB:NFINB))
 
-        RhoF(nA)=RhoF(nA)+CosProjection*(RhoS(nB))
-        RhoP(nA)=RhoP(nA)+SinProjection*(RhoS(nB))
+        RhoF(nA)=RhoF(nA)+CosProjection*(abs(RhoS(nB)))
+        RhoP(nA)=RhoP(nA)+SinProjection*(abs(RhoS(nB)))
 c --- RhoEN		
         call VectorProjections(CosProjection,SinProjection,
      1 SLIP_N(nSTARTA:nFinA),SLIP_N(NSTARTB:NFINB))
 
-        RhoF(nA)=RhoF(nA)+CosProjection*(RhoEN(nB))
-        RhoP(nA)=RhoP(nA)+SinProjection*(RhoEN(nB))		
+        RhoF(nA)=RhoF(nA)+CosProjection*(abs(RhoEN(nB)))
+        RhoP(nA)=RhoP(nA)+SinProjection*(abs(RhoEN(nB)))		
        END DO
 	   
       END DO

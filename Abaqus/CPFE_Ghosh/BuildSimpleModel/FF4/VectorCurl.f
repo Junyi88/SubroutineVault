@@ -91,6 +91,12 @@ C
       fnode(3,kint) = svars((kint-1)*knsdv+3)
       end do
 C
+c      write(6,*)"---------------------------"
+c      write(6,*)"fnode"
+c      write(6,*)fnode(1,:)
+c      write(6,*)fnode(2,:)
+c      write(6,*)fnode(3,:)
+	  
       fmat1 = matmul(fnode,dndx)
 !      dmout(1,1) = fmat1(3,2) - fmat1(2,3)
 !      dmout(2,1) = fmat1(1,3) - fmat1(3,1)
