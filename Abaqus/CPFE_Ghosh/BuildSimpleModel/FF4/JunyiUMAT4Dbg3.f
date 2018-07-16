@@ -250,10 +250,15 @@ c--- Do Stuff
        STATEV(409)=1.0
 
 c XDANGER
+c       DO ISLIPS=1,18
+c        STATEV(409+ISLIPS)=(1.0e9)*(1.0e-12)
+c        STATEV(429+ISLIPS)=(1.0e9)*(1.0e-12)
+c        STATEV(447+ISLIPS)=(1.0e9)*(1.0e-12) 
+c       END DO	 
        DO ISLIPS=1,18
-        STATEV(409+ISLIPS)=(1.0e9)*(1.0e-12)
-        STATEV(429+ISLIPS)=(1.0e9)*(1.0e-12)
-        STATEV(447+ISLIPS)=(1.0e9)*(1.0e-12) 
+        STATEV(409+ISLIPS)= 0.0
+        STATEV(429+ISLIPS)= 0.0
+        STATEV(447+ISLIPS)= 0.0
        END DO	 
 c      DO ISLIPS=1,6
 c        STATEV(271+ISLIPS)=0.0
