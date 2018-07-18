@@ -25,7 +25,7 @@
       A=0.;AM=0.;V=0.;S=0.;U=0.;Sinv=0.;Ainv=0.;tempA=0.;UT=0. 
 	 
 c -----------------------
-      IF(MAXVAL(ABS(CFP)) <= 1.0e-8) THEN 
+      IF(MAXVAL(ABS(CFP)) <= 1.0e-9) THEN 
         DO i = 1, 18     
         rhos(I) = 0.0
         rhoen(I) = 0.0
@@ -40,7 +40,9 @@ c -----------------------
             burgX = burgX*BURGVAL       
             sslip = SLIP_S(ISTART:IFIN)
             nnorm = SLIP_N(ISTART:IFIN) !Slip plane normal
-            CALL CrossProd(sslip,nnorm,tnorm)       
+c            CALL CrossProd(sslip,nnorm,tnorm)  
+            tnorm = SLIP_T(ISTART:IFIN)
+			
             CALL DyadicProd(sslip,burgX,screw)
             CALL DyadicProd(nnorm,burgX,edgeN)
             CALL DyadicProd(tnorm,burgX,edgeT)    

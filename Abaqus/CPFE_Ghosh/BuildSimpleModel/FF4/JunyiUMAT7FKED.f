@@ -369,12 +369,12 @@ c ------------------------------------------------
          END DO
       DO i=1,3
         DO j=1,3 
-         CFP(i,j) = kcurlFp(noel,npt,j+(i-1)*3)
+         CFP(i,j) = kcurlFp(noel,npt,i+(j-1)*3)
         END DO
       END DO
 c--------------------------------------------------
 c Calculate Rho_GND
-      IBURG=PROPS(69)*0.001
+      IBURG=PROPS(69)
       call kcalcGND(STATEV(1:54),STATEV(55:108),SLIP_T,
      + dRhoS,dRhoET,dRhoEN,
      + CFP,
@@ -391,9 +391,9 @@ c--------------------------------------------------
 		STATEV(648)=0.0
 		STATEV(649)=0.0
          DO ISLIPS=1,18
-		     STATEV(409+ISLIPS)=dRhoS(ISLIPS)
-		     STATEV(429+ISLIPS)=dRhoET(ISLIPS)
-		     STATEV(447+ISLIPS)=dRhoEN(ISLIPS)		
+c		     STATEV(409+ISLIPS)=dRhoS(ISLIPS)
+c		     STATEV(429+ISLIPS)=dRhoET(ISLIPS)
+c		     STATEV(447+ISLIPS)=dRhoEN(ISLIPS)		
 
 		     STATEV(509+ISLIPS)=dRhoS(ISLIPS)*dRhoS(ISLIPS)
 		     STATEV(529+ISLIPS)=dRhoET(ISLIPS)*dRhoET(ISLIPS)
@@ -409,7 +409,12 @@ c--------------------------------------------------
           STATEV(600+i)= kFp(noel,npt,i)	  
 		  STATEV(600+i+9)= kcurlFp(noel,npt,i)
       END DO
-	  
+c XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      call MutexLock( 5 )      ! lock Mutex #1 
+      DO i=1,9                                                      
+          kFp(noel,npt,i)= statev(400+i)
+      END DO
+      call MutexUnlock( 5 )      ! lock Mutex #1 	  
 	  
       IF (npt == 8 ) THEN ! update curl Fp	 
       INCLUDE 'kgauss2.f'     

@@ -154,7 +154,7 @@ c		ISYS=3*(I-1)+J ! Transposed
         END DO
         END DO		  
         END DO		         
-	  
+c       DFP=matmul(LP,FP)
 C xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
       return
