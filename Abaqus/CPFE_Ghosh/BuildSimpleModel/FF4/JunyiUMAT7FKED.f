@@ -16,16 +16,17 @@ c
      3 props(nprops),coords(3),drot(3,3),dfgrd0(3,3),dfgrd1(3,3)
 	 
       include 'DeclareParameterSlipsO.f'
+      include 'TestCase0.f'
       
       INTEGER:: ISLIPS, I, J, NDUM1, NA, NB, ICOR, ISL
       real*8 :: TAU(18), TAUPE(12), TAUSE(12), TAUCB(12)
-      real*8 :: SLIP_T(54), IBURG	  
+      real*8 :: SLIP_T(54), IBURG, CFP(3,3)	  
       real*8 :: RhoP(18),RhoF(18),RhoM(18),RhoSSD(18)
       real*8 :: TauPass(18), TauCut(18), V0(18)
       real*8 :: H(12), RhoCSD(12), TAUC(18) 
       real*8 :: Vs(18) , GammaDot(18) , TauEff(18), SSDDot(18)
       real*8 :: DStress(6) , KCURLLOCAL(6)
-	  
+      real*8 :: MXSLIP=1.0e-3
       real*8 :: ORI_ROT(3,3), SPIN_TENSOR(3,3)
       real*8:: dFP(9), dRhoS(18),dRhoET(18),dRhoEN(18)
 c ------------------------------------------------	  
@@ -36,17 +37,18 @@ C
       real*8,parameter  :: zero=1.0e-16,xgauss = 0.577350269189626
       real*8,parameter  :: xweight = 1.0
       integer, parameter :: TOTALELEMENTNUM=1728
+c  1728 853200
       Real*8:: FTINV(3,3),STRATE(3,3),VELGRD(3,3),AUX1(3,3),ONEMAT(3,3)
       PARAMETER (ONE=1.0D0,TWO=2.0D0,THREE=3.0D0,SIX=6.0D0)
       DATA NEWTON,TOLER/10,1.D-6/
       Real*8:: gausscoords(3,8)
       real*8 :: kgausscoords, kFp, kcurlFp, kDGA
       real*8:: xnat(20,3),xnat8(8,3),gauss(8,3), DGA(18)
-      real*8:: svars(48)
+      real*8:: svars(144)
 c XDANGER
       COMMON/UMPS/kgausscoords(TOTALELEMENTNUM,8,3),
      1 kFp(TOTALELEMENTNUM,8, 9),
-     1 kcurlFp(TOTALELEMENTNUM, 8, 3),
+     1 kcurlFp(TOTALELEMENTNUM, 8, 9),
      1 kDGA(TOTALELEMENTNUM, 8,18)
 	  
 c      print *, '*****************************************'
@@ -151,7 +153,10 @@ c Code starts here
       END DO	
 c ------------------------------------------------		
 c Perform Initialisation
-
+c ------------------------------------------------		
+c      write(6,*) "XX ======================================"
+c      write(6,*) KINC, NOEL, NPT
+	  
       IF (KINC.LE.1) THEN
 	  
        DO ISLIPS=1,nstatv
@@ -272,6 +277,9 @@ c       END DO
       do i =1,3
           kgausscoords(noel,npt,i) = coords(i)
       end do
+	  kfP(noel,npt,1)=1.0
+	  kfP(noel,npt,5)=1.0
+	  kfP(noel,npt,9)=1.0
       call MutexUnlock( 2 )   ! unlock Mutex #2
 		
 		
@@ -327,7 +335,11 @@ c UPDATE ALL
       DO ISLIPS=1,18  
 		DGA(ISLIPS)=DTIME*GammaDot(ISLIPS)
       END DO	
-	  
+      DO ISLIPS=1,18
+       IF ((ABS(DGA(ISLIPS)).GT.MXSLIP)) THEN
+         DGA(ISLIPS)=sign(MXSLIP,DGA(ISLIPS))
+       END IF	   
+      END DO		  
       DO ISLIPS=1,18
        STATEV(ISLIPS+108)=STATEV(ISLIPS+108)+DTIME*SSDDot(ISLIPS)
        STATEV(ISLIPS+144)=STATEV(ISLIPS+144)+DGA(ISLIPS)
@@ -355,144 +367,86 @@ c ------------------------------------------------
                  gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
              END DO 
          END DO
-
-c--------------------------------------------------
-c Calculate dRHO  
-c      INCLUDE 'kgauss.f'    
-      INCLUDE 'kgauss2.f'     
-      xnat8 = xnat(1:8,:) 			 
-      IBURG=1.0/PROPS(69)
-	  
-      DO ISLIPS=1,18  
-		     dRhoS(ISLIPS)=0.0
-		     dRhoET(ISLIPS)=0.0
-		     dRhoEN(ISLIPS)=0.0
-      ENDDO	  
-	  
-c calculate GammadotFPnalpha	
-		     STATEV(561)=0.0
-		     STATEV(562)=0.0
-		     STATEV(563)=0.0
-		     STATEV(571)=0.0
-		     STATEV(572)=0.0
-		     STATEV(573)=0.0
-
- 
-      DO ISLIPS=1,18  
-c       write(6,*) "CP1---------------------------"
-c       call MutexLock( 1 )      ! lock Mutex #1 
-         DO kint =1,8 
-            DO i=1,3          
-                 svars(i + 6*(kint-1)) = 0.0       
-             END DO	  
-       END DO			 
-c        call MutexUnlock( 1 )      ! lock Mutex #1 
-        call MutexLock( 2)   		
-c       write(6,*) "CP2"		
-         DO kint =1,8 
-             DO i=1,3         
-                 gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
-             END DO
-         END DO	 
-         DO kint =1,8          
-             DO i=1,3      
-             DO j=1,3          
-              ICOR=(J-1)*3+I
-              ISL=(ISLIPS-1)*3+J+54			 
-                 svars(i + 6*(kint-1)) = svars(i + 6*(kint-1))+
-     1              kFp(noel,kint,iCOR)*kDGA(noel, kint, ISLIPS)*
-     1              IBURG*STATEV(ISL)         
-             END DO	 
-             END DO
-         END DO	 		
-c       write(6,*) "CP3"	
-        call MutexUnlock( 2 )  			
-        call VectorCurl(svars,xnat8,gauss,gausscoords) 		
-c       write(6,*) "CP4"				
-      call MutexLock( 3 )      ! lock Mutex #1 
-      DO kint =1, 8
-          DO i=1, 3
-              kcurlFp(noel,kint,i) = svars(3+i + 6*(kint-1))
-          END DO
-      END DO
-
-c -------------------------------------------
-c      IF (KINC.EQ.2) THEN
-c        write(6,*) "--------------------------------"	
-c        write(6,*) "noel,npt,ISLIP=", noel, npt, ISLIPS
-c        write(6,*) svars(4+ 6*(npt-1)), svars(5+ 6*(npt-1)), 
-c     1             svars(6+ 6*(npt-1))		
-c      END IF	  
-	  
-	  
-      call MutexUnlock( 3 )      ! lock Mutex #1 
-	  
-c       write(6,*) "CP5"		
       DO i=1,3
-          KCURLLOCAL(3+I) = svars(3+i + 6*(npt-1))
-		  KCURLLOCAL(I) =svars(i + 6*(npt-1))
-
-c		  ICOR=(ISLIPS-1)*6
-		  STATEV(I+560)=STATEV(I+560)+ KCURLLOCAL(I) 
-		  STATEV(I+570)=STATEV(I+570)+ KCURLLOCAL(3+I)		  
+        DO j=1,3 
+         CFP(i,j) = kcurlFp(noel,npt,j+(i-1)*3)
+        END DO
       END DO
-c       write(6,*) "CP6"		
-
-      DO i=1,3	  
-	      ICOR=3*(ISLIPS-1)+I
-          dRhoS(ISLIPS)=dRhoS(ISLIPS)+
-     1 (STATEV(ICOR)*KCURLLOCAL(3+I))
-          dRhoET(ISLIPS)=dRhoET(ISLIPS)+
-     1 (SLIP_T(ICOR)*KCURLLOCAL(3+I))
-          dRhoEN(ISLIPS)=dRhoEN(ISLIPS)+
-     1 (STATEV(ICOR+54)*KCURLLOCAL(3+I))
-      END DO	  
-c       write(6,*) "CP7=",ISLIPS
-      END DO
+c--------------------------------------------------
+c Calculate Rho_GND
+      IBURG=PROPS(69)*0.001
+      call kcalcGND(STATEV(1:54),STATEV(55:108),SLIP_T,
+     + dRhoS,dRhoET,dRhoEN,
+     + CFP,
+     + IBURG)
 		 
 c--------------------------------------------------		 
          DO ISLIPS=1,9
+		    if (abs(dFP(ISLIPS)).GE.(1.0e-8)) THEN
 		     STATEV(400+ISLIPS)=STATEV(400+ISLIPS)+dFP(ISLIPS)
+		    END IF
          END DO		 
 
-       call MutexLock( 1 )      ! lock Mutex #1 
-   
-       DO i=1,3      
-       DO j=1,3  	   
-		ICOR=(J-1)*3+I
-        kFp(noel,npt,iCOR)= STATEV(400+ICOR)
-	 
-       END DO	 
-       END DO	   
-
-      DO ISLIPS =1, 18	  
-	    kDGA(noel, npt, ISLIPS)= DGA(ISLIPS)
-      END DO
-	   
-       call MutexunLock( 1 ) 
-		 
+		STATEV(647)=0.0
+		STATEV(648)=0.0
+		STATEV(649)=0.0
          DO ISLIPS=1,18
-c		     STATEV(409+ISLIPS)=STATEV(409+ISLIPS)+dRhoS(ISLIPS)
-c		     STATEV(429+ISLIPS)=STATEV(429+ISLIPS)+dRhoET(ISLIPS)
-c		     STATEV(447+ISLIPS)=STATEV(447+ISLIPS)+dRhoEN(ISLIPS)		
+		     STATEV(409+ISLIPS)=dRhoS(ISLIPS)
+		     STATEV(429+ISLIPS)=dRhoET(ISLIPS)
+		     STATEV(447+ISLIPS)=dRhoEN(ISLIPS)		
 
-c		     IF (STATEV(409+ISLIPS).LE.0.0) THEN
-c		        STATEV(409+ISLIPS)=0.0
-c		     ENDIF
-c		     IF (STATEV(429+ISLIPS).LE.0.0) THEN
-c		        STATEV(429+ISLIPS)=0.0
-c		     ENDIF
-c		     IF (STATEV(447+ISLIPS).LE.0.0) THEN
-c		        STATEV(447+ISLIPS)=0.0
-c		     ENDIF			 
-		     STATEV(465+ISLIPS)=STATEV(465+ISLIPS)+dRhoS(ISLIPS)
-		     STATEV(483+ISLIPS)=STATEV(483+ISLIPS)+dRhoET(ISLIPS)
-		     STATEV(501+ISLIPS)=STATEV(501+ISLIPS)+dRhoEN(ISLIPS)		
-
-			 
+		     STATEV(509+ISLIPS)=dRhoS(ISLIPS)*dRhoS(ISLIPS)
+		     STATEV(529+ISLIPS)=dRhoET(ISLIPS)*dRhoET(ISLIPS)
+		     STATEV(547+ISLIPS)=dRhoEN(ISLIPS)*dRhoEN(ISLIPS)
+			 STATEV(647)=STATEV(647)+dRhoS(ISLIPS)*dRhoS(ISLIPS)
+			 STATEV(648)=STATEV(648)+dRhoET(ISLIPS)*dRhoET(ISLIPS)
+			 STATEV(649)=STATEV(649)+dRhoEN(ISLIPS)*dRhoEN(ISLIPS)
          END DO		
 
-c  -----------------------------------
+		     STATEV(650)=STATEV(647)+STATEV(648)+STATEV(649)
+
+      DO i=1,9
+          STATEV(600+i)= kFp(noel,npt,i)	  
+		  STATEV(600+i+9)= kcurlFp(noel,npt,i)
+      END DO
+	  
+	  
+      IF (npt == 8 ) THEN ! update curl Fp	 
+      INCLUDE 'kgauss2.f'     
+      xnat8 = xnat(1:8,:) 		  
+c ---------------------------  	  
+         DO kint =1,8    
+             DO i=1,3         
+                 gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
+             END DO
+         
+             DO i=1,9          
+                 svars(i + 18*(kint-1)) = kFp(noel,kint,i)         
+             END DO
+         END DO	  
+	  
+      CALL kcurl(svars,xnat8,gauss,gausscoords)
+    
+      call MutexLock( 3 )      ! lock Mutex #1 
+      DO kint =1, 8
+          DO i=1, 9
+              kcurlFp(noel,kint,i) = svars(9+i + 18*(kint-1))
+          END DO
+      END DO
+      call MutexUnlock( 3 )      ! lock Mutex #1 
+      END IF
+	  
+c -------------------------
+
+	  
+c ------------------------------
+c XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      call MutexLock( 1 )      ! lock Mutex #1 
+      DO i=1,9                                                      
+          kFp(noel,npt,i)= statev(400+i)
+      END DO
+      call MutexUnlock( 1 )      ! lock Mutex #1 
+c --------------------------------------
       DO ISLIPS=1,6
        IF ((ABS(DStress(ISLIPS)).LT.5.0e1)) THEN
        ELSE
@@ -507,43 +461,10 @@ c  -----------------------------------
        END IF	   
       END DO		  
 c ------------------------------------------------	 
-
-c H, RhoCSD, TAUC
-      DO ISLIPS=1,12  
-       STATEV(500+ISLIPS)=H(ISLIPS)
-       STATEV(520+ISLIPS)=RhoCSD(ISLIPS)
-      END DO
-       STATEV(600)=0.0	  
-       STATEV(601)=0.0
-	   STATEV(602)=0.0
-	   STATEV(603)=0.0
-	   STATEV(605)=0.0
-	   STATEV(606)=0.0
-      DO ISLIPS=1,18  
-		STATEV(540+ISLIPS)=TAUC(ISLIPS)
-		STATEV(600)=STATEV(600)+STATEV(ISLIPS+126)
-		STATEV(601)=STATEV(601)+STATEV(409+ISLIPS)*STATEV(409+ISLIPS)
-		STATEV(602)=STATEV(602)+STATEV(429+ISLIPS)*STATEV(429+ISLIPS)
-		STATEV(603)=STATEV(603)+STATEV(447+ISLIPS)*STATEV(447+ISLIPS)
-		
-		STATEV(605)=STATEV(605)+DGA(ISLIPS)
-		STATEV(606)=STATEV(606)+abs(DGA(ISLIPS))
-      END DO		  
-	  
-	  
-	    STATEV(604)=STATEV(601)+STATEV(602)+STATEV(603)
-		STATEV(611)=noel
-		STATEV(612)=npt		
-		STATEV(613)=coords(1)
-		STATEV(614)=coords(2)
-		STATEV(615)=coords(3)	
-c		call MutexLock( 8 )      ! lock Mutex #1 
-c       DO kint=1,8 
-c       DO i=1,3                                                      
-c        STATEV(615+I+8*(kint-8))= kgausscoords(noel,kint,i)
-c       END DO
-c       END DO
-c		call MutexUnlock( 8 )  
+       IF (KINC.EQ.100) THEN
+	   PNEWDT=0.001
+       END IF	 	   
+c  ----------------------------------- 
       return
       end subroutine UMAT
 
@@ -563,5 +484,9 @@ c		call MutexUnlock( 8 )
       include 'VectorCurl.f'	  	  
 c      include 'CalculateDRhoDBG.f'	  
       include 'kshapes.f'
+      include 'kCalcGND.f'
       include 'utils.f'
+      include 'utilsX.f'
       include 'uexternaldb.f'
+      include 'kcurlJ.f'
+      include 'ksvd2.f'

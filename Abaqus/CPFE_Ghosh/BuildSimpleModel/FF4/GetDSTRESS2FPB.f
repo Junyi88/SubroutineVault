@@ -147,7 +147,6 @@ c--------------------------------------
         DO J=1,3
         DO K=1,3
 		ISYS=3*(J-1)+I
-c		ISYS=3*(I-1)+J ! Transposed
         IVAL=3*(K-1)+I
 		ICOR=3*(J-1)+K
         DFP(ISYS)=DFP(ISYS)+LP(IVAL)*FP(ICOR)

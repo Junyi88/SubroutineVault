@@ -4,7 +4,7 @@ C *                     Compute Curl of a 2nd order tensor                      
 C *              As a vector, curl of row written in corresponding column       *
 C *                          Full integration                                   *
 C *******************************************************************************
-       SUBROUTINE VectorCurl(svars,xnat8,gauss,gausscoords) 
+       SUBROUTINE kcurl(nsvars,svars,knsdv,xnat8,gauss,gausscoords) 
 
        INCLUDE 'ABA_PARAM.INC'
 
@@ -12,10 +12,10 @@ C ******************************************************************************
       real*8,parameter  :: zero=1.0e-6,xgauss = 0.577350269189626
 
       !scalars
-      integer,parameter :: knsdv=6, nintpts = 8
-      integer,parameter :: nsvars=nintpts * knsdv
+      integer,intent(in) :: nsvars,knsdv
+      
       !arrays
-      real*8,intent(inout):: svars(48)
+      real*8,intent(inout):: svars(nsvars)
       real*8,intent(in) :: xnat8(nnodes,3),gauss(nnodes,3),
      + gausscoords(3,nnodes)
 
@@ -61,44 +61,33 @@ C
 C     SET UP JACOBIAN           
 C  
       xj = matmul(gausscoords,dndloc)
-c      write(6,*)"---------------------------"
-c      write(6,*)"gausscoords"
-c      write(6,*)gausscoords
-c      write(6,*)"xj"
-c      write(6,*)xj
-
+!      write(6,*)"xj"
+!      write(6,*)xj
+!      write(6,*)"xj"
+!      write(6,*)xj
 C
 C    AND ITS INVERSE
 C
       call KDETER(xj,det)
-c      write(6,*)"DET0=",abs(det)      
+      
 !      write(6,*)"kint2,det",kint2,det
       
-      if (abs(det) <= zero .or. det /= det) then !last part true if det=NaN
+      if (abs(det) <= 1.0e-6 .or. det /= det) then !last part true if det=NaN
          dmout = 0.0
-         z11i(kint2) = 0.0
-         z21i(kint2) = 0.0
-         z31i(kint2) = 0.0  
       else  
          call lapinverse(xj,3,info,xjinv)
-c         if(info /= 0) write(6,*) "inverse failure: xj in kcurl"
+!         if(info /= 0) write(6,*) "inverse failure: xj in kcurl"
 C
       dndx = matmul(dndloc,xjinv) 
 C
 C    DETERMINE first column of curlf: Read row, to determine column.
 C
       do kint = 1,8 !integration points are our nodes now
-      fnode(1,kint) = svars((kint-1)*6+1)
-      fnode(2,kint) = svars((kint-1)*6+2)
-      fnode(3,kint) = svars((kint-1)*6+3)
+      fnode(1,kint) = svars((kint-1)*knsdv+81)
+      fnode(2,kint) = svars((kint-1)*knsdv+82)
+      fnode(3,kint) = svars((kint-1)*knsdv+83)
       end do
 C
-c      write(6,*)"---------------------------"
-c      write(6,*)"fnode"
-c      write(6,*)fnode(1,:)
-c      write(6,*)fnode(2,:)
-c      write(6,*)fnode(3,:)
-	  
       fmat1 = matmul(fnode,dndx)
 !      dmout(1,1) = fmat1(3,2) - fmat1(2,3)
 !      dmout(2,1) = fmat1(1,3) - fmat1(3,1)
@@ -111,7 +100,45 @@ c      write(6,*)fnode(3,:)
       
 !      write(6,*)"z11i",kint2; write(6,fmt8)z11i
             
-C     
+C
+C    DETERMINE second column of curlf
+C
+      do kint = 1,8
+      fnode(1,kint) = svars((kint-1)*knsdv+84)
+      fnode(2,kint) = svars((kint-1)*knsdv+85)
+      fnode(3,kint) = svars((kint-1)*knsdv+86)
+      end do
+C
+      fmat1 = matmul(fnode,dndx)
+!      dmout(1,2) = fmat1(3,2) - fmat1(2,3)
+!      dmout(2,2) = fmat1(1,3) - fmat1(3,1)
+!      dmout(3,2) = fmat1(2,1) - fmat1(1,2)
+      
+      !Curlfp at integeration points
+      z12i(kint2) = fmat1(3,2) - fmat1(2,3)
+      z22i(kint2) = fmat1(1,3) - fmat1(3,1)
+      z32i(kint2) = fmat1(2,1) - fmat1(1,2)
+      
+!      write(6,*)"z12i",kint2; write(6,fmt8)z12i
+             
+C
+C    DETERMINE third column of curlf
+C
+      do kint = 1,8
+      fnode(1,kint) = svars((kint-1)*knsdv+87)
+      fnode(2,kint) = svars((kint-1)*knsdv+88)
+      fnode(3,kint) = svars((kint-1)*knsdv+89)
+      end do
+C
+      fmat1 = matmul(fnode,dndx)
+!      dmout(1,3) = fmat1(3,2) - fmat1(2,3)
+!      dmout(2,3) = fmat1(1,3) - fmat1(3,1)
+!      dmout(3,3) = fmat1(2,1) - fmat1(1,2)
+      
+      !Curlfp at integeration points
+      z13i(kint2) = fmat1(3,2) - fmat1(2,3)
+      z23i(kint2) = fmat1(1,3) - fmat1(3,1)
+      z33i(kint2) = fmat1(2,1) - fmat1(1,2)         
 C
       end if
 
@@ -130,14 +157,21 @@ C
 !      write(6,*)"z12i",kint2; write(6,fmt8)z12i
 !      write(6,*)"xnmat",kint2; write(6,fmt8)(xnmat(i,:),i=1,8)
       
-c      call lapinverse(xnmat,nnodes,info2,xnmatI)
+      call lapinverse(xnmat,nnodes,info2,xnmatI)
 !      if(info2 /= 0) write(6,*) "inverse failure: xnmat in kcurl"
 !      write(6,*)"xnmatI",kint2; write(6,fmt8)(xnmatI(i,:),i=1,8)
       
-c      z11n = matmul(xnmatI,z11i)
-c      z21n = matmul(xnmatI,z21i)
-c      z31n = matmul(xnmatI,z31i)
+      z11n = matmul(xnmatI,z11i)
+      z21n = matmul(xnmatI,z21i)
+      z31n = matmul(xnmatI,z31i)
       
+      z12n = matmul(xnmatI,z12i)
+      z22n = matmul(xnmatI,z22i)
+      z32n = matmul(xnmatI,z32i)
+      
+      z13n = matmul(xnmatI,z13i)
+      z23n = matmul(xnmatI,z23i)
+      z33n = matmul(xnmatI,z33i)
       
 !      write(6,*)"z11i",kint2; write(6,fmt8)z11i
 !      write(6,*)"z11n"; write(6,fmt8)z11n
@@ -146,12 +180,17 @@ c      z31n = matmul(xnmatI,z31i)
 
       !The storage is done by row.
       do kint=1,nnodes
-c         svars((kint-1)*knsdv+4) = z11n(kint)
-c         svars((kint-1)*knsdv+5) = z12n(kint)
-c         svars((kint-1)*knsdv+6) = z13n(kint)
-         svars((kint-1)*6+4) = z11i(kint)
-         svars((kint-1)*6+5) = z21i(kint)
-         svars((kint-1)*6+6) = z31i(kint)      
+         svars((kint-1)*knsdv+38) = z11n(kint)
+         svars((kint-1)*knsdv+39) = z12n(kint)
+         svars((kint-1)*knsdv+40) = z13n(kint)
+         
+         svars((kint-1)*knsdv+41) = z21n(kint)
+         svars((kint-1)*knsdv+42) = z22n(kint)
+         svars((kint-1)*knsdv+43) = z23n(kint)
+         
+         svars((kint-1)*knsdv+44) = z31n(kint)
+         svars((kint-1)*knsdv+45) = z32n(kint)
+         svars((kint-1)*knsdv+46) = z33n(kint)      
       end do !kint 
 C     
       RETURN
