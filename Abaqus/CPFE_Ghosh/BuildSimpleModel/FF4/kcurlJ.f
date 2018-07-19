@@ -12,10 +12,10 @@ C ******************************************************************************
       real*8,parameter  :: zero=1.0e-6,xgauss = 0.577350269189626
 
       !scalars
-      integer:: nsvars=144, knsdv=18
+      integer::  knsdv=18
       
       !arrays
-      real*8,intent(inout):: svars(nsvars)
+      real*8,intent(inout):: svars(144)
       real*8,intent(in) :: xnat8(nnodes,3),gauss(nnodes,3),
      + gausscoords(3,nnodes)
 

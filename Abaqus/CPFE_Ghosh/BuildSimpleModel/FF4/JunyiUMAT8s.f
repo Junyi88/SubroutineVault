@@ -36,7 +36,7 @@ C     REFERENCE: Li & al. Acta Mater. 52 (2004) 4859-4875
 C     
       real*8,parameter  :: zero=1.0e-16,xgauss = 0.577350269189626
       real*8,parameter  :: xweight = 1.0
-      integer, parameter :: TOTALELEMENTNUM=1728
+      integer, parameter :: TOTALELEMENTNUM=735680
 c  1728 853200
       Real*8:: FTINV(3,3),STRATE(3,3),VELGRD(3,3),AUX1(3,3),ONEMAT(3,3)
       PARAMETER (ONE=1.0D0,TWO=2.0D0,THREE=3.0D0,SIX=6.0D0)
@@ -387,28 +387,25 @@ c--------------------------------------------------
 		    END IF
          END DO		 
 
-		STATEV(647)=0.0
-		STATEV(648)=0.0
-		STATEV(649)=0.0
+		STATEV(466)=0.0
+		STATEV(467)=0.0
+		STATEV(468)=0.0
          DO ISLIPS=1,18
-		     STATEV(409+ISLIPS)=dRhoS(ISLIPS)
-		     STATEV(429+ISLIPS)=dRhoET(ISLIPS)
-		     STATEV(447+ISLIPS)=dRhoEN(ISLIPS)		
+c		     STATEV(409+ISLIPS)=dRhoS(ISLIPS)
+c		     STATEV(429+ISLIPS)=dRhoET(ISLIPS)
+c		     STATEV(447+ISLIPS)=dRhoEN(ISLIPS)		
 
-		     STATEV(509+ISLIPS)=dRhoS(ISLIPS)*dRhoS(ISLIPS)
-		     STATEV(529+ISLIPS)=dRhoET(ISLIPS)*dRhoET(ISLIPS)
-		     STATEV(547+ISLIPS)=dRhoEN(ISLIPS)*dRhoEN(ISLIPS)
-			 STATEV(647)=STATEV(647)+dRhoS(ISLIPS)*dRhoS(ISLIPS)
-			 STATEV(648)=STATEV(648)+dRhoET(ISLIPS)*dRhoET(ISLIPS)
-			 STATEV(649)=STATEV(649)+dRhoEN(ISLIPS)*dRhoEN(ISLIPS)
+			 STATEV(466)=STATEV(466)+dRhoS(ISLIPS)*dRhoS(ISLIPS)
+			 STATEV(467)=STATEV(467)+dRhoET(ISLIPS)*dRhoET(ISLIPS)
+			 STATEV(468)=STATEV(468)+dRhoEN(ISLIPS)*dRhoEN(ISLIPS)
          END DO		
 
-		     STATEV(650)=STATEV(647)+STATEV(648)+STATEV(649)
+		     STATEV(469)=STATEV(466)+STATEV(467)+STATEV(468)
 
-      DO i=1,9
-          STATEV(600+i)= kFp(noel,npt,i)	  
-		  STATEV(600+i+9)= kcurlFp(noel,npt,i)
-      END DO
+c      DO i=1,9
+c          STATEV(600+i)= kFp(noel,npt,i)	  
+c		  STATEV(600+i+9)= kcurlFp(noel,npt,i)
+c      END DO
 c XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       call MutexLock( 5 )      ! lock Mutex #1 
       DO i=1,9                                                      
@@ -466,9 +463,9 @@ c --------------------------------------
        END IF	   
       END DO		  
 c ------------------------------------------------	 
-       IF (KINC.EQ.100) THEN
-	   PNEWDT=0.001
-       END IF	 	   
+c       IF (KINC.EQ.100) THEN
+c	   PNEWDT=0.001
+c       END IF	 	   
 c  ----------------------------------- 
       return
       end subroutine UMAT
