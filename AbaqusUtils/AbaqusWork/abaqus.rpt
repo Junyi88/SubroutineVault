@@ -1,0 +1,12 @@
+
+                                                S:Max Principal (  S:Max Principal P  S:Mid Principal P  S:Min Principal P                                                                                                                                                          S:Third Invariant                   
+                             PEEQ PI: PART-1-1  Abs) PI: PART-1-1  I: PART-1-1 E: 1   I: PART-1-1 E: 1   I: PART-1-1 E: 1   S:Mises PI: PART-  S:Pressure PI: PA  S:S11 PI: PART-1-  S:S12 PI: PART-1-  S:S13 PI: PART-1-  S:S22 PI: PART-1-  S:S23 PI: PART-1-  S:S33 PI: PART-1-   PI: PART-1-1 E:   S:Tresca PI: PART
+                  X              E: 1 IP: 1         E: 1 IP: 1           IP: 1              IP: 1              IP: 1          1-1 E: 1 IP: 1   RT-1-1 E: 1 IP: 1     1 E: 1 IP: 1       1 E: 1 IP: 1       1 E: 1 IP: 1       1 E: 1 IP: 1       1 E: 1 IP: 1       1 E: 1 IP: 1         1 IP: 1        -1-1 E: 1 IP: 1 
+
+                0.                 0.                 0.                 0.                 0.                 0.                 0.                -0.                 0.                 0.                 0.                 0.                 0.                 0.                 0.                 0.         
+                1.E-03             0.                 9.7114             9.7114             1.18091E-15      788.432E-18          9.7114            -3.23713            9.7114           343.768E-18        271.085E-18        788.432E-18        418.414E-18          1.18091E-15        9.7114             9.7114     
+                1.E-03             0.                 5.37749            5.37749         -111.493E-03       -111.493E-03          5.48898           -1.71817            5.37749          126.806E-18        297.746E-18       -111.493E-03         80.2342E-18      -111.493E-03          5.48898            5.48898    
+
+
+
+
