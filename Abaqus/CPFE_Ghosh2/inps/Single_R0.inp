@@ -50,7 +50,7 @@
 *Density
  1e-21,
 *Depvar
-    600,
+    800,
 *User Material, constants=79
 1.,       0.,       0.,       0.,       1.,       0.,       0.,       0.
        1.,  0.00501,  0.00501,  0.00501,  0.00501,  0.00501,  0.00501,  0.00501
@@ -66,7 +66,7 @@
 ** 
 ** STEP: Step-1
 ** 
-*Step, name=Step-1, nlgeom=YES
+*Step, name=Step-1, nlgeom=YES, inc=200
 *Static
 0.001, 1., 1e-08, 0.1
 ** 
