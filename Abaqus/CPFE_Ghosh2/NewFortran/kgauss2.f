@@ -51,12 +51,12 @@
 !Reflect: This gives exactly the results before. It gets one of the faces in logical order!      
       gauss(1,:) = (/xnat(1,1),xnat(1,2),xnat(1,3)/)*xgauss  
       gauss(2,:) = (/xnat(2,1),xnat(2,2),xnat(2,3)/)*xgauss
-      gauss(4,:) = (/xnat(3,1),xnat(3,2),xnat(3,3)/)*xgauss
-      gauss(3,:) = (/xnat(4,1),xnat(4,2),xnat(4,3)/)*xgauss      
+      gauss(3,:) = (/xnat(3,1),xnat(3,2),xnat(3,3)/)*xgauss
+      gauss(4,:) = (/xnat(4,1),xnat(4,2),xnat(4,3)/)*xgauss      
       gauss(5,:) = (/xnat(5,1),xnat(5,2),xnat(5,3)/)*xgauss 
       gauss(6,:) = (/xnat(6,1),xnat(6,2),xnat(6,3)/)*xgauss 
-      gauss(8,:) = (/xnat(7,1),xnat(7,2),xnat(7,3)/)*xgauss  
-      gauss(7,:) = (/xnat(8,1),xnat(8,2),xnat(8,3)/)*xgauss    
+      gauss(7,:) = (/xnat(7,1),xnat(7,2),xnat(7,3)/)*xgauss  
+      gauss(8,:) = (/xnat(8,1),xnat(8,2),xnat(8,3)/)*xgauss    
               
 !================================================= 
         

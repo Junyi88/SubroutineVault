@@ -9,7 +9,7 @@ c
 #include <SMAAspUserSubroutines.hdr>
       CHARACTER*8 CMNAME
 c      EXTERNAL F
-
+      real*8:: Statev
       dimension stress(ntens),statev(nstatv),
      1 ddsdde(ntens,ntens),ddsddt(ntens),drplde(ntens),
      2 stran(ntens),dstran(ntens),time(2),predef(1),dpred(1),
@@ -28,6 +28,7 @@ c      EXTERNAL F
       real*8 :: MXSLIP=1.0e-3
       real*8 :: ORI_ROT(3,3), SPIN_TENSOR(3,3)
       real*8:: dFP(9), dRhoS(18),dRhoET(18),dRhoEN(18)
+      real*8:: FWORDMORON
 c ------------------------------------------------	  
 C
 C     CALCULATE VELOCITY GRADIENT FROM DEFORMATION GRADIENT.
@@ -35,22 +36,27 @@ C     REFERENCE: Li & al. Acta Mater. 52 (2004) 4859-4875
 C     
       real*8,parameter  :: zero=1.0e-16,xgauss = 0.577350269189626
       real*8,parameter  :: xweight = 1.0
-      integer, parameter :: TOTALELEMENTNUM=159520
+      integer, parameter :: TOTALELEMENTNUM=100
 c  1728 853200
       Real*8:: FTINV(3,3),STRATE(3,3),VELGRD(3,3),AUX1(3,3),ONEMAT(3,3)
       PARAMETER (ONE=1.0D0,TWO=2.0D0,THREE=3.0D0,SIX=6.0D0)
-      DATA NEWTON,TOLER/10,1.D-6/
+c      DATA NEWTON,TOLER/10,1.D-6/
       Real*8:: gausscoords(3,8)
-      real*8 :: kgausscoords, kFp, kcurlFp, kDGA
+      real*8 :: kgausscoords, kFp, kcurlFp, kDGA, kX
       real*8:: xnat(20,3),xnat8(8,3),gauss(8,3), DGA(18)
       real*8:: svars(144)
+	  
+      INTEGER:: PLASTICFLAG
 c XDANGER
       COMMON/UMPS/kgausscoords(TOTALELEMENTNUM,8,3),
      1 kFp(TOTALELEMENTNUM,8, 9),
-     1 kcurlFp(TOTALELEMENTNUM, 8, 9)
-	 
+     1 kcurlFp(TOTALELEMENTNUM, 8, 9), 
+     1 kDGA(TOTALELEMENTNUM, 8, 9),
+     1 kX(TOTALELEMENTNUM, 8, 9)
 c -------------------------------------------------
 c Initialisation
+
+	  
       IF (KINC.LE.1) THEN
        DO ISLIPS=1,nstatv
           STATEV(ISLIPS)=0.0
@@ -174,12 +180,14 @@ c       END DO
           kgausscoords(noel,npt,i) = coords(i)
           statev(480+I) = coords(i)
         end do
+
+        if	(npt == 8) THEN	
         DO kint =1,8 
           DO i=1,3         
            gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
           END DO 
          END DO	  
-	  
+        end if
         kfP(noel,npt,1)=1.0
         kfP(noel,npt,5)=1.0
         kfP(noel,npt,9)=1.0
@@ -204,7 +212,11 @@ c       END DO
 	  
       ENDIF
 c ---
-
+      DO i=1, 9
+         STATEV(770+I) = kcurlFp(noel,npt,i)
+      END DO	
+	  
+C XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 c --------------------------------
 C Calculate som common values
         call Get_TfromSN(STATEV(1:54),STATEV(55:108),SLIP_T)
@@ -273,9 +285,9 @@ c UPDATE ALL
        STATEV(ISLIPS+144)=STATEV(ISLIPS+144)+DGA(ISLIPS)
        STATEV(163)=STATEV(163)+abs(DGA(ISLIPS))
       END DO
-      DO ISLIPS=1,6
-       Stress(ISLIPS)=Stress(ISLIPS)+DStress(ISLIPS)	
-      END DO
+C       DO ISLIPS=1,6
+C        Stress(ISLIPS)=Stress(ISLIPS)+DStress(ISLIPS)	
+C       END DO
       DO ISLIPS=1,12
        STATEV(ISLIPS+126)=RhoCSD(ISLIPS)	
       END DO
@@ -305,13 +317,23 @@ c Calculate Rho_GND
      + CFP,
      + IBURG)
 		 
-c--------------------------------------------------		 
+c--------------------------------------------------		
+         PLASTICFLAG = 0 
          DO ISLIPS=1,9
-		    if (abs(dFP(ISLIPS)).GE.(1.0e-8)) THEN
-		     STATEV(400+ISLIPS)=STATEV(400+ISLIPS)+dFP(ISLIPS)
+		    if (abs(dFP(ISLIPS)).GE.(1.0e-6)) THEN
+c		     STATEV(400+ISLIPS)=STATEV(400+ISLIPS)+dFP(ISLIPS)
+		     PLASTICFLAG = 1
 		    END IF
-         END DO		 
+         END DO		
+		
+		    if (PLASTICFLAG == 1) THEN		 
+         DO ISLIPS=1,9
 
+		     STATEV(400+ISLIPS)=STATEV(400+ISLIPS)+dFP(ISLIPS)
+		     
+
+         END DO		
+		    END IF		 
          STATEV(466)=0.0
          STATEV(467)=0.0
          STATEV(468)=0.0
@@ -335,48 +357,148 @@ c SDV(428->429) :: SRho SSD (ISLIP)
 		     STATEV(429)=STATEV(429)+STATEV(126+ISLIPS)
          END DO	
 		     STATEV(469)=STATEV(466)+STATEV(467)+STATEV(468)
+c      DO i=1, 9
+c         STATEV(600+I) = kcurlFp(noel,npt,i)
+c         STATEV(610+I) = kFp(noel,npt,i)
+c      END DO	
 
-c -------------------------------------------
+C XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+c --------------------------------
+C Calculate som common values
       IF (npt == 8 ) THEN ! update curl Fp	 
       INCLUDE 'kgauss2.f'     
-      xnat8 = xnat(1:8,:) 		  
-c ---------------------------  	  
+      xnat8 = xnat(1:8,:) 		
+c ------------------------
          DO kint =1,8    
-             DO i=1,3         
-                 gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
-             END DO
+c             DO i=1,3         
+c                 gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
+c             END DO
          
              DO i=1,9          
-                 svars(i + 18*(kint-1)) = kFp(noel,kint,i)         
+                 svars(i + 18*(kint-1)) = kFp(noel,kint,i)
              END DO
-         END DO	  
+         END DO	  	  
+c ---------------------------
+C          DO kint =1,8        
+C              DO i=1,9          
+C                  svars(i + 18*(kint-1)) = 0.0		 
+C              END DO
+C          END DO	  
+C        svars(   1 )=   1.00168894230775     
+C        svars(   2 )= -4.367406225334836E-019
+C        svars(   3 )=  3.642920309857558E-020
+C        svars(   4 )= -8.698496561446528E-020
+C        svars(   5 )=  0.996630419844280     
+C        svars(   6 )= -1.148707946645798E-020
+C        svars(   7 )=  3.457327773001572E-020
+C        svars(   8 )=  4.779935736863440E-020
+C        svars(   9 )=   1.00168894230775     
+C        svars(  19 )=   1.00168894230775     
+C        svars(  20 )=  1.738758857668812E-019
+C        svars(  21 )=  3.457327773001572E-020
+C        svars(  22 )= -8.698496561446528E-020
+C        svars(  23 )=  0.996630419844280     
+C        svars(  24 )= -6.589749465511214E-021
+C        svars(  25 )=  3.457327773001572E-020
+C        svars(  26 )=  4.482044221181302E-020
+C        svars(  27 )=   1.00168894230775     
+C        svars(  37 )=   1.00168894230775     
+C        svars(  38 )= -7.583439870741832E-019
+C        svars(  39 )=  4.151920006271557E-020
+C        svars(  40 )= -6.746862424499425E-020
+C        svars(  41 )=  0.996630419844280     
+C        svars(  42 )= -4.034802469796552E-020
+C        svars(  43 )=  2.354322733132434E-020
+C        svars(  44 )=  1.079473314471735E-019
+C        svars(  45 )=   1.00168894230775     
+C        svars(  55 )=   1.00168894230775     
+C        svars(  56 )=  1.350470347921469E-019
+C        svars(  57 )=  2.354322733132434E-020
+C        svars(  58 )= -6.746862424499425E-020
+C        svars(  59 )=  0.996630419844280     
+C        svars(  60 )=  3.570441772386774E-021
+C        svars(  61 )=  2.354322733132434E-020
+C        svars(  62 )=  6.858472900367286E-020
+C        svars(  63 )=   1.00168894230775     
+C        svars(  73 )=   1.00168894230775     
+C        svars(  74 )= -2.248118123696042E-019
+C        svars(  75 )=  2.115734842884869E-020
+C        svars(  76 )= -8.698496561446528E-020
+C        svars(  77 )=  0.996630419844280     
+C        svars(  78 )= -2.758883419489638E-020
+C        svars(  79 )=  3.457327773001572E-020
+C        svars(  80 )=  5.461690612533097E-020
+C        svars(  81 )=   1.00168894230775     
+C        svars(  91 )=   1.00168894230775     
+C        svars(  92 )=  1.738758857668812E-019
+C        svars(  93 )=  3.457327773001572E-020
+C        svars(  94 )= -8.698496561446528E-020
+C        svars(  95 )=  0.996630419844280     
+C        svars(  96 )= -6.589749465511214E-021
+C        svars(  97 )=  3.457327773001572E-020
+C        svars(  98 )=  4.482044221181302E-020
+C        svars(  99 )=   1.00168894230775     
+C        svars( 109 )=   1.00168894230775     
+C        svars( 110 )= -9.462191036105157E-019
+C        svars( 111 )= -9.016713697741803E-022
+C        svars( 112 )= -8.698496561446528E-020
+C        svars( 113 )=  0.996630419844280     
+C        svars( 114 )= -3.525827613228095E-020
+C        svars( 115 )=  3.457327773001572E-020
+C        svars( 116 )=  4.698232682959014E-020
+C        svars( 117 )=   1.00168894230775     
+C        svars( 127 )=   1.00162897108488     
+C        svars( 128 )=  1.738967094423529E-019
+C        svars( 129 )=  3.457120782422306E-020
+C        svars( 130 )= -8.697975781537819E-020
+C        svars( 131 )=  0.996749778019433     
+C        svars( 132 )= -6.589354936514069E-021
+C        svars( 133 )=  3.457120782422306E-020
+C        svars( 134 )=  4.482580998514745E-020
+C        svars( 135 )=   1.00162897108488 
+C          DO kint =1,8        
+C              DO i=1,9          
+C                  kX(noel,kint,1) = 1.00862	
+C                  kX(noel,kint,2) = 0.0	
+C                  kX(noel,kint,3) = 0.0	
+C                  kX(noel,kint,4) = 0.0	
+C                  kX(noel,kint,5) = 0.982986	
+C                  kX(noel,kint,6) = 0.0	
+C                  kX(noel,kint,7) = 0.0
+C                  kX(noel,kint,8) = 0.0	
+C                  kX(noel,kint,9) = 1.00862					 
+C              END DO
+C          END DO	  
+  	  
+C          DO kint =1,8        
+C              DO i=1,9          
+C                  svars(i + 18*(kint-1)) = kX(noel,kint,i)		 
+C              END DO
+C          END DO	  
 	  
       CALL kcurl(svars,xnat8,gauss,gausscoords)
 
-      DO i=1, 9
-         STATEV(600+I) = kcurlFp(noel,npt,i)
-      END DO	
-	  
       call MutexLock( 5 )      ! lock Mutex #1 
-      DO kint =1, 8
+
+      DO J =1, 8
           DO i=1, 9
-              kcurlFp(noel,kint,i) = svars(9+i + 18*(kint-1))
-              STATEV(520+(10*kint)+I) = svars(9+i + 18*(kint-1))
+              kcurlFp(noel,J,i) = svars(9+i + 18*(J-1))
+              kDGA(noel,J,i) = svars(9+i + 18*(J-1))
+
+              STATEV(600+(10*J)+I) = svars(9+i + 18*(J-1))
+              STATEV(500+(10*J)+I) = svars(i + 18*(J-1))
           END DO
       END DO
       call MutexUnlock( 5 )      ! lock Mutex #1 
 
       END IF
-	  
-  
-	  
 c ----------
       call MutexLock( 6 )      ! lock Mutex #1 
       DO i=1,9                                                      
           kFp(noel,npt,i)= statev(400+i)
-c		  statev(470+I) = kcurlFp(noel,npt,i) ! PROBLEM 
       END DO
       call MutexUnlock( 6 )      ! lock Mutex #1 
+
 c --------------------------------------
       DO ISLIPS=1,6
        IF ((ABS(DStress(ISLIPS)).GT.5.0e1)) THEN
@@ -389,8 +511,9 @@ c --------------------------------------
          PNEWDT=0.5
        END IF	   
       END DO	  
+C 	  
 c -------------------------------------------------
-C       CALL UMATTEMPLATE(STRESS,STATEV,DDSDDE,SSE,SPD,SCD,
+C        CALL UMATTEMPLATE(STRESS,STATEV,DDSDDE,SSE,SPD,SCD,
 C      1 RPL,DDSDDT,DRPLDE,DRPLDT,
 C      2 STRAN,DSTRAN,TIME,DTIME,TEMP,DTEMP,PREDEF,DPRED,CMNAME,
 C      3 NDI,NSHR,NTENS,NSTATV,PROPS,NPROPS,COORDS,DROT,PNEWDT,

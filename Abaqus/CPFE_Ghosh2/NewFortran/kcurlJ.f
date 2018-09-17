@@ -86,6 +86,7 @@ C
       
       if (abs(det) <= 1.0e-6 .or. det /= det) then !last part true if det=NaN
          dmout = 0.0
+         write(6,*)  "DET is ZERO"
       else  
          call lapinverse(xj,3,info,xjinv)
 !         if(info /= 0) write(6,*) "inverse failure: xj in kcurl"
@@ -163,7 +164,7 @@ C
 !       end do
       
       end do !kint2
-      
+C ******************************************************      
       !All integration points done. Extrapolation begins
 !      write(6,*)"z11i",kint2; write(6,fmt8)z11i
 !      write(6,*)"z12i",kint2; write(6,fmt8)z12i
@@ -204,6 +205,20 @@ c      z33n = matmul(xnmatI,z33i)
          svars((kint-1)*knsdv+17) = z32i(kint)
          svars((kint-1)*knsdv+18) = z33i(kint)      
       end do !kint 
+	  
+c      do kint=1,nnodes
+c         svars((kint-1)*knsdv+10) = svars((kint-1)*knsdv+1)
+c         svars((kint-1)*knsdv+11) = svars((kint-1)*knsdv+2)
+c         svars((kint-1)*knsdv+12) = svars((kint-1)*knsdv+3)
+         
+c         svars((kint-1)*knsdv+13) = svars((kint-1)*knsdv+4)
+c         svars((kint-1)*knsdv+14) = svars((kint-1)*knsdv+5)
+c         svars((kint-1)*knsdv+15) = svars((kint-1)*knsdv+6)
+         
+c         svars((kint-1)*knsdv+16) = svars((kint-1)*knsdv+7)
+c         svars((kint-1)*knsdv+17) = svars((kint-1)*knsdv+8)
+c         svars((kint-1)*knsdv+18) = svars((kint-1)*knsdv+9)
+c      end do !kint 	  
 C     
 c      write(6,*) "kcurlfp ------------------"
 c      do kint = 1,8 !integration points are our nodes now
