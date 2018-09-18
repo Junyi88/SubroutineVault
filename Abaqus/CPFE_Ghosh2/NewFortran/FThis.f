@@ -250,7 +250,121 @@ c EDBG
      1 TauPass, TauCut, V0,	  
      2 PROPS(51:53))
 	 
- 
+       call GetCSDHTauC(TAUPE,TAUSE,TAUCB,
+     1 H, RhoCSD, TAUC, 	   
+     2 PROPS(54:66))	 
+
+      call GetGammaDot(Tau, TauPass, TauCut, V0, RhoM, 
+     1 Vs, GammaDot, TauEff, TAUC,	    	   
+     2 PROPS(67:69))	 	 
+
+C-DBG	 
+c      DO ISLIPS=1,18  
+c		GammaDot(ISLIPS)=0.0
+c      END DO	
+	 
+      call GetRhoSSDEvolve(Tau, TauPass, TauCut, V0, RhoM, 
+     1 GammaDot, TauEff, SSDDot, STATEV(109:126), RhoF,      	   
+     2 PROPS(70:75))
+
+c *****************
+      call GetDSTRESSFP(DStress,GammaDot,dstran,Stress,dTIME, 
+     1 STATEV(1:54),STATEV(55:108), dFP, STATEV(401:409),
+     2 STATEV(164:184))
+
+C       call GetDDSDDE(DDSDDE,Stress,	   
+C      2 STATEV(164:184))
+c ------------------------------------------------	
+c UPDATE ALL
+      DO ISLIPS=1,18  
+		DGA(ISLIPS)=DTIME*GammaDot(ISLIPS)
+      END DO	
+      DO ISLIPS=1,18
+       IF ((ABS(DGA(ISLIPS)).GT.MXSLIP)) THEN
+         DGA(ISLIPS)=sign(MXSLIP,DGA(ISLIPS))
+       END IF	   
+      END DO		  
+      DO ISLIPS=1,18
+       STATEV(ISLIPS+108)=STATEV(ISLIPS+108)+DTIME*SSDDot(ISLIPS)
+       STATEV(ISLIPS+144)=STATEV(ISLIPS+144)+DGA(ISLIPS)
+       STATEV(163)=STATEV(163)+abs(DGA(ISLIPS))
+      END DO
+C        DO ISLIPS=1,6
+C         Stress(ISLIPS)=Stress(ISLIPS)+DStress(ISLIPS)	
+C        END DO
+      DO ISLIPS=1,12
+       STATEV(ISLIPS+126)=RhoCSD(ISLIPS)	
+      END DO
+c ------------------------------------------------	
+c Rotate The Slip Systems
+
+c ---- S
+c      call RotateSlipSystems(GammaDot,dTIME,DSTRAN, SPIN_TENSOR,
+c     1 STATEV(1:54),STATEV(55:108),
+c     +  STATEV(185:220), STATEV(221:256),
+c     +  STATEV(257:292), STATEV(293:328),
+c     +  STATEV(329:364), STATEV(365:400))
+
+c ------------------------------------------------	
+
+      DO i=1,3
+        DO j=1,3 
+         CFP(i,j) =  kcurlFp(noel,npt,i+(j-1)*3)
+c  CFP(i,j) = kcurlFp(noel,npt,i+(j-1)*3)
+        END DO
+      END DO
+c--------------------------------------------------
+c Calculate Rho_GND
+      IBURG=PROPS(69)
+      call kcalcGND(STATEV(1:54),STATEV(55:108),SLIP_T,
+     + dRhoS,dRhoET,dRhoEN,
+     + CFP,
+     + IBURG)
+		 
+c--------------------------------------------------		
+         PLASTICFLAG = 0 
+         DO ISLIPS=1,9
+		    if (abs(dFP(ISLIPS)).GE.(1.0e-6)) THEN
+c		     STATEV(400+ISLIPS)=STATEV(400+ISLIPS)+dFP(ISLIPS)
+		     PLASTICFLAG = 1
+		    END IF
+         END DO		
+		
+		    if (PLASTICFLAG == 1) THEN		 
+         DO ISLIPS=1,9
+
+		     STATEV(400+ISLIPS)=STATEV(400+ISLIPS)+dFP(ISLIPS)
+		     
+
+         END DO		
+		    END IF		 
+         STATEV(466)=0.0
+         STATEV(467)=0.0
+         STATEV(468)=0.0
+		
+         STATEV(428)=0.0
+         STATEV(429)=0.0
+C SDV(109->126) :: Rho SSD (ISLIP)
+C SDV(127->144) :: Rho CSD (ISLIP)
+c SDV(428->429) :: SRho SSD (ISLIP)		
+         DO ISLIPS=1,18
+		     STATEV(409+ISLIPS)=dRhoS(ISLIPS)
+		     STATEV(429+ISLIPS)=dRhoET(ISLIPS)
+		     STATEV(447+ISLIPS)=dRhoEN(ISLIPS)		
+
+		     STATEV(466)=STATEV(466)+dRhoS(ISLIPS)*dRhoS(ISLIPS)
+		     STATEV(467)=STATEV(467)+dRhoET(ISLIPS)*dRhoET(ISLIPS)
+		     STATEV(468)=STATEV(468)+dRhoEN(ISLIPS)*dRhoEN(ISLIPS)
+		     STATEV(428)=STATEV(428)+STATEV(108+ISLIPS)
+         END DO		
+         DO ISLIPS=1,12
+		     STATEV(429)=STATEV(429)+STATEV(126+ISLIPS)
+         END DO	
+		     STATEV(469)=STATEV(466)+STATEV(467)+STATEV(468)
+c      DO i=1, 9
+c         STATEV(600+I) = kcurlFp(noel,npt,i)
+c         STATEV(610+I) = kFp(noel,npt,i)
+c      END DO	 
 
 
 

@@ -36,7 +36,7 @@ C     REFERENCE: Li & al. Acta Mater. 52 (2004) 4859-4875
 C     
       real*8,parameter  :: zero=1.0e-16,xgauss = 0.577350269189626
       real*8,parameter  :: xweight = 1.0
-      integer, parameter :: TOTALELEMENTNUM=100
+      integer, parameter :: TOTALELEMENTNUM=10000
 c  1728 853200
       Real*8:: FTINV(3,3),STRATE(3,3),VELGRD(3,3),AUX1(3,3),ONEMAT(3,3)
       PARAMETER (ONE=1.0D0,TWO=2.0D0,THREE=3.0D0,SIX=6.0D0)
@@ -270,9 +270,9 @@ c EDBG
      2 PROPS(67:69))	 	 
 
 C-DBG	 
-c      DO ISLIPS=1,18  
-c		GammaDot(ISLIPS)=0.0
-c      END DO	
+      DO ISLIPS=1,18  
+       GammaDot(ISLIPS)=0.0
+      END DO	
 	 
       call GetRhoSSDEvolve(Tau, TauPass, TauCut, V0, RhoM, 
      1 GammaDot, TauEff, SSDDot, STATEV(109:126), RhoF,      	   
@@ -394,102 +394,6 @@ c ------------------------
              END DO
          END DO	  	  
 c ---------------------------
-C          DO kintB =1,8        
-C              DO i=1,9          
-C                  svars(i + 18*(kintB-1)) = 0.0		 
-C              END DO
-C          END DO	  
-C        svars(   1 )=   1.00168894230775     
-C        svars(   2 )= -4.367406225334836E-019
-C        svars(   3 )=  3.642920309857558E-020
-C        svars(   4 )= -8.698496561446528E-020
-C        svars(   5 )=  0.996630419844280     
-C        svars(   6 )= -1.148707946645798E-020
-C        svars(   7 )=  3.457327773001572E-020
-C        svars(   8 )=  4.779935736863440E-020
-C        svars(   9 )=   1.00168894230775     
-C        svars(  19 )=   1.00168894230775     
-C        svars(  20 )=  1.738758857668812E-019
-C        svars(  21 )=  3.457327773001572E-020
-C        svars(  22 )= -8.698496561446528E-020
-C        svars(  23 )=  0.996630419844280     
-C        svars(  24 )= -6.589749465511214E-021
-C        svars(  25 )=  3.457327773001572E-020
-C        svars(  26 )=  4.482044221181302E-020
-C        svars(  27 )=   1.00168894230775     
-C        svars(  37 )=   1.00168894230775     
-C        svars(  38 )= -7.583439870741832E-019
-C        svars(  39 )=  4.151920006271557E-020
-C        svars(  40 )= -6.746862424499425E-020
-C        svars(  41 )=  0.996630419844280     
-C        svars(  42 )= -4.034802469796552E-020
-C        svars(  43 )=  2.354322733132434E-020
-C        svars(  44 )=  1.079473314471735E-019
-C        svars(  45 )=   1.00168894230775     
-C        svars(  55 )=   1.00168894230775     
-C        svars(  56 )=  1.350470347921469E-019
-C        svars(  57 )=  2.354322733132434E-020
-C        svars(  58 )= -6.746862424499425E-020
-C        svars(  59 )=  0.996630419844280     
-C        svars(  60 )=  3.570441772386774E-021
-C        svars(  61 )=  2.354322733132434E-020
-C        svars(  62 )=  6.858472900367286E-020
-C        svars(  63 )=   1.00168894230775     
-C        svars(  73 )=   1.00168894230775     
-C        svars(  74 )= -2.248118123696042E-019
-C        svars(  75 )=  2.115734842884869E-020
-C        svars(  76 )= -8.698496561446528E-020
-C        svars(  77 )=  0.996630419844280     
-C        svars(  78 )= -2.758883419489638E-020
-C        svars(  79 )=  3.457327773001572E-020
-C        svars(  80 )=  5.461690612533097E-020
-C        svars(  81 )=   1.00168894230775     
-C        svars(  91 )=   1.00168894230775     
-C        svars(  92 )=  1.738758857668812E-019
-C        svars(  93 )=  3.457327773001572E-020
-C        svars(  94 )= -8.698496561446528E-020
-C        svars(  95 )=  0.996630419844280     
-C        svars(  96 )= -6.589749465511214E-021
-C        svars(  97 )=  3.457327773001572E-020
-C        svars(  98 )=  4.482044221181302E-020
-C        svars(  99 )=   1.00168894230775     
-C        svars( 109 )=   1.00168894230775     
-C        svars( 110 )= -9.462191036105157E-019
-C        svars( 111 )= -9.016713697741803E-022
-C        svars( 112 )= -8.698496561446528E-020
-C        svars( 113 )=  0.996630419844280     
-C        svars( 114 )= -3.525827613228095E-020
-C        svars( 115 )=  3.457327773001572E-020
-C        svars( 116 )=  4.698232682959014E-020
-C        svars( 117 )=   1.00168894230775     
-C        svars( 127 )=   1.00162897108488     
-C        svars( 128 )=  1.738967094423529E-019
-C        svars( 129 )=  3.457120782422306E-020
-C        svars( 130 )= -8.697975781537819E-020
-C        svars( 131 )=  0.996749778019433     
-C        svars( 132 )= -6.589354936514069E-021
-C        svars( 133 )=  3.457120782422306E-020
-C        svars( 134 )=  4.482580998514745E-020
-C        svars( 135 )=   1.00162897108488 
-C          DO kintB =1,8        
-C              DO i=1,9          
-C                  kX(noel,kintB,1) = 1.00862	
-C                  kX(noel,kintB,2) = 0.0	
-C                  kX(noel,kintB,3) = 0.0	
-C                  kX(noel,kintB,4) = 0.0	
-C                  kX(noel,kintB,5) = 0.982986	
-C                  kX(noel,kintB,6) = 0.0	
-C                  kX(noel,kintB,7) = 0.0
-C                  kX(noel,kintB,8) = 0.0	
-C                  kX(noel,kintB,9) = 1.00862					 
-C              END DO
-C          END DO	  
-  	  
-C          DO kintB =1,8        
-C              DO i=1,9          
-C                  svars(i + 18*(kintB-1)) = kX(noel,kintB,i)		 
-C              END DO
-C          END DO	  
 	  
       CALL kcurl(svars,xnat8,gauss,gausscoords)
 
@@ -519,13 +423,15 @@ c ----------
 
 c --------------------------------------
       DO ISLIPS=1,6
-       IF ((ABS(DStress(ISLIPS)).GT.5.0e1)) THEN
+       IF ((ABS(DStress(ISLIPS)).LE.5.0e1)) THEN
+       ELSE
          PNEWDT=0.5
        END IF	   
       END DO		
 
       DO ISLIPS=1,18
-       IF ((ABS(DGA(ISLIPS)).GT.1.0e-3)) THEN
+       IF ((ABS(DGA(ISLIPS)).LE.1.0e-3)) THEN
+       ELSE
          PNEWDT=0.5
        END IF	   
       END DO	  
