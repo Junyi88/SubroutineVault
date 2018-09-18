@@ -457,6 +457,10 @@ c XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       DO i=1,9                                                      
           kFp(noel,npt,i)= statev(400+i)
       END DO
+      do i =1,3
+          kgausscoords(noel,npt,i) = coords(i)
+          STATEV(520+I) = coords(i)
+      end do
       call MutexUnlock( 4 )      ! lock Mutex #1 
 c --------------------------------------
       DO ISLIPS=1,6
