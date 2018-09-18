@@ -18832,10 +18832,10 @@
 *Elset, elset=Set-4, generate
  1729,  8000,     1
 ** Section: Percipittate
-*Solid Section, elset=Set-3, material=Percipitate
+*Solid Section, elset=Set-3, material=Percipitate2
 ,
 ** Section: Channel
-*Solid Section, elset=Set-4, material=Channel
+*Solid Section, elset=Set-4, material=Percipitate2
 ,
 *End Part
 **  
@@ -19070,8 +19070,8 @@
 *End Assembly
 *Amplitude, name=Amp-1, time=TOTAL TIME
              0.,              0.,             20.,             -3.
-*Amplitude, name=Amp-2, definition=SMOOTH STEP
-             0.,              0.,             20.,             -3.
+*Amplitude, name=Amp-2, time=TOTAL TIME, definition=SMOOTH STEP
+             0.,              0.,             20.,              3.
 ** 
 ** MATERIALS
 ** 
