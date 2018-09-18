@@ -182,9 +182,9 @@ c       END DO
         end do
 
         if	(npt == 8) THEN	
-        DO kint =1,8 
+        DO kintB =1,8 
           DO i=1,3         
-           gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
+           gausscoords(i,kintB) = kgausscoords(noel,kintB,i)                          
           END DO 
          END DO	  
         end if
@@ -198,9 +198,9 @@ c       END DO
         do i =1,3
           kgausscoords(noel,npt,i) = statev(480+I)
         end do
-        DO kint =1,8 
+        DO kintB =1,8 
           DO i=1,3         
-           gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
+           gausscoords(i,kintB) = kgausscoords(noel,kintB,i)                          
           END DO 
          END DO	  
 	  
@@ -215,8 +215,45 @@ c ---
       DO i=1, 9
          STATEV(770+I) = kcurlFp(noel,npt,i)
       END DO	
-	  
+ 
+      if (NPT==1) THEN
+      write(6,*) "----------------------------------------------"	
+      write(6,*) "CP1", STATEV(612), kcurlFp(noel,npt,2)       
+      end if
 C XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+C Calculate som common values
+C Calculate som common values
+        call Get_TfromSN(STATEV(1:54),STATEV(55:108),SLIP_T)
+
+c ------------------------------------------------	
+c NOW FOR THE MAIN STUFF
+        call CalculateTauS(STRESS, TAU, TAUPE, TAUSE, TAUCB,
+     +  STATEV(1:54), STATEV(55:108),
+     +  STATEV(185:220), STATEV(221:256),
+     +  STATEV(257:292), STATEV(293:328),
+     +  STATEV(329:364), STATEV(365:400))	
+c --
+c DBG
+         DO ISLIPS=1,18
+           STATEV(409+ISLIPS)=0.0
+           STATEV(429+ISLIPS)=0.0
+           STATEV(447+ISLIPS)=0.0	
+         END DO	
+c EDBG
+       call GetRhoPFMGND(RhoP,RhoF,RhoM,
+     1 STATEV(109:126),
+     2 STATEV(1:54),STATEV(55:108),SLIP_T,
+     2 STATEV(410:427),STATEV(430:447),STATEV(448:465),
+     5 PROPS(50))
+	 
+        call GetTauSlips(RhoP,RhoF,RhoM,
+     1 TauPass, TauCut, V0,	  
+     2 PROPS(51:53))
+	 
+ 
+
+
+
 
 
 C XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -224,11 +261,16 @@ c --------------------------------
 C Calculate som common values
       IF (npt == 8 ) THEN ! update curl Fp	 
       INCLUDE 'kgauss2.f'     
-      xnat8 = xnat(1:8,:) 		  
+      xnat8 = xnat(1:8,:) 	
+        DO kintB =1,8 
+          DO i=1,3         
+           gausscoords(i,kintB) = kgausscoords(noel,kintB,i)                          
+          END DO 
+         END DO	 	  
 c ---------------------------
-         DO kint =1,8        
+         DO kintB =1,8        
              DO i=1,9          
-                 svars(i + 18*(kint-1)) = 0.0		 
+                 svars(i + 18*(kintB-1)) = 0.0		 
              END DO
          END DO	  
        svars(   1 )=   1.00168894230775     
@@ -303,25 +345,7 @@ c ---------------------------
        svars( 133 )=  3.457120782422306E-020
        svars( 134 )=  4.482580998514745E-020
        svars( 135 )=   1.00162897108488 
-C          DO kint =1,8        
-C              DO i=1,9          
-C                  kX(noel,kint,1) = 1.00862	
-C                  kX(noel,kint,2) = 0.0	
-C                  kX(noel,kint,3) = 0.0	
-C                  kX(noel,kint,4) = 0.0	
-C                  kX(noel,kint,5) = 0.982986	
-C                  kX(noel,kint,6) = 0.0	
-C                  kX(noel,kint,7) = 0.0
-C                  kX(noel,kint,8) = 0.0	
-C                  kX(noel,kint,9) = 1.00862					 
-C              END DO
-C          END DO	  
-  	  
-C          DO kint =1,8        
-C              DO i=1,9          
-C                  svars(i + 18*(kint-1)) = kX(noel,kint,i)		 
-C              END DO
-C          END DO	  
+
 	  
       CALL kcurl(svars,xnat8,gauss,gausscoords)
 
@@ -347,17 +371,17 @@ c ----------
       END DO
       call MutexUnlock( 6 )      ! lock Mutex #1 
 c --------------------------------------
-      DO ISLIPS=1,6
-       IF ((ABS(DStress(ISLIPS)).GT.5.0e1)) THEN
-         PNEWDT=0.5
-       END IF	   
-      END DO		
+C       DO ISLIPS=1,6
+C        IF ((ABS(DStress(ISLIPS)).GT.5.0e1)) THEN
+C          PNEWDT=0.5
+C        END IF	   
+C       END DO		
 
-      DO ISLIPS=1,18
-       IF ((ABS(DGA(ISLIPS)).GT.1.0e-3)) THEN
-         PNEWDT=0.5
-       END IF	   
-      END DO	  
+C       DO ISLIPS=1,18
+C        IF ((ABS(DGA(ISLIPS)).GT.1.0e-3)) THEN
+C          PNEWDT=0.5
+C        END IF	   
+C       END DO	  
 	  
 c -------------------------------------------------
        CALL UMATTEMPLATE(STRESS,STATEV,DDSDDE,SSE,SPD,SCD,

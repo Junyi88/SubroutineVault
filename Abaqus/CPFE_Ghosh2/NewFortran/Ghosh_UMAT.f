@@ -54,9 +54,19 @@ c XDANGER
      1 kDGA(TOTALELEMENTNUM, 8, 9),
      1 kX(TOTALELEMENTNUM, 8, 9)
 c -------------------------------------------------
+      INCLUDE 'kgauss2.f'
 c Initialisation
 
-	  
+c      write(6,*) "...............................................   "   
+      DO i=1, 9
+         STATEV(770+I) = kcurlFp(noel,npt,i)
+C          write(6,*) 'KCURLFP_OUTA' , noel, npt, i, 770+I
+C          write(6,*) kcurlFp(noel,npt,i), STATEV(770+I), kDGA(noel,npt,i)
+         
+         STATEV(750+I) = kFp(noel,npt,i)
+         
+      END DO	  
+      
       IF (KINC.LE.1) THEN
        DO ISLIPS=1,nstatv
           STATEV(ISLIPS)=0.0
@@ -182,9 +192,9 @@ c       END DO
         end do
 
         if	(npt == 8) THEN	
-        DO kint =1,8 
+        DO kintB =1,8 
           DO i=1,3         
-           gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
+           gausscoords(i,kintB) = kgausscoords(noel,kintB,i)                          
           END DO 
          END DO	  
         end if
@@ -198,9 +208,9 @@ c       END DO
         do i =1,3
           kgausscoords(noel,npt,i) = statev(480+I)
         end do
-        DO kint =1,8 
+        DO kintB =1,8 
           DO i=1,3         
-           gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
+           gausscoords(i,kintB) = kgausscoords(noel,kintB,i)                          
           END DO 
          END DO	  
 	  
@@ -212,10 +222,15 @@ c       END DO
 	  
       ENDIF
 c ---
-      DO i=1, 9
-         STATEV(770+I) = kcurlFp(noel,npt,i)
-      END DO	
-	  
+C       DO i=1, 9
+C          STATEV(770+I) = kcurlFp(noel,npt,i)
+C          write(6,*) 'KCURLFP_OUT' , noel, npt, i, 770+I
+C          write(6,*) kcurlFp(noel,npt,i), STATEV(770+I), kDGA(noel,npt,i)
+C          
+C          STATEV(750+I) = kFp(noel,npt,i)
+C          
+C       END DO	
+C        write(6,*) '   ' 
 C XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 c --------------------------------
 C Calculate som common values
@@ -285,9 +300,9 @@ c UPDATE ALL
        STATEV(ISLIPS+144)=STATEV(ISLIPS+144)+DGA(ISLIPS)
        STATEV(163)=STATEV(163)+abs(DGA(ISLIPS))
       END DO
-C       DO ISLIPS=1,6
-C        Stress(ISLIPS)=Stress(ISLIPS)+DStress(ISLIPS)	
-C       END DO
+       DO ISLIPS=1,6
+        Stress(ISLIPS)=Stress(ISLIPS)+DStress(ISLIPS)	
+       END DO
       DO ISLIPS=1,12
        STATEV(ISLIPS+126)=RhoCSD(ISLIPS)	
       END DO
@@ -366,22 +381,22 @@ C XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 c --------------------------------
 C Calculate som common values
       IF (npt == 8 ) THEN ! update curl Fp	 
-      INCLUDE 'kgauss2.f'     
+     
       xnat8 = xnat(1:8,:) 		
 c ------------------------
-         DO kint =1,8    
-c             DO i=1,3         
-c                 gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
-c             END DO
+         DO kintB =1,8    
+             DO i=1,3         
+                 gausscoords(i,kintB) = kgausscoords(noel,kintB,i)                          
+             END DO
          
              DO i=1,9          
-                 svars(i + 18*(kint-1)) = kFp(noel,kint,i)
+                 svars(i + 18*(kintB-1)) = kFp(noel,kintB,i)
              END DO
          END DO	  	  
 c ---------------------------
-C          DO kint =1,8        
+C          DO kintB =1,8        
 C              DO i=1,9          
-C                  svars(i + 18*(kint-1)) = 0.0		 
+C                  svars(i + 18*(kintB-1)) = 0.0		 
 C              END DO
 C          END DO	  
 C        svars(   1 )=   1.00168894230775     
@@ -456,23 +471,23 @@ C        svars( 132 )= -6.589354936514069E-021
 C        svars( 133 )=  3.457120782422306E-020
 C        svars( 134 )=  4.482580998514745E-020
 C        svars( 135 )=   1.00162897108488 
-C          DO kint =1,8        
+C          DO kintB =1,8        
 C              DO i=1,9          
-C                  kX(noel,kint,1) = 1.00862	
-C                  kX(noel,kint,2) = 0.0	
-C                  kX(noel,kint,3) = 0.0	
-C                  kX(noel,kint,4) = 0.0	
-C                  kX(noel,kint,5) = 0.982986	
-C                  kX(noel,kint,6) = 0.0	
-C                  kX(noel,kint,7) = 0.0
-C                  kX(noel,kint,8) = 0.0	
-C                  kX(noel,kint,9) = 1.00862					 
+C                  kX(noel,kintB,1) = 1.00862	
+C                  kX(noel,kintB,2) = 0.0	
+C                  kX(noel,kintB,3) = 0.0	
+C                  kX(noel,kintB,4) = 0.0	
+C                  kX(noel,kintB,5) = 0.982986	
+C                  kX(noel,kintB,6) = 0.0	
+C                  kX(noel,kintB,7) = 0.0
+C                  kX(noel,kintB,8) = 0.0	
+C                  kX(noel,kintB,9) = 1.00862					 
 C              END DO
 C          END DO	  
   	  
-C          DO kint =1,8        
+C          DO kintB =1,8        
 C              DO i=1,9          
-C                  svars(i + 18*(kint-1)) = kX(noel,kint,i)		 
+C                  svars(i + 18*(kintB-1)) = kX(noel,kintB,i)		 
 C              END DO
 C          END DO	  
 	  
@@ -487,6 +502,9 @@ C          END DO
 
               STATEV(600+(10*J)+I) = svars(9+i + 18*(J-1))
               STATEV(500+(10*J)+I) = svars(i + 18*(J-1))
+              
+C          write(6,*) 'KCURLFP_IN' , noel, npt, i, J 
+C          write(6,*) kcurlFp(noel,J,i), svars(9+i + 18*(J-1))
           END DO
       END DO
       call MutexUnlock( 5 )      ! lock Mutex #1 
