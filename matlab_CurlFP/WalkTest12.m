@@ -1,8 +1,8 @@
 clear;
 
-X=[0 0 0 0 1 1 1 1].';
-Y=[1 0 1 0 1 0 1 0].';
-Z=[1 1 0 0 1 1 0 0].';
+X=1.*[0 0 0 0 1 1 1 1].';
+Y=1.*[1 0 1 0 1 0 1 0].';
+Z=1.*[1 1 0 0 1 1 0 0].';
 
 [FEVals]=GetFEVals(X,Y,Z);
 GaussPX=zeros(8,1);
@@ -53,9 +53,22 @@ end
  -6.391929880099079E-020  0.983103594869020      -2.238439065702651E-020;...
   6.385408626874273E-020  5.673699527702107E-020   1.00855612439176];   
 
+figure(200);
+clf;
+hold on;
+plot(kFP(1).FP(:),'rx-');
+plot(kFP(2).FP(:),'gs-');
+plot(kFP(3).FP(:),'bo-');
+plot(kFP(4).FP(:),'k>-');
+plot(kFP(5).FP(:),'rp-');
+plot(kFP(6).FP(:),'g<-');
+plot(kFP(7).FP(:),'k^-');
+plot(kFP(8).FP(:),'kx-');
+
+
 %%
 % for n1=1:8
-%    kFP(n1).FP= kFP(n1).FP.';
+%    kFP(n1).FP= kFP(n1).FP;
 % end
 %%
 [FEIn,curlFP]=GetCurlFP(kFP,FEVals);
@@ -81,3 +94,15 @@ for n1=1:8
        end
    end
 end
+
+figure(201);
+clf;
+hold on;
+plot(curlFP(1).cFP(:),'rx-');
+plot(curlFP(2).cFP(:),'gs-');
+plot(curlFP(3).cFP(:),'bo-');
+plot(curlFP(4).cFP(:),'k>-');
+plot(curlFP(5).cFP(:),'rp-');
+plot(curlFP(6).cFP(:),'g<-');
+plot(curlFP(7).cFP(:),'k^-');
+plot(curlFP(8).cFP(:),'kx-');

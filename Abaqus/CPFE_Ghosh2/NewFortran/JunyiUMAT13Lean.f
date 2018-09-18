@@ -16,7 +16,7 @@ c      EXTERNAL F
      3 props(nprops),coords(3),drot(3,3),dfgrd0(3,3),dfgrd1(3,3)
 	 
       include 'DeclareParameterSlipsO.f'
-      include 'TestCase0.f'
+c      include 'TestCase0.f'
       
       INTEGER:: ISLIPS, I, J, NDUM1, NA, NB, ICOR, ISL
       real*8 :: TAU(18), TAUPE(12), TAUSE(12), TAUCB(12)
@@ -142,7 +142,7 @@ c ------------------------------------------------
 c      write(6,*) "XX ======================================"
 c      write(6,*) KINC, NOEL, NPT
 	  
-      IF (KINC.LE.1).AND.(KSTEP.LE.1) THEN
+      IF ((KINC.LE.1).AND.(KSTEP.LE.1)) THEN
 	  
        DO ISLIPS=1,nstatv
           STATEV(ISLIPS)=0.0
@@ -267,7 +267,7 @@ c       END DO
           kfP(noel,npt,5)=1.0
           kfP(noel,npt,9)=1.0
       call MutexUnlock( 1 )   ! unlock Mutex #2
-      ELSE IF (KINC.LE.1).AND.(KSTEP.GT.1) THEN		
+      ELSE IF ((KINC.LE.1).AND.(KSTEP.GT.1)) THEN		
           call MutexLock( 1 )      ! lock Mutex #2      
           ! use original co-ordinates X     
           do i =1,3
@@ -277,6 +277,9 @@ c       END DO
           call MutexUnlock( 1 )   ! unlock Mutex #2		
       ENDIF
 c --------------------------------
+      DO i=1,9                                                      
+           statev(700+i)=kcurlFp(noel,npt,i)
+      END DO
 C Calculate som common values
         call Get_TfromSN(STATEV(1:54),STATEV(55:108),SLIP_T)
 
@@ -287,7 +290,13 @@ c NOW FOR THE MAIN STUFF
      +  STATEV(185:220), STATEV(221:256),
      +  STATEV(257:292), STATEV(293:328),
      +  STATEV(329:364), STATEV(365:400))	
-
+c DBG
+         DO ISLIPS=1,18
+		     STATEV(409+ISLIPS)=0.0
+		     STATEV(429+ISLIPS)=0.0
+		     STATEV(447+ISLIPS)=0.0	
+         END DO	
+c EDBG
        call GetRhoPFMGND(RhoP,RhoF,RhoM,
      1 STATEV(109:126),
      2 STATEV(1:54),STATEV(55:108),SLIP_T,
@@ -492,5 +501,5 @@ c  -----------------------------------
       include 'kCalcGND.f'
       include 'utils.f'
       include 'utilsX.f'
-      include 'kcurlJ.f'
+      include 'kcurlJB.f'
       include 'ksvd2.f'
