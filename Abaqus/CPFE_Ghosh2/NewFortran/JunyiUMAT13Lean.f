@@ -157,7 +157,7 @@ c      write(6,*) KINC, NOEL, NPT
        END DO
 	   
        DO ISLIPS=1,18
-          STATEV(ISLIPS+108)=PROPS(ISLIPS+9)
+          STATEV(ISLIPS+108)= 0.1 !PROPS(ISLIPS+9)
        END DO
 
 c ---- S_SCHMID
@@ -246,6 +246,9 @@ c        STATEV(409+ISLIPS)=(1.0e9)*(1.0e-12)
 c        STATEV(429+ISLIPS)=(1.0e9)*(1.0e-12)
 c        STATEV(447+ISLIPS)=(1.0e9)*(1.0e-12) 
 c       END DO	 
+C       DO ISLIPS=1,18
+C        STATEV(ISLIPS+108)=STATEV(ISLIPS+108)+DTIME*SSDDot(ISLIPS)
+C       END DO
        DO ISLIPS=1,18
         STATEV(409+ISLIPS)= 0.0
         STATEV(429+ISLIPS)= 0.0
@@ -257,29 +260,38 @@ c        STATEV(289+ISLIPS)=0.0
 c        STATEV(307+ISLIPS)=0.0   
 c       END DO	
 	   
-      call MutexLock( 1 )      ! lock Mutex #2      
-      ! use original co-ordinates X     
-      do i =1,3
-          kgausscoords(noel,npt,i) = coords(i)
-          STATEV(480+I) = coords(i)
-      end do
-          kfP(noel,npt,1)=1.0
-          kfP(noel,npt,5)=1.0
-          kfP(noel,npt,9)=1.0
-      call MutexUnlock( 1 )   ! unlock Mutex #2
+C       call MutexLock( 1 )      ! lock Mutex #2      
+C       ! use original co-ordinates X     
+C       do i =1,3
+C           kgausscoords(noel,npt,i) = coords(i)
+C           STATEV(480+I) = coords(i)
+C       end do
+C           kfP(noel,npt,1)=1.0
+C           kfP(noel,npt,5)=1.0
+C           kfP(noel,npt,9)=1.0
+C       call MutexUnlock( 1 )   ! unlock Mutex #2      call MutexLock( 1 )      ! lock Mutex #2      
+C       ! use original co-ordinates X     
+C       do i =1,3
+C           kgausscoords(noel,npt,i) = coords(i)
+C           STATEV(480+I) = coords(i)
+C       end do
+C           kfP(noel,npt,1)=1.0
+C           kfP(noel,npt,5)=1.0
+C           kfP(noel,npt,9)=1.0
+C       call MutexUnlock( 1 )   ! unlock Mutex #2
       ELSE IF ((KINC.LE.1).AND.(KSTEP.GT.1)) THEN		
-          call MutexLock( 1 )      ! lock Mutex #2      
-          ! use original co-ordinates X     
-          do i =1,3
-              kgausscoords(noel,npt,i) = STATEV(480+I)
-              KFP(noel,npt,i) = STATEV(400+I)
-          end do
-          call MutexUnlock( 1 )   ! unlock Mutex #2		
+C           call MutexLock( 1 )      ! lock Mutex #2      
+C           ! use original co-ordinates X     
+C           do i =1,3
+C               kgausscoords(noel,npt,i) = STATEV(480+I)
+C               KFP(noel,npt,i) = STATEV(400+I)
+C           end do
+C           call MutexUnlock( 1 )   ! unlock Mutex #2		
       ENDIF
 c --------------------------------
-      DO i=1,9                                                      
-           statev(700+i)=kcurlFp(noel,npt,i)
-      END DO
+C       DO i=1,9                                                      
+C            statev(700+i)=kcurlFp(noel,npt,i)
+C       END DO
 C Calculate som common values
         call Get_TfromSN(STATEV(1:54),STATEV(55:108),SLIP_T)
 
@@ -423,45 +435,45 @@ C           kFp(noel,npt,i)= statev(400+i)
 C       END DO
 C       call MutexUnlock( 2 )      ! lock Mutex #1 	  
 	  
-      IF (npt == 8 ) THEN ! update curl Fp	 
-      INCLUDE 'kgauss2.f'     
-      xnat8 = xnat(1:8,:) 		  
-c ---------------------------  	  
-         DO kint =1,8    
-             DO i=1,3         
-                 gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
-             END DO
-         
-             DO i=1,9          
-                 svars(i + 18*(kint-1)) = kFp(noel,kint,i)         
-             END DO
-         END DO	  
-	  
-      CALL kcurl(svars,xnat8,gauss,gausscoords)
+C       IF (npt == 8 ) THEN ! update curl Fp	 
+C       INCLUDE 'kgauss2.f'     
+C       xnat8 = xnat(1:8,:) 		  
+c  ---------------------------  	  
+C          DO kint =1,8    
+C              DO i=1,3         
+C                  gausscoords(i,kint) = kgausscoords(noel,kint,i)                          
+C              END DO
+C          
+C              DO i=1,9          
+C                  svars(i + 18*(kint-1)) = kFp(noel,kint,i)         
+C              END DO
+C          END DO	  
+C 	  
+C       CALL kcurl(svars,xnat8,gauss,gausscoords)
     
-      call MutexLock( 3 )      ! lock Mutex #1 
-      DO kint =1, 8
-          DO i=1, 9
-              kcurlFp(noel,kint,i) = svars(9+i + 18*(kint-1))
-          END DO
-      END DO
-      call MutexUnlock( 3 )      ! lock Mutex #1 
-      END IF
+C       call MutexLock( 3 )      ! lock Mutex #1 
+C       DO kint =1, 8
+C           DO i=1, 9
+C               kcurlFp(noel,kint,i) = svars(9+i + 18*(kint-1))
+C           END DO
+C       END DO
+C       call MutexUnlock( 3 )      ! lock Mutex #1 
+C       END IF
 	  
 c -------------------------
 
 	  
 c ------------------------------
 c XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-      call MutexLock( 4 )      ! lock Mutex #1 
-      DO i=1,9                                                      
-          kFp(noel,npt,i)= statev(400+i)
-      END DO
-      do i =1,3
-          kgausscoords(noel,npt,i) = coords(i)
-          STATEV(520+I) = coords(i)
-      end do
-      call MutexUnlock( 4 )      ! lock Mutex #1 
+C       call MutexLock( 4 )      ! lock Mutex #1 
+C       DO i=1,9                                                      
+C           kFp(noel,npt,i)= statev(400+i)
+C       END DO
+C       do i =1,3
+C           kgausscoords(noel,npt,i) = coords(i)
+C           STATEV(520+I) = coords(i)
+C       end do
+C       call MutexUnlock( 4 )      ! lock Mutex #1 
 c --------------------------------------
       DO ISLIPS=1,6
        IF ((ABS(DStress(ISLIPS)).LT.5.0e1)) THEN
