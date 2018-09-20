@@ -3,7 +3,7 @@
      1 StiffR, STRESS,
      1 Ltot, DTotStran,
      1 StressV, StressVMat,
-     1 StressTrial, StressTrialMat
+     1 StressTrial, StressTrialMat, F
      1 )
      
       IMPLICIT NONE
@@ -14,10 +14,10 @@
 
       REAL*8, INTENT(OUT) :: StressV(6), StressVMat(3,3)
       REAL*8, INTENT(OUT) :: StressTrial(6), StressTrialMat(3,3)
-      REAL*8, INTENT(OUT) :: Ltot(3,3), DTotStran(6)
+      REAL*8, INTENT(OUT) :: Ltot(3,3), DTotStran(6), F(3,3)
       
       INTEGER :: info
-      REAL*8 :: F(3,3), Fdot(3,3), invF(3,3) 
+      REAL*8 ::  Fdot(3,3), invF(3,3) 
       REAL*8 :: TempStrain(3,3), Spin(3,3)     
         
 C ==== Calculate Strains =================     

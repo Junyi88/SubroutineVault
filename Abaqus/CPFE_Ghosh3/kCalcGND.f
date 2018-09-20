@@ -1,12 +1,17 @@
-      SUBROUTINE kcalcGND(FCC_S, FCC_N, CUBIC_S, CUBIC_N,
+      SUBROUTINE kcalcGND(FCC_S, FCC_N, FCC_T, 
+     + CUBIC_S, CUBIC_N, CUBIC_T,
      + RhoS,RhoET,RhoEN, CFP,
      + BURGVAL)
       INCLUDE 'ABA_PARAM.INC'
 	  
       REAL*8,parameter  :: zero=1.0e-8
-	  
+      INTEGER, PARAMETER :: NDOF = 3
+      INTEGER, PARAMETER :: NFCC = 12
+      INTEGER, PARAMETER :: NCUB = 6
+      
       REAL*8, INTENT(IN) :: FCC_S(NDOF,NFCC), FCC_N(NDOF,NFCC)
       REAL*8, INTENT(IN) :: CUBIC_S(NDOF,NCUB), CUBIC_N(NDOF,NCUB)
+      REAL*8, INTENT(IN) :: FCC_T(NDOF,NFCC), CUBIC_T(NDOF,NCUB)
       REAL*8,intent(in) :: BURGVAL, CFP(9)
       Real*8,intent(out) :: RhoS(18),RhoET(18),RhoEN(18)	 
 

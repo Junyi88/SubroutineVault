@@ -1,5 +1,5 @@
 c  --- For Declaration      
-      REAL*8 :: kgausscoords, kFp, kcurlFp,      
+      REAL*8 :: kgausscoords, kFp, kcurlFp      
       COMMON/UMPS/kgausscoords(TOTALELEMENTNUM,8,3),
      1 kFp(TOTALELEMENTNUM,8, 9),
      1 kcurlFp(TOTALELEMENTNUM, 8, 9)
@@ -70,7 +70,7 @@ c --- After NEWTON
       REAL*8, PARAMETER :: xI(3,3) = reshape([
      1  1.0, 0.0, 0.0, 
      1  0.0, 1.0, 0.0, 
-     1  0.0, 0.0, 1.0, 
+     1  0.0, 0.0, 1.0 
      1  ], [3,3]) 
 
 c----  FOR CalculateSlipRate
@@ -81,7 +81,8 @@ c ---- For Calculate SSD EVOLVE
       real*8 :: SSDDot(18)
       
 c ---- For ROTATION
-      real*8 :: FPinv(3,3), Fe(3,3), Le(3,3), LpFeinv(3,3)
+      real*8 :: FPinv(3,3), Fe(3,3), Le(3,3), LpFeinv(3,3),F(3,3)
+       real*8 :: FeInv(3,3)
       real*8 :: elasspin(3,3), matrix(3,3), update(3,3), ROTMnew(3,3)
       
       

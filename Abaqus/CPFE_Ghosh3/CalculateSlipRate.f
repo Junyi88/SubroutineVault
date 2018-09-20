@@ -32,26 +32,26 @@ c -------------------------------------------
       
 
       DO ISLIPS = 1, 18   
-        IF (Tau(ISLIPS).GT.TauPass(ISLIPS))
+        IF (Tau(ISLIPS).GT.TauPass(ISLIPS)) THEN 
             TauEff(ISLIPS) = Tau(ISLIPS) - TauPass(ISLIPS)
         ELSE
             TauEff(ISLIPS) = 0.0
         END IF
         
 c ================================     
-        IF (TauEff(ISLIPS).GT.TauC(ISLIPS))
+        IF (TauEff(ISLIPS).GT.TauC(ISLIPS)) THEN
             TauEff(ISLIPS) = TauEff(ISLIPS) / TauCut(ISLIPS)
             tempVal = TauEff(ISLIPS)**CinS(2)
             GammaDot(ISLIPS) = CinS(1)*Sinh(tempVal)
 
 c ---- Calculate the differential
         if (ISLIPS.LE.12) THEN
-            tempDir = TAUSIGN(ISLIPS)*FCC_S(:,ISLIPS)
+            tempDir = TAU_SIGN(ISLIPS)*FCC_S(:,ISLIPS)
             tempNorm = FCC_N(:,ISLIPS)
         ELSE
-            tempDir = TAUSIGN(ISLIPS)*CUBIC_S(:,ISLIPS-12)
+            tempDir = TAU_SIGN(ISLIPS)*CUBIC_S(:,ISLIPS-12)
             tempNorm = CUBIC_N(:,ISLIPS-12)
-        END
+        ENDIF
 c ----  
          xsnt = spread(tempDir,2,3)*spread(tempNorm,1,3)
          xnst = spread(tempNorm,2,3)*spread(tempDir,1,3)

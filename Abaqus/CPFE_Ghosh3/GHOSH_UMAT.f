@@ -21,7 +21,7 @@ c ---- INITIALISE
      1 PROPS, STATEV, 
      1 NPROPS, NSTATV,
      1 KSTEP, KINC, NOEL, NPT,
-     1 ROTM
+     1 ROTM, COORDS
      1 )     
 
 C ==== Preliminary Calculations before constitutive ============= 
@@ -47,8 +47,8 @@ c ---- ROTATE Slip Systems
      
 c ---- Calculate Rhos    
       CALL GetRhoPFM(RhoP,RhoF,RhoM,
-     1 SDV(28:45),
-     2 SDV(64:81),SDV(82:99),SDV(100:117),
+     1 STATEV(28:45),
+     2 STATEV(64:81),STATEV(82:99),STATEV(100:117),
      2 FCC_S, FCC_N, FCC_T,  
      2 CUBIC_S, CUBIC_N, CUBIC_T,
      5 PROPS(13))
@@ -63,7 +63,7 @@ C ==== Initialise Loop For Newton =============
      1 StiffR, STRESS,
      1 Ltot, DTotStran,
      1 StressV, StressVMat,
-     1 StressTrial, StressTrialMat
+     1 StressTrial, StressTrialMat, F
      1 )     
      
       CALL CalculateTauS(StressTrialMat, 
@@ -73,8 +73,8 @@ C ==== Initialise Loop For Newton =============
      +  FCC_SSE, FCC_NSE,
      +  FCC_SCB, FCC_NCB)	     
      
-      CALL GetCSDHTauC(TAUPEI,TAUSEI,TAUCBI,
-     1 SDV(46:63), TAUC, 	   
+      CALL GetCSDHTauC(TAUPE,TAUSE,TAUCB,
+     1 STATEV(46:63), TAUC, 	   
      2 PROPS(16:28))
  
       CALL CalculateSlipRate( 
@@ -121,8 +121,8 @@ c --- Now to redo the stuff
      +  FCC_SSE, FCC_NSE,
      +  FCC_SCB, FCC_NCB)  
      
-      CALL GetCSDHTauC(TAUPEI,TAUSEI,TAUCBI,
-     1 SDV(46:63), TAUC, 	   
+      CALL GetCSDHTauC(TAUPE,TAUSE,TAUCB,
+     1 STATEV(46:63), TAUC, 	   
      2 PROPS(16:28))
  
       CALL CalculateSlipRate( 
@@ -155,13 +155,13 @@ cc --- Elastic
 c      StressVMat = StressVMat
       DDSDDE = StiffR 
       plasStrainrate= 0.0 
-      END
+      ENDIF
 C ================================================================
 
 c --   Calculate Other Stuff
-      CALL GetSSDEvolve(RhoM, RhoF, STATEV(28:45), 
-     1 GammaDot, TauEff, SSDDot,    
-     2 PROP(31:37))
+      CALL GetSSDEvolve(RhoM, RhoF,STATEV(28:45),
+     1 GammaDot, TauEff, SSDDot, TAU,   
+     2 PROPS(31:37))
      
       CALL kmatvec6(StressVMat,STRESS) !output stress
 c ===
@@ -194,7 +194,8 @@ C     RHO SSD
 
 C     RHO CSD DONE
 C     GNDS
-      Call kcalcGND(FCC_S, FCC_N, CUBIC_S, CUBIC_N,
+      Call kcalcGND(FCC_S, FCC_N, FCC_T, 
+     + CUBIC_S, CUBIC_N, CUBIC_T,
      + STATEV(64:81),STATEV(82:99),STATEV(100:117), STATEV(19:27),
      + PROPS(38))
 
@@ -280,13 +281,7 @@ c --------------------------------------
          PNEWDT=0.5
        END IF	   
       END DO		
-
-      DO ISLIPS=1,18
-       IF ((ABS(DGA(ISLIPS)).LT.1.0e-3)) THEN
-       ELSE
-         PNEWDT=0.5
-       END IF	   
-      END DO		  
+	  
 c ------------------------------------------------	
       return
       end subroutine UMAT
@@ -294,18 +289,20 @@ c ------------------------------------------------
 c ---- Includes ------   
       include 'uexternaldb.f'
       include 'utils.f'
+      include 'ksvd2.f'
       
       include 'InitialiseUMAT.f'
-      include 'RotateStiffnessSimple.f'
+      include 'RotateStiffnessTensorSimple.f'
       include 'RotateSlipSystems.f'
       
       include 'GetRhoPFM.f'
-      include 'GetTauPass.f'
+      include 'GetTauSlips.f'
       
       include 'PrepNewtonIter.f'
       include 'CalculateTauS.f'
       include 'GetCSDHTauC.f'
       include 'CalculateSlipRate.f'
+      
       include 'GetSSDEvolve.f'
       include 'PerformCurl.f'
       include 'kCalcGND.f'

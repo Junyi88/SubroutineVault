@@ -36,10 +36,14 @@ C ----------------------------------------
            TVecT(I) = FCC_T0(I,K)
         END DO		
 		
-        TMagS = matmul(ROTM,TVecS)
-        TMagN = matmul(ROTM,TVecN)
-        TMagT = matmul(ROTM,TVecT)
+        TVecS = matmul(ROTM,TVecS)
+        TVecN = matmul(ROTM,TVecN)
+        TVecT = matmul(ROTM,TVecT)
 		
+        TMagS = sqrt(dot_product(TVecS,TVecS))
+        TMagN = sqrt(dot_product(TVecN,TVecN))
+        TMagT = sqrt(dot_product(TVecT,TVecT))
+        
         DO I = 1, NDOF
          FCC_S(I,K) = TVecS(I)/TMagS
          FCC_N(I,K) = TVecN(I)/TMagN
@@ -54,8 +58,13 @@ c -------------
            TVecN(I) = FCC_NPE0(I,K)
         END DO		
 		
-        TMagS = matmul(ROTM,TVecS)
-        TMagN = matmul(ROTM,TVecN)
+        TVecS = matmul(ROTM,TVecS)
+        TVecN = matmul(ROTM,TVecN)
+        TVecT = matmul(ROTM,TVecT)
+		
+        TMagS = sqrt(dot_product(TVecS,TVecS))
+        TMagN = sqrt(dot_product(TVecN,TVecN))
+        TMagT = sqrt(dot_product(TVecT,TVecT))
 		
         DO I = 1, NDOF
          FCC_SPE(I,K) = TVecS(I)/TMagS
@@ -70,8 +79,13 @@ c -------------
            TVecN(I) = FCC_NSE0(I,K)
         END DO		
 		
-        TMagS = matmul(ROTM,TVecS)
-        TMagN = matmul(ROTM,TVecN)
+        TVecS = matmul(ROTM,TVecS)
+        TVecN = matmul(ROTM,TVecN)
+        TVecT = matmul(ROTM,TVecT)
+		
+        TMagS = sqrt(dot_product(TVecS,TVecS))
+        TMagN = sqrt(dot_product(TVecN,TVecN))
+        TMagT = sqrt(dot_product(TVecT,TVecT))
 		
         DO I = 1, NDOF
          FCC_SSE(I,K) = TVecS(I)/TMagS
@@ -86,8 +100,13 @@ c -------------
            TVecN(I) = FCC_NCB0(I,K)
         END DO		
 		
-        TMagS = matmul(ROTM,TVecS)
-        TMagN = matmul(ROTM,TVecN)
+        TVecS = matmul(ROTM,TVecS)
+        TVecN = matmul(ROTM,TVecN)
+        TVecT = matmul(ROTM,TVecT)
+		
+        TMagS = sqrt(dot_product(TVecS,TVecS))
+        TMagN = sqrt(dot_product(TVecN,TVecN))
+        TMagT = sqrt(dot_product(TVecT,TVecT))
 		
         DO I = 1, NDOF
          FCC_SCB(I,K) = TVecS(I)/TMagS
@@ -104,9 +123,13 @@ c -------------
            TVecT(I) = CUBIC_T0(I,K)
         END DO		
 		
-        TMagS = matmul(ROTM,TVecS)
-        TMagN = matmul(ROTM,TVecN)
-        TMagT = matmul(ROTM,TVecT)
+        TVecS = matmul(ROTM,TVecS)
+        TVecN = matmul(ROTM,TVecN)
+        TVecT = matmul(ROTM,TVecT)
+		
+        TMagS = sqrt(dot_product(TVecS,TVecS))
+        TMagN = sqrt(dot_product(TVecN,TVecN))
+        TMagT = sqrt(dot_product(TVecT,TVecT))
 		
         DO I = 1, NDOF
          CUBIC_S(I,K) = TVecS(I)/TMagS

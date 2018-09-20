@@ -21,9 +21,9 @@
      1  ], [nnodes,3])
 
 c ------     
-      real*8,intent(inout):: svars(144)
-      INTEGER :: I,J,K, kintB, kintB2
-      REAL*8 :: gausscoords(3,nnodes), yp, yq, yr
+      real*8 :: svars(144)
+      INTEGER :: I,J, kintB, kintB2, info
+      REAL*8 :: gausscoords(3,nnodes), yp, yq, yr, det
 
       real*8 :: xj(3,3),xjinv(3,3),dndloc(nnodes,3),dndx(nnodes,3),
      + fnode(3,nnodes), fmat1(3,3),dmout(3,3),xn(nnodes)
@@ -40,7 +40,7 @@ c ------
      + fmt5 = "(' ',5(F12.8,1X))",fmt8="(8(' ',(ES11.3,1X)))"
 
       include 'UserParameters.f'       
-      REAL*8 :: kgausscoords, kFp, kcurlFp,      
+      REAL*8 :: kgausscoords, kFp, kcurlFp      
       COMMON/UMPS/kgausscoords(TOTALELEMENTNUM,8,3),
      1 kFp(TOTALELEMENTNUM,8, 9),
      1 kcurlFp(TOTALELEMENTNUM, 8, 9)     

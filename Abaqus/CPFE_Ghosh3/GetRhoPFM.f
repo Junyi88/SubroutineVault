@@ -76,7 +76,7 @@ c --- RhoS
         RhoP(nA)=RhoP(nA)+MyFactor*SinProjection*(abs(RhoS(nB)))
 c --- RhoEN		
         call VectorProjections(CosProjection,SinProjection,
-     1 STSlipNA,TSlipNB)
+     1 TSlipNA,TSlipNB)
 
         RhoF(nA)=RhoF(nA)+MyFactor*CosProjection*(abs(RhoEN(nB)))
         RhoP(nA)=RhoP(nA)+MyFactor*SinProjection*(abs(RhoEN(nB)))		

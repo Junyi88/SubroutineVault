@@ -2,7 +2,7 @@
      1 PROPS, STATEV, 
      1 NPROPS, NSTATV,
      1 KSTEP, KINC, NOEL, NPT,
-     1 ROTM
+     1 ROTM, COORDS
      1 )
 	  
       IMPLICIT NONE    
@@ -11,14 +11,14 @@
       
       INTEGER, INTENT(IN) :: NPROPS, NSTATV
       INTEGER, INTENT(IN) :: KSTEP, KINC, NOEL, NPT
-      REAL*8, INTENT(IN) :: PROPS(NPROPS)
+      REAL*8, INTENT(IN) :: PROPS(NPROPS), COORDS(3)
       REAL*8, INTENT(INOUT) :: STATEV(NSTATV)
 
       REAL*8, INTENT(OUT) :: ROTM(NDIR,NDIR)
  
       INTEGER :: I,J,K, NN
       
-      REAL*8 :: kgausscoords, kFp, kcurlFp,      
+      REAL*8 :: kgausscoords, kFp, kcurlFp      
       COMMON/UMPS/kgausscoords(TOTALELEMENTNUM,8,3),
      1 kFp(TOTALELEMENTNUM,8, 9),
      1 kcurlFp(TOTALELEMENTNUM, 8, 9)
