@@ -24,7 +24,15 @@ c ---- INITIALISE
      1 ROTM
      1 )     
 
-C ==== Preliminary Calculations before constitutive =============     
+C ==== Preliminary Calculations before constitutive ============= 
+c ---- LOAD SDV
+      DO I = 1,3
+      DO J = 1,3
+         FP(I,J) = STATEV(9+J+(I-1)*3)
+         STATEV(18+J+(I-1)*3) = kcurlFp(noel,J+(I-1)*3,i)
+      END DO
+      END DO
+    
 c ---- ROTATE STIFFNESS TENSOR
       CALL RotateStiffnessTensorSimple(ROTM,
      1 PROPS(10:12), StiffR)     
@@ -67,14 +75,14 @@ C ==== Initialise Loop For Newton =============
      
       CALL GetCSDHTauC(TAUPEI,TAUSEI,TAUCBI,
      1 SDV(46:63), TAUC, 	   
-     2 PROP(16:28))
+     2 PROPS(16:28))
  
       CALL CalculateSlipRate( 
      1  TAU, TAU_SIGN,
      2  TauPass, TauCut, TauC,
      +  FCC_S, FCC_N, CUBIC_S, CUBIC_N,
      2  Lp, GammaDot, dGammadTau, TauEff, 
-     3  PROP(29:30))
+     3  PROPS(29:30))
       
       PlasticFlag = maxval(TauEff)
       IF (PlasticFlag.GT.UserZero) THEN     
@@ -115,33 +123,171 @@ c --- Now to redo the stuff
      
       CALL GetCSDHTauC(TAUPEI,TAUSEI,TAUCBI,
      1 SDV(46:63), TAUC, 	   
-     2 PROP(16:28))
+     2 PROPS(16:28))
  
       CALL CalculateSlipRate( 
      1  TAU, TAU_SIGN,
      2  TauPass, TauCut, TauC,
      +  FCC_S, FCC_N, CUBIC_S, CUBIC_N,
      2  Lp, GammaDot, dGammadTau, TauEff, 
-     3  PROP(29:30))      
+     3  PROPS(29:30))      
       
       END DO
 
 C **** FINISH NEWTON CALCULATIONS ***************
 c -- Calculate Other Stuff
-
-
-
+      DDSDDE =  matmul(xFaiInv,StiffR)  
+      plasStrainrate=(Lp+transpose(Lp))*0.5  
+      
+C     *** UPDATE PLASTIC DEFORMATION GRADIENT    
+      tempSys1 = 0.; tempSys2 = 0.
+      tempSys1 = xI - Lp*dtime      
+      CALL kdeter(tempSys1,deter)      
+      IF (deter /= 0.0) THEN
+         CALL lapinverse(tempSys1,3,info,tempSys2)
+         fp = matmul(tempSys2,fp)
+      ELSE
+         fp = fp
+      END IF   
+      
       ELSE
 cc --- Elastic      
 c      StressVMat = StressVMat
       DDSDDE = StiffR 
-      
+      plasStrainrate= 0.0 
       END
 C ================================================================
 
+c --   Calculate Other Stuff
+      CALL GetSSDEvolve(RhoM, RhoF, STATEV(28:45), 
+     1 GammaDot, TauEff, SSDDot,    
+     2 PROP(31:37))
+     
+      CALL kmatvec6(StressVMat,STRESS) !output stress
 c ===
 
-  
+C ====  NOW TO CALCULATE GNDs ===================================================== 
+      IF (NPT.EQ.8) THEN 
+         CALL PerformCurl(NOEL,NPT)
+      END IF
+      
+C ====  NOW TO UPDATE EVERYTHING ===================================================== 
+C     STRESS = DONE
+C     DDSDDE = DONE
+
+      DO I = 1,3
+      DO J = 1,3
+         STATEV(9+J+(I-1)*3) = FP(I,J) 
+      END DO
+      END DO
+ 
+      call MutexLock( 5 )      
+      DO i=1, 9
+          kFp(noel,NPT,i) = STATEV(9+J+(I-1)*3)
+      END DO
+      call MutexUnlock( 5 )   
+      
+C     RHO SSD
+      DO I = 1,18
+        STATEV(27+I) = STATEV(27+I)+SSDDot(I)*DTIME
+      END DO
+
+C     RHO CSD DONE
+C     GNDS
+      Call kcalcGND(FCC_S, FCC_N, CUBIC_S, CUBIC_N,
+     + STATEV(64:81),STATEV(82:99),STATEV(100:117), STATEV(19:27),
+     + PROPS(38))
+
+c     CUMULATIVE GAMMA
+      STATEV(140) = 0.0
+      STATEV(141) = 0.0
+      STATEV(142) = 0.0      
+      
+      DO I=1,18
+        tempValGamma = GAMMADOT(I)*DTIME
+        STATEV(117+I) = STATEV(117+I)+tempValGamma
+        STATEV(139) = STATEV(139)+tempValGamma
+
+      STATEV(140) = STATEV(140) +  STATEV(27+I)  
+      STATEV(141) = STATEV(141) +  STATEV(45+I) 
+      
+      STATEV(142) = STATEV(142) +  STATEV(63+I)*STATEV(63+I)
+      STATEV(142) = STATEV(142) +  STATEV(81+I)*STATEV(81+I)
+      STATEV(142) = STATEV(142) +  STATEV(99+I)*STATEV(99+I)      
+      END DO      
+      STATEV(142) = sqrt(STATEV(142))
+      
+C ===== ROTATE ========================
+      CALL kdeter(Fp,deter)            
+      IF (deter /= 0.) THEN
+         Fpinv = 0.
+         CALL lapinverse(Fp,3,info,Fpinv)
+!         IF(info5 /= 0) write(6,*) "inverse failure: print3 in kmat"
+         Fe = matmul(F,Fpinv)          
+      ELSE
+         write(*,*) "Error in orientation update: finding inv(Fp)",noel,
+     +    npt, kinc
+         call XIT       
+      END IF 
+      
+      CALL kdeter(Fe,deter)            
+      IF (deter /= 0.) THEN
+         Feinv = 0.
+         CALL lapinverse(Fe,3,info5,Feinv)
+!         IF(info5 /= 0) write(6,*) "inverse failure: print3 in kmat"         
+      ELSE
+          write(*,*) "Error in orientation update: finding inv(Fe)",noel
+     +     ,npt, kinc
+         call XIT      
+      END IF    
+      
+      LpFeinv = 0.; 
+      LpFeinv = matmul(Lp, Feinv)
+      Le = L - matmul(Fe,LpFeinv)        
+      elasspin=(Le-transpose(Le))*0.5
+      matrix = xI - elasspin*dtime      
+      CALL kdeter(matrix,deter)         
+      IF (deter /= 0.) THEN
+         update = 0.
+         CALL lapinverse(matrix,3,info,update)
+         IF(info /= 0) write(*,*) "inverse failure: print3 in kmat"
+         !print3 = 0.
+         !print3 = gmatinv + dtime*matmul(elasspin,gmatinv)
+         ROTMnew = matmul(update,ROTM)                        
+         !write(*,*) "gmatinv, print3", gmatinv, print3      
+      ELSE         
+         ROTMnew = ROTM
+      write(*,*) "WARNING gmatinv not updated at noel,npt, kinc:", noel,
+     + npt, kinc
+      END IF    
+      
+      DO I = 1,3
+        DO J = 1,3 
+           STATEV(J+(I-1)*3) = ROTMnew(I,J)
+        END DO
+      END DO        
+       if (maxval(ROTMnew) > 1) then
+          write(*,*) "something very wrong with gmatinv"
+          call XIT
+       end if 
+
+c =========== 
+
+c --------------------------------------
+      DO ISLIPS=1,6
+       IF ((ABS(DStress(ISLIPS)).LT.5.0e1)) THEN
+       ELSE
+         PNEWDT=0.5
+       END IF	   
+      END DO		
+
+      DO ISLIPS=1,18
+       IF ((ABS(DGA(ISLIPS)).LT.1.0e-3)) THEN
+       ELSE
+         PNEWDT=0.5
+       END IF	   
+      END DO		  
+c ------------------------------------------------	
       return
       end subroutine UMAT
 
@@ -160,5 +306,8 @@ c ---- Includes ------
       include 'CalculateTauS.f'
       include 'GetCSDHTauC.f'
       include 'CalculateSlipRate.f'
+      include 'GetSSDEvolve.f'
+      include 'PerformCurl.f'
+      include 'kCalcGND.f'
       
       

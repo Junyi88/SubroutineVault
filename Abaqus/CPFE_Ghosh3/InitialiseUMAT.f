@@ -54,13 +54,12 @@ c ---
         END DO
 c ---
 
-        IF (NPT.EQ.8) THEN
         CALL MUTEXLOCK(1)
             DO I = 1,9
                 kFp(NOEL, NPT, I) = STATEV(9+I)
             END DO
         CALL MUTEXUNLOCK(1)
-        END IF
+
 c -------      
       END IF
 
@@ -68,11 +67,22 @@ c ==============================================
       IF ((KSTEP.LE.1).AND.(KINC.LE.1)) THEN       
         DO I = 1,9
             STATEV(18+I) = 0.0
-        END DO        
+        END DO
+        CALL MUTEXLOCK(2)
+            DO i =1,3
+            kgausscoords(noel,npt,i) = coords(i)
+            STATEV(135+I) = coords(i)
+            END DO
+        CALL MUTEXUNLOCK(2)        
       ELSE 
         DO I = 1,9
             STATEV(18+I) = kcurlFp(NOEL, NPT, I)
         END DO  
+        CALL MUTEXLOCK(2)
+            DO i =1,3
+            kgausscoords(noel,npt,i) = STATEV(135+I)
+            END DO
+        CALL MUTEXUNLOCK(2)  
       END IF
 
 

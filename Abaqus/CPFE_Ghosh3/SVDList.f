@@ -10,14 +10,13 @@ c     SDV(64->81) :: Rho GND S (SLIP)
 c     SDV(82->99) :: Rho GND ET (SLIP)
 c     SDV(100->117) :: Rho GND EN (SLIP)
 
-
-
 c     SDV(118->135) :: Gamma Slip cumulative
+c     SDV(136->138) :: COORDS
 
-
-
-
-
+c     SDV(139) :: GAMMA SLIP ALL
+c     SDV(140) :: RHO SSD ALL
+c     SDV(141) :: RHO CSD ALL
+c     SDV(142) :: RHO GND ALL
 
 c ---------------------------------
 c SDV(163) :: Cumulative gamma slip

@@ -27,3 +27,16 @@ c     PROPS(28) :: (13) :: kB * Theta
 c ---- Calculate SLup Rate **** NEW **** -----
 c     PROPS(29) :: (1) :: [c_10 * kB * Theta / (G * b^2) ] * [c_1*(THETA^c_2)*exp(-Q/kB*THETA)]
 c     PROPS(30) :: (2) :: p
+
+c ---- GetSSDEvolve
+c GetRhoSSDEvolve
+c     PROPS(31) :: (1) :: c_5 / b
+c     PROPS(32) :: (2) :: (c_6 / b) * (sqrt(3) * G * b)/ (16 * (1-nu))
+c     PROPS(33) :: (3) :: c_7
+c     PROPS(34) :: (4) :: c_8 * ( (D_0 b^3) / (kB * Theta) ) * exp(- Q_Bulk / (kB * Theta))) * SET 2 ZERO
+c     PROPS(35) :: (5) :: c_9
+c     PROPS(36) :: (6) :: gamma_dot_ref
+c     PROPS(37) :: (7) :: MaxTauEff
+
+c ---- CALC_GND
+c     PROPS(38) :: (1) :: BURGERS VECTOR
