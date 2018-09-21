@@ -114,25 +114,34 @@ c   --- DBG
       PlasticFlag = maxval(TauEff)
       
 c DBGMSG ---     
-      IF (((NOEL.EQ.1).AND.(NPT.EQ.1)).AND.(KINC.LT.10)) THEN
-      write(6,*), '    '
-      write(6,*), '-  CP1  -----------------------'
-      write(6,*), 'PlasticFlag = ', PlasticFlag
-      write(6,*), 'Tau = ', Tau
-      write(6,*), '    '
-      write(6,*), 'TauPass = ', TauPass
-      write(6,*), '    '
-      write(6,*), 'TauCut = ', TauCut
-      write(6,*), '    '
-      write(6,*), 'TauEff = ', TauEff
-      write(6,*), '    '
-      write(6,*), 'StressTrialMat = ', StressTrialMat
-      write(6,*), 'PNEWDT = ', PNEWDT
-      END IF
+C       IF (((NOEL.EQ.1).AND.(NPT.EQ.1)).AND.(KINC.LT.10)) THEN
+C       write(6,*), '    '
+C       write(6,*), '-  CP1  -----------------------'
+C       write(6,*), 'PlasticFlag = ', PlasticFlag
+C       write(6,*), 'Tau = ', Tau
+C       write(6,*), '    '
+C       write(6,*), 'TauPass = ', TauPass
+C       write(6,*), '    '
+C       write(6,*), 'TauCut = ', TauCut
+C       write(6,*), '    '
+C       write(6,*), 'TauEff = ', TauEff
+C       write(6,*), '    '
+C       write(6,*), 'StressTrialMat = ', StressTrialMat
+C       write(6,*), 'PNEWDT = ', PNEWDT
+C       END IF
       ITERN = 0
       FaiValue = 1.0
+
       IF (PlasticFlag.GT.UserZero) THEN     
 C **** START NEWTON CALCULATIONS ***************
+      IF ((NPT.EQ.1).AND.(STATEV(200).LT.0.5)) THEN
+      write(6,*), '   '
+            write(6,*), '-------------------------'
+            write(6,*), KINC
+            write(6,*), 'stress trial'
+            write(6,*), StressTrial
+      ENDIF 
+
       DO WHILE (FaiValue .GT. IterAccu)        
         ITERN = ITERN + 1
           if(any(dGammadTau /= dGammadTau) .or. 
@@ -150,7 +159,20 @@ c --- Calculate Stress Increments
 
       Fai = StressTrial - StressV - matmul(StiffR,plasStrainInc2)
       dStress = matmul(xFaiInv,Fai)
-      StressV = StressV + dStress*0.05
+      StressV = StressV + dStress
+      
+C     DBG
+C       IF ((NPT.EQ.1).AND.(STATEV(200).LT.0.5)) THEN
+C           write(6,*), ITERN, FAIVALUE
+C           write(6,*), 'STRESSV'
+C           write(6,*), STRESSV
+C           write(6,*), 'dSTRESS'
+C           write(6,*), dSTRESS
+C           write(6,*), 'Fai'
+C           write(6,*), Fai
+C           write(6,*), '  '
+C       ENDIF      
+      
       CALL kvecmat6(StressV,StressVMat)      
       FaiValue = sqrt(sum(Fai*Fai))
       
@@ -161,15 +183,17 @@ c     DBG
       
 c --- Ditch if too big
       IF (ITERN .gt. MaxITER) THEN
-           pnewdt = 0.1
-          write(6,*) 'HIGH ITER', FaiValue, ITERN, KINC, NPT
-           return
+C            pnewdt = 0.1                        
+C           write(6,*) 'HIGH ITER', FaiValue, ITERN, KINC, NPT
+C            return
 C           write(6,*) 'FAI  = ', Fai
 C           write(6,*) 'StressV  = ', StressV
 C           write(6,*) 'StressTrial  = ', StressTrial
 c DBG  
-      StressV = StressV - matmul(StiffR,plasStrainInc2)
+       StressV = StressV - matmul(StiffR,plasStrainInc2)
+c      StressV = StressTrial - matmul(StiffR,plasStrainInc2)
       FaiValue = 0.0
+            STATEV(200) = 1.0
       END IF
 
 c DBG      
@@ -186,7 +210,8 @@ c --- Now to redo the stuff
       CALL GetCSDHTauC(TAUPE,TAUSE,TAUCB,
      1 STATEV(46:63), TAUC, 	   
      2 PROPS(16:28))
- 
+c   --- DBG
+       TAUC=0.0 
       CALL CalculateSlipRate( 
      1  TAU, TAU_SIGN,
      2  TauPass, TauCut, TauC,
@@ -228,11 +253,11 @@ c --   Calculate Other Stuff
       CALL kmatvec6(StressVMat,STRESS) !output stress
 c ===
 c DBGMSG ---     
-      IF (((NOEL.EQ.1).AND.(NPT.EQ.1)).AND.(KINC.LT.10)) THEN
-      write(6,*), '-  CP2 '
-      write(6,*), 'Stress = ', Stress
-      write(6,*), 'PNEWDT = ', PNEWDT
-      END IF
+C       IF (((NOEL.EQ.1).AND.(NPT.EQ.1)).AND.(KINC.LT.10)) THEN
+C       write(6,*), '-  CP2 '
+C       write(6,*), 'Stress = ', Stress
+C       write(6,*), 'PNEWDT = ', PNEWDT
+C       END IF
       
 C ====  NOW TO CALCULATE GNDs ===================================================== 
       IF (NPT.EQ.8) THEN 
@@ -289,11 +314,11 @@ c     CUMULATIVE GAMMA
       STATEV(142) = sqrt(STATEV(142))
       
 c DBGMSG ---     
-      IF (((NOEL.EQ.1).AND.(NPT.EQ.1)).AND.(KINC.LT.10)) THEN
-      write(6,*), '-  CP3 '
-      write(6,*), 'FP = ', FP
-      write(6,*), 'F = ', F
-      END IF      
+C       IF (((NOEL.EQ.1).AND.(NPT.EQ.1)).AND.(KINC.LT.10)) THEN
+C       write(6,*), '-  CP3 '
+C       write(6,*), 'FP = ', FP
+C       write(6,*), 'F = ', F
+C       END IF      
       
 C ===== ROTATE ========================
       CALL kdeter(Fp,deter)            
@@ -340,13 +365,13 @@ C ===== ROTATE ========================
       END IF    
 
 c DBGMSG ---     
-      IF (((NOEL.EQ.1).AND.(NPT.EQ.1)).AND.(KINC.LT.10)) THEN
-      write(6,*), 'ROTM = ', ROTM
-      write(6,*), 'ROTMNew = ', ROTMnew
-      write(6,*), 'F = ', F
-      write(6,*), 'Fp = ', Fp
-      write(6,*), 'Fe = ', Fe
-      END IF   
+C       IF (((NOEL.EQ.1).AND.(NPT.EQ.1)).AND.(KINC.LT.10)) THEN
+C       write(6,*), 'ROTM = ', ROTM
+C       write(6,*), 'ROTMNew = ', ROTMnew
+C       write(6,*), 'F = ', F
+C       write(6,*), 'Fp = ', Fp
+C       write(6,*), 'Fe = ', Fe
+C       END IF   
 
       
       DO I = 1,3
@@ -365,19 +390,19 @@ C   DEBUG VALUES -------------
       END DO
 
 c =========== 
-      IF ((NOEL.EQ.1).AND.(NPT.EQ.1)) THEN
-      write(6,*), 'PNEWDT = ', PNEWDT
-      END IF
+C       IF ((NOEL.EQ.1).AND.(NPT.EQ.1)) THEN
+C       write(6,*), 'PNEWDT = ', PNEWDT
+C       END IF
       
 c --------------------------------------
-      DO ISLIPS=1,6
-       IF ((ABS(DStress(ISLIPS)).LT.5.0e1)) THEN
-       ELSE
-         PNEWDT=0.5
-         write(6,*) "LargeStresses", noel,
-     + npt, kinc
-       END IF	   
-      END DO		
+C       DO ISLIPS=1,6
+C        IF ((ABS(DStress(ISLIPS)).LT.5.0e1)) THEN
+C        ELSE
+C          PNEWDT=0.5
+C          write(6,*) "LargeStresses", noel,
+C      + npt, kinc
+C        END IF	   
+C       END DO		
 	  
 c ------------------------------------------------	
       return

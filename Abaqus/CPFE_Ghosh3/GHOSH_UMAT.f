@@ -28,6 +28,7 @@ C ==== Preliminary Calculations before constitutive =============
 c ---- LOAD SDV
       DO I = 1,3
       DO J = 1,3
+         ROTM(I,J)=STATEV(J+(I-1)*3)                                   
          FP(I,J) = STATEV(9+J+(I-1)*3)
          STATEV(18+J+(I-1)*3) = kcurlFp(noel,J+(I-1)*3,i)
       END DO
@@ -87,9 +88,11 @@ C ==== Initialise Loop For Newton =============
       PlasticFlag = maxval(TauEff)
       IF (PlasticFlag.GT.UserZero) THEN     
 C **** START NEWTON CALCULATIONS ***************
-      DO WHILE (FaiVal .GT. IterAccu)        
+      ITERN = 0
+      FaiValue = 1.0
+      DO WHILE (FaiValue  .GT. IterAccu)        
         ITERN = ITERN + 1
-          if(any(dGammadTau /= tmatdGammadTau) .or. 
+          if(any(dGammadTau /= dGammadTau) .or. 
      1          any(dGammadTau-1 == dGammadTau)) then
               pnewdt = 0.5 ! if sinh( ) has probably blown up then try again with smaller dt
               return
@@ -110,7 +113,8 @@ c --- Calculate Stress Increments
       
 c --- Ditch if too big
       IF (ITERN .gt. MaxITER) THEN
-          pnewdt = 0.5
+          pnewdt = 0.1
+          return
       END IF
 
 c --- Now to redo the stuff
@@ -152,7 +156,7 @@ C     *** UPDATE PLASTIC DEFORMATION GRADIENT
       
       ELSE
 cc --- Elastic      
-c      StressVMat = StressVMat
+      StressVMat = StressTrialMat
       DDSDDE = StiffR 
       plasStrainrate= 0.0 
       ENDIF

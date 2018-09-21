@@ -74,6 +74,9 @@ c ==============================================
             STATEV(135+I) = coords(i)
             END DO
         CALL MUTEXUNLOCK(2)        
+        DO I= 28,45
+          STATEV(I) = 0.005
+        END DO                   
       ELSE 
         DO I = 1,9
             STATEV(18+I) = kcurlFp(NOEL, NPT, I)

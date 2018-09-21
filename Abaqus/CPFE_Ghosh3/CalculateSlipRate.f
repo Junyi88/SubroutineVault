@@ -23,7 +23,7 @@
       REAL*8 :: tempDGammaDTau(6,6)
       INTEGER :: I, J, K, ISLIPS
       REAL*8 :: tempNorm(3), tempDir(3)
-      REAL*8 :: tempVal
+      REAL*8 :: tempVal, tempStress
       REAL*8 :: xsnt(3,3),xsnv(6),xnsv(6),xsnnst(6,6),xnst(3,3)
 c -------------------------------------------
       dGammadTau = 0.0
@@ -40,8 +40,8 @@ c -------------------------------------------
         
 c ================================     
         IF (TauEff(ISLIPS).GT.TauC(ISLIPS)) THEN
-            TauEff(ISLIPS) = TauEff(ISLIPS) / TauCut(ISLIPS)
-            tempVal = TauEff(ISLIPS)**CinS(2)
+            tempStress = TauEff(ISLIPS) / TauCut(ISLIPS)
+            tempVal = tempStress**CinS(2)
             GammaDot(ISLIPS) = CinS(1)*Sinh(tempVal)
 
 c ---- Calculate the differential
@@ -60,8 +60,8 @@ c ----
          xsnnst = spread(xsnv,2,6)*spread(xnsv,1,6)          
 c ----
          tempDGammaDTau = tempDGammaDTau +
-     1       CinS(1)*CinS(2)*(TauEff(ISLIPS)**(Cins(2)-1.0))*
-     1       cosh(tempVal)
+     1       CinS(1)*CinS(2)*(tempStress**(Cins(2)-1.0))*
+     1       cosh(tempVal)/TauCut(ISLIPS)
      
          Lp = Lp + gammaDot(ISLIPS)*xsnt           
         ELSE
