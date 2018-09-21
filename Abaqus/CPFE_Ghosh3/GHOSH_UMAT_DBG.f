@@ -134,13 +134,13 @@ C       END IF
 
       IF (PlasticFlag.GT.UserZero) THEN     
 C **** START NEWTON CALCULATIONS ***************
-      IF ((NPT.EQ.1).AND.(STATEV(200).LT.0.5)) THEN
-      write(6,*), '   '
-            write(6,*), '-------------------------'
-            write(6,*), KINC
-            write(6,*), 'stress trial'
-            write(6,*), StressTrial
-      ENDIF 
+C       IF ((NPT.EQ.1).AND.(STATEV(200).LT.0.5)) THEN
+C       write(6,*), '   '
+C             write(6,*), '-------------------------'
+C             write(6,*), KINC
+C             write(6,*), 'stress trial'
+C             write(6,*), StressTrial
+C       ENDIF 
 
       DO WHILE (FaiValue .GT. IterAccu)        
         ITERN = ITERN + 1
@@ -183,21 +183,25 @@ c     DBG
       
 c --- Ditch if too big
       IF (ITERN .gt. MaxITER) THEN
-C            pnewdt = 0.1                        
+           pnewdt = 0.1       
+           return           
 C           write(6,*) 'HIGH ITER', FaiValue, ITERN, KINC, NPT
 C            return
 C           write(6,*) 'FAI  = ', Fai
 C           write(6,*) 'StressV  = ', StressV
 C           write(6,*) 'StressTrial  = ', StressTrial
 c DBG  
-       StressV = StressV - matmul(StiffR,plasStrainInc2)
+c       StressV = StressV - matmul(StiffR,plasStrainInc2)
 c      StressV = StressTrial - matmul(StiffR,plasStrainInc2)
-      FaiValue = 0.0
-            STATEV(200) = 1.0
+C       FaiValue = 0.0
+C             STATEV(200) = 1.0
       END IF
 
 c DBG      
-      
+C       DO I = 1,18
+        STATEV(150) = FaiValue
+        STATEV(149) = ITERN        
+C       END DO
       
 c --- Now to redo the stuff
       CALL CalculateTauS(StressVMat, 

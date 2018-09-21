@@ -60,11 +60,14 @@ c ----
          xsnnst = spread(xsnv,2,6)*spread(xnsv,1,6)          
 c ----
          tempDGammaDTau = tempDGammaDTau +
-     1       CinS(1)*CinS(2)*(tempStress**(Cins(2)-1.0))*
+     1       xsnnst*CinS(1)*CinS(2)*(tempStress**(Cins(2)-1.0))*
      1       cosh(tempVal)/TauCut(ISLIPS)
      
          Lp = Lp + gammaDot(ISLIPS)*xsnt           
         ELSE
+C             tempDGammaDTau = tempDGammaDTau +
+C      1       xsnnst*CinS(1)*CinS(2)*(0.0001**(Cins(2)-1.0))*
+C      1       1.0/TauCut(ISLIPS)
             GammaDot(ISLIPS) = 0.0
         END IF        
             
