@@ -60,38 +60,36 @@ C=======================
         END IF   
         
 c --- SSD		
-      write(6,*), '****'
-      write(6,*), 'nA,nB = ', nA, nB
+
       
         call VectorProjections(CosProjection,SinProjection,
      1 TSlipNA,TSlipTB)
      
-      write(6,*), 'NT = ', CosProjection,SinProjection
+
       
         RhoF(nA)=RhoF(nA)+CosProjection*(RhoSSD(nB))
         RhoP(nA)=RhoP(nA)+SinProjection*(RhoSSD(nB))
-        write(6,*), 'RhoP= ',RhoP(nA), SinProjection*(RhoSSD(nB))
+
 c --- RhoET		
         RhoF(nA)=RhoF(nA)+MyFactor*CosProjection*(abs(RhoET(nB)))
         RhoP(nA)=RhoP(nA)+MyFactor*SinProjection*(abs(RhoET(nB)))	
         
-        write(6,*),RhoP(nA),MyFactor*SinProjection*(abs(RhoET(nB)))	    
+   
 c --- RhoS		
         call VectorProjections(CosProjection,SinProjection,
      1 TSlipNA,TSlipSB)
-      write(6,*), 'NS = ', CosProjection,SinProjection
+
         RhoF(nA)=RhoF(nA)+MyFactor*CosProjection*(abs(RhoS(nB)))
         RhoP(nA)=RhoP(nA)+MyFactor*SinProjection*(abs(RhoS(nB)))
-      write(6,*),RhoP(nA),MyFactor*SinProjection*(abs(RhoS(nB)))	
+	
 c --- RhoEN		
       
         call VectorProjections(CosProjection,SinProjection,
      1 TSlipNA,TSlipNB)
-       write(6,*), 'NN = ', CosProjection,SinProjection
+
         RhoF(nA)=RhoF(nA)+MyFactor*CosProjection*(abs(RhoEN(nB)))
         RhoP(nA)=RhoP(nA)+MyFactor*SinProjection*(abs(RhoEN(nB)))
-       write(6,*),RhoEN(nB)
-       write(6,*),RhoP(nA),MyFactor*SinProjection*(abs(RhoEN(nB)))		
+	
        END DO
 	   
       END DO

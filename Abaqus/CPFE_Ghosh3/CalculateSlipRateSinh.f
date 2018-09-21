@@ -42,7 +42,7 @@ c ================================
         IF (TauEff(ISLIPS).GT.TauC(ISLIPS)) THEN
             tempStress = TauEff(ISLIPS) / TauCut(ISLIPS)
             tempVal = tempStress
-            GammaDot(ISLIPS) = CinS(1)*tempVal
+            GammaDot(ISLIPS) = CinS(1)*Sinh(tempVal)
 
 c ---- Calculate the differential
         if (ISLIPS.LE.12) THEN
@@ -60,10 +60,14 @@ c ----
          xsnnst = spread(xsnv,2,6)*spread(xnsv,1,6)          
 c ----
          tempDGammaDTau = tempDGammaDTau +
-     1       xsnnst*CinS(1)
+     1       xsnnst*CinS(1)*
+     1       cosh(tempVal)/TauCut(ISLIPS)
      
          Lp = Lp + gammaDot(ISLIPS)*xsnt           
         ELSE
+C             tempDGammaDTau = tempDGammaDTau +
+C      1       xsnnst*CinS(1)*CinS(2)*(0.0001**(Cins(2)-1.0))*
+C      1       1.0/TauCut(ISLIPS)
             GammaDot(ISLIPS) = 0.0
         END IF        
             

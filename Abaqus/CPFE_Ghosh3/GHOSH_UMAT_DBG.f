@@ -432,7 +432,8 @@ c ---- Includes ------
       include 'PrepNewtonIter.f'
       include 'CalculateTauS.f'
       include 'GetCSDHTauC.f'
-      include 'CalculateSlipRate.f'
+       include 'CalculateSlipRateSinh.f'
+C       include 'CalculateSlipRateLinear.f' 
       
       include 'GetSSDEvolve.f'
       include 'PerformCurl.f'
