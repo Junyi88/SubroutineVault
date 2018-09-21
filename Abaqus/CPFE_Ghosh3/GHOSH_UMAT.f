@@ -76,7 +76,8 @@ C ==== Initialise Loop For Newton =============
      
       CALL GetCSDHTauC(TAUPE,TAUSE,TAUCB,
      1 STATEV(46:63), TAUC, 	   
-     2 PROPS(16:28))
+     2 PROPS(16:28),PROPS(39))
+ 
  
       CALL CalculateSlipRate( 
      1  TAU, TAU_SIGN,
@@ -88,41 +89,17 @@ C ==== Initialise Loop For Newton =============
       PlasticFlag = maxval(TauEff)
       IF (PlasticFlag.GT.UserZero) THEN     
 C **** START NEWTON CALCULATIONS ***************
-      ITERN = 0
+      ITRNUM= 0
       FaiValue = 1.0
       DO WHILE (FaiValue  .GT. IterAccu)        
-        ITERN = ITERN + 1
+        ITRNUM= ITRNUM+ 1
           if(any(dGammadTau /= dGammadTau) .or. 
      1          any(dGammadTau-1 == dGammadTau)) then
               pnewdt = 0.5 ! if sinh( ) has probably blown up then try again with smaller dt
               return
           end if  
-c --- Calculate Plastic Strains
-      plasStrainRate = (Lp+transpose(Lp))*0.5*dtime
-      CALL kmatvec6(plasStrainRate,plasStrainInc2)
-      plasStrainInc2(4:6) = 2.0*plasStrainInc2(4:6) 
-c --- Calculate Stress Increments
-      xFai =  xIden6 + matmul(StiffR,dGammadTau)
-      CALL lapinverse(xFai,6,info,xFaiInv)   
 
-      Fai = StressTrial - StressV - matmul(StiffR,plasStrainInc2)
-      dStress = matmul(xFaiInv,Fai)
-      StressV = StressV + dStress
-      CALL kvecmat6(StressV,StressVMat)      
-      FaiValue = sqrt(sum(Fai*Fai))
-      
-c --- Ditch if too big
-      IF (ITERN .gt. MaxITER) THEN
-        IF (FAIVALUE.GT.FuzzyAccept) THEN
-           pnewdt = 0.1       
-           return           
-         ELSE
-            FaiValue = 0.0
-         ENDIF
-      END IF
-
-        STATEV(150) = FaiValue
-        STATEV(149) = ITERN                     
+       IF (ITERN.GT.1) THEN
 c --- Now to redo the stuff
       CALL CalculateTauS(StressVMat, 
      1  TAU, TAUPE, TAUSE, TAUCB, TAU_SIGN,
@@ -133,7 +110,8 @@ c --- Now to redo the stuff
      
       CALL GetCSDHTauC(TAUPE,TAUSE,TAUCB,
      1 STATEV(46:63), TAUC, 	   
-     2 PROPS(16:28))
+     2 PROPS(16:28),PROPS(39))
+ 
  
       CALL CalculateSlipRate( 
      1  TAU, TAU_SIGN,
@@ -141,6 +119,36 @@ c --- Now to redo the stuff
      +  FCC_S, FCC_N, CUBIC_S, CUBIC_N,
      2  Lp, GammaDot, dGammadTau, TauEff, 
      3  PROPS(29:30))      
+      END IF
+		  
+c --- Calculate Plastic Strains
+      plasStrainRate = (Lp+transpose(Lp))*0.5*dtime
+      CALL kmatvec6(plasStrainRate,plasStrainInc2)
+      plasStrainInc2(4:6) = 2.0*plasStrainInc2(4:6) 
+c --- Calculate Stress Increments
+      dGammadTau=dGammadTau*DTIME
+      xFai =  xIden6 + matmul(StiffR,dGammadTau)
+      CALL lapinverse(xFai,6,info,xFaiInv)   
+
+      Fai = StressTrial - StressV - matmul(StiffR,plasStrainInc2)
+      dStress = matmul(xFaiInv,Fai)
+      StressV = StressV + dStress
+      CALL kvecmat6(StressV,StressVMat)      
+      FaiValue = sqrt(sum(Fai*Fai))
+      
+c --- Ditch if too big
+      IF (ITRNUM.gt. MaxITER) THEN
+        IF (FAIVALUE.GT.FuzzyAccept) THEN
+           pnewdt = 0.1       
+           return           
+         ELSE
+            FaiValue = 0.0
+         ENDIF
+      END IF
+
+        STATEV(150) = FaiValue
+        STATEV(149) = ITRNUM                    
+
       
       END DO
 

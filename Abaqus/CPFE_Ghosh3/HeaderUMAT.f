@@ -1,4 +1,4 @@
-      INTEGER :: I,J,K
+      INTEGER :: I,J,K, NNN
 c  --- For Initialise
       REAL*8 :: ROTM(3,3) 
       INTEGER :: info 
@@ -35,7 +35,7 @@ c ---- FOR PrepNewton Iter
       REAL*8 :: Ltot(3,3), DTotStran(6)      
 
       REAL*8 :: FaiValue = 1.0 + IterAccu
-      INTEGER :: ITERN = 0
+      INTEGER :: ITRNUM= 0
 
 c----  FOR CalculateTauS      
       REAL*8 :: TAU(18), TAUPE(12), TAUSE(12), TAUCB(12)  
@@ -58,7 +58,7 @@ c----  NEWTON CALCULATIONS
       REAL*8 :: plasStrainRate(3,3), plasStrainInc2(6)
       REAL*8 :: xFai(6,6)
       REAL*8 :: xFaiInv(6,6)
-      REAL*8 :: dStress(6), Fai(6)
+      REAL*8 :: dStress(6), Fai(6), FUCK(6)
 c --- After NEWTON
       REAL*8 :: tempSys1(3,3),tempSys2(3,3), deter
       REAL*8, PARAMETER :: xI(3,3) = reshape([

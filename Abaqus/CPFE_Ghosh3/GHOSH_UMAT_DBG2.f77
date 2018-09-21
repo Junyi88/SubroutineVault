@@ -78,7 +78,6 @@ C ==== Initialise Loop For Newton =============
      1 STATEV(46:63), TAUC, 	   
      2 PROPS(16:28),PROPS(39))
  
- 
       CALL CalculateSlipRate( 
      1  TAU, TAU_SIGN,
      2  TauPass, TauCut, TauC,
@@ -87,32 +86,66 @@ C ==== Initialise Loop For Newton =============
      3  PROPS(29:30))
       
       PlasticFlag = maxval(TauEff)
+C       write(6,*), 'AAAA--'
+C       write(6,*), 'CP1 --'
+C       IF (PlasticFlag.LT.-1000.0) THEN  
       IF (PlasticFlag.GT.UserZero) THEN     
 C **** START NEWTON CALCULATIONS ***************
+C       write(6,*), 'CP2--'
       ITRNUM= 0
       FaiValue = 1.0
-      DO WHILE (FaiValue  .GT. IterAccu)        
+C       DO WHILE (FaiValue  .GT. IterAccu)      
+      DO NNN = 1,10	  
         ITRNUM= ITRNUM+ 1
           if(any(dGammadTau /= dGammadTau) .or. 
      1          any(dGammadTau-1 == dGammadTau)) then
               pnewdt = 0.5 ! if sinh( ) has probably blown up then try again with smaller dt
-              return
+      faiVAlue = 0.0
+C               return
           end if  
-
+c DBGMSG ---     
+c     DBG
+C       IF ((NOEL.EQ.10).AND.(NPT.EQ.2)) THEN
+C       write(6,*), 'CP1', ITERN, Faivalue, NOEL, NPT, KINC
+C       END IF   		  
+C       write(6,*), 'CP3 --' , NNN, ITRNUM, NOEL, NPT 	  
+	  
+	  
+       IF ((NOEL.EQ.10).AND.(NPT.EQ.5)) THEN
+       DDD = 1.0
+       write(6,*), 'XA = ' , KINC, NOEL, NPT, NNN, INTRNUM, DDD
+       ENDIF	   
+       IF ((NOEL.EQ.10).AND.(NPT.EQ.5)) THEN
+	   DDD = 2.0
+       write(6,*), 'XB = ' , KINC, NOEL, NPT, NNN, INTRNUM, DDD 
+       ENDIF
+       IF ((NOEL.EQ.10).AND.(NPT.EQ.5)) THEN
+	   DDD = 3.0
+       write(6,*), 'XC = ' , KINC, NOEL, NPT, NNN, INTRNUM, DDD 
+       ENDIF
+C        call mutexlock(6)
+C        IF ((NOEL.EQ.10).AND.(NPT.EQ.5)) THEN
+C        write(6,*), 'XC = ' , KINC, NOEL, NPT, NNN, ITRNUM 
+C        ENDIF	   
+C        IF ((NOEL.EQ.10).AND.(NPT.EQ.5)) THEN
+C        write(6,*), 'XD = ' , KINC, NOEL, NPT, NNN, ITRNUM 
+C        ENDIF
+C        call mutexunlock(6)	   
        IF (ITERN.GT.1) THEN
 c --- Now to redo the stuff
+C       write(6,*), 'CP4 --'
       CALL CalculateTauS(StressVMat, 
      1  TAU, TAUPE, TAUSE, TAUCB, TAU_SIGN,
      +  FCC_S, FCC_N, CUBIC_S, CUBIC_N,
      +  FCC_SPE, FCC_NPE,
      +  FCC_SSE, FCC_NSE,
      +  FCC_SCB, FCC_NCB)  
-     
+C        write(6,*), 'CP5 --'    
       CALL GetCSDHTauC(TAUPE,TAUSE,TAUCB,
      1 STATEV(46:63), TAUC, 	   
      2 PROPS(16:28),PROPS(39))
- 
- 
+
+C       write(6,*), 'CP6 --' 
       CALL CalculateSlipRate( 
      1  TAU, TAU_SIGN,
      2  TauPass, TauCut, TauC,
@@ -120,7 +153,7 @@ c --- Now to redo the stuff
      2  Lp, GammaDot, dGammadTau, TauEff, 
      3  PROPS(29:30))      
       END IF
-		  
+C       write(6,*), 'CP7 --'		  
 c --- Calculate Plastic Strains
       plasStrainRate = (Lp+transpose(Lp))*0.5*dtime
       CALL kmatvec6(plasStrainRate,plasStrainInc2)
@@ -129,34 +162,48 @@ c --- Calculate Stress Increments
       dGammadTau=dGammadTau*DTIME
       xFai =  xIden6 + matmul(StiffR,dGammadTau)
       CALL lapinverse(xFai,6,info,xFaiInv)   
-
+      Fai = StressTrial 
+       IF ((NOEL.EQ.10).AND.(NPT.EQ.5)) THEN
+       write(6,*), 'FAI' , shape(FAI) 
+       write(6,*), 'StressTrial ' , shape(StressTrial ) 
+       write(6,*), 'StiffR' , shape(StiffR)
+       write(6,*), 'plasStrainInc2' , shape(plasStrainInc2)
+       write(6,*), 'XXX' , shape(matmul(StiffR,plasStrainInc2))	   
+       ENDIF
       Fai = StressTrial - StressV - matmul(StiffR,plasStrainInc2)
       dStress = matmul(xFaiInv,Fai)
       StressV = StressV + dStress
       CALL kvecmat6(StressV,StressVMat)      
       FaiValue = sqrt(sum(Fai*Fai))
-      
+	  
+	  
+	  
+C       write(6,*), 'CP8 --'	      
 c --- Ditch if too big
-      IF (ITRNUM.gt. MaxITER) THEN
-        IF (FAIVALUE.GT.FuzzyAccept) THEN
-           pnewdt = 0.1       
-           return           
-         ELSE
-            FaiValue = 0.0
-         ENDIF
-      END IF
+C       IF (ITRNUM.gt. MaxITER) THEN
+C         IF (FAIVALUE.GT.FuzzyAccept) THEN
+C            pnewdt = 0.1       
+C       faiVAlue = 0.0
+C            return           
+C          ELSE
+C             FaiValue = 0.0
+C            pnewdt = 0.1   
+		   
+C            return  
+C          ENDIF
+C       END IF
 
-        STATEV(150) = FaiValue
-        STATEV(149) = ITRNUM                    
-
+C         STATEV(150) = FaiValue
+C         STATEV(149) = ITRNUM                    
+C       write(6,*), 'CP9 --'	
       
       END DO
-
+C       write(6,*), 'CP10 --'	
 C **** FINISH NEWTON CALCULATIONS ***************
 c -- Calculate Other Stuff
       DDSDDE =  matmul(xFaiInv,StiffR)  
       plasStrainrate=(Lp+transpose(Lp))*0.5  
-      
+C       write(6,*), 'CP11 --'	      
 C     *** UPDATE PLASTIC DEFORMATION GRADIENT    
       tempSys1 = 0.; tempSys2 = 0.
       tempSys1 = xI - Lp*dtime      
@@ -174,8 +221,12 @@ cc --- Elastic
       DDSDDE = StiffR 
       plasStrainrate= 0.0 
       ENDIF
+	  
+      StressVMat = StressTrialMat
+      DDSDDE = StiffR 
+      plasStrainrate= 0.0 
 C ================================================================
-
+C       write(6,*), 'XXX--'
 c --   Calculate Other Stuff
       CALL GetSSDEvolve(RhoM, RhoF,STATEV(28:45),
      1 GammaDot, TauEff, SSDDot, TAU,   
@@ -185,9 +236,9 @@ c --   Calculate Other Stuff
 c ===
 
 C ====  NOW TO CALCULATE GNDs ===================================================== 
-      IF (NPT.EQ.8) THEN 
-         CALL PerformCurl(NOEL,NPT)
-      END IF
+C       IF (NPT.EQ.8) THEN 
+C          CALL PerformCurl(NOEL,NPT)
+C       END IF
       
 C ====  NOW TO UPDATE EVERYTHING ===================================================== 
 C     STRESS = DONE
@@ -212,10 +263,10 @@ C     RHO SSD
 
 C     RHO CSD DONE
 C     GNDS
-      Call kcalcGND(FCC_S, FCC_N, FCC_T, 
-     + CUBIC_S, CUBIC_N, CUBIC_T,
-     + STATEV(64:81),STATEV(82:99),STATEV(100:117), STATEV(19:27),
-     + PROPS(38))
+C       Call kcalcGND(FCC_S, FCC_N, FCC_T, 
+C      + CUBIC_S, CUBIC_N, CUBIC_T,
+C      + STATEV(64:81),STATEV(82:99),STATEV(100:117), STATEV(19:27),
+C      + PROPS(38))
 
 c     CUMULATIVE GAMMA
       STATEV(140) = 0.0
@@ -286,13 +337,8 @@ C ===== ROTATE ========================
         END DO
       END DO        
        if (maxval(ROTMnew) > 1) then
-          write(6,*) "ERROR:: something very wrong with gmatinv"
+          write(6,*) "something very wrong with gmatinv"
 C           call XIT
-        DO I = 1,3
-        DO J = 1,3 
-           STATEV(J+(I-1)*3) = ROTM(I,J)
-        END DO
-      END DO  
        end if 
 
 c =========== 
