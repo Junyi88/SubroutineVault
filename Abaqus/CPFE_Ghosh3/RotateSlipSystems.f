@@ -60,11 +60,9 @@ c -------------
 		
         TVecS = matmul(ROTM,TVecS)
         TVecN = matmul(ROTM,TVecN)
-        TVecT = matmul(ROTM,TVecT)
 		
         TMagS = sqrt(dot_product(TVecS,TVecS))
         TMagN = sqrt(dot_product(TVecN,TVecN))
-        TMagT = sqrt(dot_product(TVecT,TVecT))
 		
         DO I = 1, NDOF
          FCC_SPE(I,K) = TVecS(I)/TMagS
@@ -81,11 +79,9 @@ c -------------
 		
         TVecS = matmul(ROTM,TVecS)
         TVecN = matmul(ROTM,TVecN)
-        TVecT = matmul(ROTM,TVecT)
 		
         TMagS = sqrt(dot_product(TVecS,TVecS))
         TMagN = sqrt(dot_product(TVecN,TVecN))
-        TMagT = sqrt(dot_product(TVecT,TVecT))
 		
         DO I = 1, NDOF
          FCC_SSE(I,K) = TVecS(I)/TMagS
@@ -102,11 +98,9 @@ c -------------
 		
         TVecS = matmul(ROTM,TVecS)
         TVecN = matmul(ROTM,TVecN)
-        TVecT = matmul(ROTM,TVecT)
 		
         TMagS = sqrt(dot_product(TVecS,TVecS))
         TMagN = sqrt(dot_product(TVecN,TVecN))
-        TMagT = sqrt(dot_product(TVecT,TVecT))
 		
         DO I = 1, NDOF
          FCC_SCB(I,K) = TVecS(I)/TMagS

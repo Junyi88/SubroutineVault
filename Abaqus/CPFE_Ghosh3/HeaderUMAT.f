@@ -40,7 +40,7 @@ c ---- FOR PrepNewton Iter
       REAL*8 :: StressTrial(6), StressTrialMat(3,3)
       REAL*8 :: Ltot(3,3), DTotStran(6)      
 
-      REAL*8 :: FaiVal = 1.0 + IterAccu
+      REAL*8 :: FaiValue = 1.0 + IterAccu
       INTEGER :: ITERN = 0
 
 c----  FOR CalculateTauS      
