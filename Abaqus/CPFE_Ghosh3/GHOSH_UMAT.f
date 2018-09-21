@@ -113,10 +113,16 @@ c --- Calculate Stress Increments
       
 c --- Ditch if too big
       IF (ITERN .gt. MaxITER) THEN
-          pnewdt = 0.1
-          return
+        IF (FAIVALUE.GT.FuzzyAccept) THEN
+           pnewdt = 0.1       
+           return           
+         ELSE
+            FaiValue = 0.0
+         ENDIF
       END IF
 
+        STATEV(150) = FaiValue
+        STATEV(149) = ITERN                     
 c --- Now to redo the stuff
       CALL CalculateTauS(StressVMat, 
      1  TAU, TAUPE, TAUSE, TAUCB, TAU_SIGN,
@@ -228,7 +234,7 @@ C ===== ROTATE ========================
          Fpinv = 0.
          CALL lapinverse(Fp,3,info,Fpinv)
 !         IF(info5 /= 0) write(6,*) "inverse failure: print3 in kmat"
-         Fe = matmul(F,Fpinv)          
+         Fe = matmul(F,Fpinv) ! SHOULD BE THE NEW F RIGHT?         
       ELSE
          write(*,*) "Error in orientation update: finding inv(Fp)",noel,
      +    npt, kinc
@@ -241,7 +247,7 @@ C ===== ROTATE ========================
          CALL lapinverse(Fe,3,info5,Feinv)
 !         IF(info5 /= 0) write(6,*) "inverse failure: print3 in kmat"         
       ELSE
-          write(*,*) "Error in orientation update: finding inv(Fe)",noel
+          write(6,*) "Error in orientation update: finding inv(Fe)",noel
      +     ,npt, kinc
          call XIT      
       END IF    
@@ -255,14 +261,14 @@ C ===== ROTATE ========================
       IF (deter /= 0.) THEN
          update = 0.
          CALL lapinverse(matrix,3,info,update)
-         IF(info /= 0) write(*,*) "inverse failure: print3 in kmat"
+         IF(info /= 0) write(6,*) "inverse failure: print3 in kmat"
          !print3 = 0.
          !print3 = gmatinv + dtime*matmul(elasspin,gmatinv)
          ROTMnew = matmul(update,ROTM)                        
          !write(*,*) "gmatinv, print3", gmatinv, print3      
       ELSE         
          ROTMnew = ROTM
-      write(*,*) "WARNING gmatinv not updated at noel,npt, kinc:", noel,
+      write(6,*) "WARNING gmatinv not updated at noel,npt, kinc:", noel,
      + npt, kinc
       END IF    
       
@@ -272,19 +278,21 @@ C ===== ROTATE ========================
         END DO
       END DO        
        if (maxval(ROTMnew) > 1) then
-          write(*,*) "something very wrong with gmatinv"
+          write(6,*) "something very wrong with gmatinv"
           call XIT
        end if 
 
 c =========== 
 
 c --------------------------------------
-      DO ISLIPS=1,6
-       IF ((ABS(DStress(ISLIPS)).LT.5.0e1)) THEN
-       ELSE
-         PNEWDT=0.5
-       END IF	   
-      END DO		
+C       DO ISLIPS=1,6
+C        IF ((ABS(DStress(ISLIPS)).LT.5.0e1)) THEN
+C        ELSE
+C          PNEWDT=0.5
+C                                             
+C                   
+C        END IF	   
+C       END DO		
 	  
 c ------------------------------------------------	
       return

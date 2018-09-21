@@ -100,9 +100,9 @@ C ==== Initialise Loop For Newton =============
      
       CALL GetCSDHTauC(TAUPE,TAUSE,TAUCB,
      1 STATEV(46:63), TAUC, 	   
-     2 PROPS(16:28))
+     2 PROPS(16:28),PROPS(39))
 c   --- DBG
-       TAUC=0.0
+C        TAUC=0.0
 
       CALL CalculateSlipRate( 
      1  TAU, TAU_SIGN,
@@ -183,8 +183,13 @@ c     DBG
       
 c --- Ditch if too big
       IF (ITERN .gt. MaxITER) THEN
+      
+        IF (FAIVALUE.GT.FuzzyAccept) THEN
            pnewdt = 0.1       
            return           
+         ELSE
+            FaiValue = 0.0
+         ENDIF
 C           write(6,*) 'HIGH ITER', FaiValue, ITERN, KINC, NPT
 C            return
 C           write(6,*) 'FAI  = ', Fai
@@ -213,9 +218,9 @@ c --- Now to redo the stuff
      
       CALL GetCSDHTauC(TAUPE,TAUSE,TAUCB,
      1 STATEV(46:63), TAUC, 	   
-     2 PROPS(16:28))
+     2 PROPS(16:28),PROPS(39))
 c   --- DBG
-       TAUC=0.0 
+C        TAUC=0.0 
       CALL CalculateSlipRate( 
      1  TAU, TAU_SIGN,
      2  TauPass, TauCut, TauC,
@@ -293,10 +298,10 @@ C     RHO CSD DONE
 C     GNDS
 
 C DBG
-C       Call kcalcGND(FCC_S, FCC_N, FCC_T, 
-C      + CUBIC_S, CUBIC_N, CUBIC_T,
-C      + STATEV(64:81),STATEV(82:99),STATEV(100:117), STATEV(19:27),
-C      + PROPS(38))
+      Call kcalcGND(FCC_S, FCC_N, FCC_T, 
+     + CUBIC_S, CUBIC_N, CUBIC_T,
+     + STATEV(64:81),STATEV(82:99),STATEV(100:117), STATEV(19:27),
+     + PROPS(38))
 
 c     CUMULATIVE GAMMA
       STATEV(140) = 0.0
@@ -388,10 +393,10 @@ C       END IF
           call XIT
        end if 
 C   DEBUG VALUES -------------
-      DO I = 1,18
-        STATEV(200+I) = TauPass(I)
-        STATEV(220+I) = TauCut(I)        
-      END DO
+C       DO I = 1,18
+C         STATEV(200+I) = TauPass(I)
+C         STATEV(220+I) = TauCut(I)        
+C       END DO
 
 c =========== 
 C       IF ((NOEL.EQ.1).AND.(NPT.EQ.1)) THEN

@@ -4,6 +4,7 @@
       INTEGER, PARAMETER  :: K=3,M=3,N=8,nnodes=8,knsdv=18
       REAL*8, PARAMETER  :: zero=1.0e-6,xgauss = 0.577350269189626
       INTEGER, INTENT(IN) :: NOEL, NPT
+      REAL*8, parameter :: CurlFPZero = 1.0e-6
       
       REAL*8, PARAMETER :: xnat8(nnodes,3) =reshape([
      1 -1., -1., -1., -1.,  1.,  1.,  1.,  1., 
@@ -216,6 +217,8 @@ c      z33n = matmul(xnmatI,z33i)
          svars((kintB-1)*knsdv+18) = z33i(kintB)      
       end do !kintB 
 	  
+      
+      
 c     ==============================================
    
       call MutexLock( 4 )      

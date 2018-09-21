@@ -40,3 +40,6 @@ c     PROPS(37) :: (7) :: MaxTauEff
 
 c ---- CALC_GND
 c     PROPS(38) :: (1) :: BURGERS VECTOR
+
+
+c     PROPS(39) :: (1) :: MATTYPE 1 is percipitate

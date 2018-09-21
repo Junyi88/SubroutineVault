@@ -1,11 +1,11 @@
       subroutine GetCSDHTauC(TAUPEI,TAUSEI,TAUCBI,
      1 RhoCSD, TAUC, 	   
-     2 CinS)
+     2 CinS, MatType)
 
 C Subroutine to calculate forest parallel and mobile dislocations
       
       implicit none
-      real*8,intent(in) :: TAUPEI(12),TAUSEI(12),TAUCBI(12)
+      real*8,intent(in) :: TAUPEI(12),TAUSEI(12),TAUCBI(12), MatType
       real*8 :: TAUPE(12),TAUSE(12),TAUCB(12)
       real*8,intent(out) :: RhoCSD(12), TAUC(18)
 
@@ -14,6 +14,7 @@ C Subroutine to calculate forest parallel and mobile dislocations
       real*8 :: DUM1
       integer ISLIPS
 
+      IF (MatType.GT.0.5) THEN
 C ------------------------------------------------------	
       DO ISLIPS=1,12
        TAUPE(ISLIPS)=TAUPEI(ISLIPS)*CinS(1)
@@ -43,6 +44,14 @@ C ------------------------------------------------------
       DO ISLIPS=13,18
        TauC(ISLIPS)=CinS(5)
       END DO	
-	  
+c ---------------      
+      ELSE
+      
+      DO ISLIPS=1,12
+       RhoCSD(ISLIPS)=0.0
+       TauC(ISLIPS)=0.0
+      END DO
+      
+      ENDIF
       return
       end subroutine GetCSDHTauC

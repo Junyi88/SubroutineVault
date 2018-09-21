@@ -75,7 +75,7 @@ c ==============================================
             END DO
         CALL MUTEXUNLOCK(2)        
         DO I= 28,45
-          STATEV(I) = 0.005
+          STATEV(I) = InitSSD
         END DO                   
       ELSE 
         DO I = 1,9
