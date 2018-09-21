@@ -16,11 +16,11 @@ c ---- User Start ------
       include 'HeaderUMAT.f'      
      
 c DBGMSG ---     
-      IF (((NOEL.EQ.1).AND.(NPT.EQ.1)).AND.(KINC.LT.10)) THEN
-      write(6,*), '    '
-      write(6,*), '================================================='
-      write(6,*), KSTEP, KINC, NOEL, NPT 
-      END IF     
+C       IF (((NOEL.EQ.1).AND.(NPT.EQ.1)).AND.(KINC.LT.10)) THEN
+C       write(6,*), '    '
+C       write(6,*), '================================================='
+C       write(6,*), KSTEP, KINC, NOEL, NPT 
+C       END IF     
 c ---- INITIALISE
       CALL InitialiseUMAT(
      1 PROPS, STATEV, 
@@ -60,23 +60,23 @@ c ---- Calculate Rhos
      5 PROPS(13))
      
 c DBGMSG ---     
-      IF (((NOEL.EQ.1).AND.(NPT.EQ.1)).AND.(KINC.LT.10)) THEN
-      write(6,*), '    '
-      write(6,*), '-  CP1  -----------------------'
-      write(6,*), 'PlasticFlag = ', PlasticFlag
-      write(6,*), 'RhoP = ', RhoP
-      write(6,*), '    '
-      write(6,*), 'RhoF = ', RhoF
-      write(6,*), '    '
-      write(6,*), 'RhoM = ', RhoM
-      write(6,*), '    '
-      write(6,*), 'FCC_S = ', FCC_S
-      write(6,*), '    '
-      write(6,*), 'FCC_N = ', FCC_N
-      write(6,*), '    '
-      write(6,*), 'FCC_T = ', FCC_T
-      write(6,*), '    '
-      END IF
+C       IF (((NOEL.EQ.1).AND.(NPT.EQ.1)).AND.(KINC.LT.10)) THEN
+C       write(6,*), '    '
+C       write(6,*), '-  CP1  -----------------------'
+C       write(6,*), 'PlasticFlag = ', PlasticFlag
+C       write(6,*), 'RhoP = ', RhoP
+C       write(6,*), '    '
+C       write(6,*), 'RhoF = ', RhoF
+C       write(6,*), '    '
+C       write(6,*), 'RhoM = ', RhoM
+C       write(6,*), '    '
+C       write(6,*), 'FCC_S = ', FCC_S
+C       write(6,*), '    '
+C       write(6,*), 'FCC_N = ', FCC_N
+C       write(6,*), '    '
+C       write(6,*), 'FCC_T = ', FCC_T
+C       write(6,*), '    '
+C       END IF
       
 c ---- Calculate Tau Slips 
       CALL GetTauSlips(RhoP,RhoF,RhoM,
@@ -141,9 +141,64 @@ C             write(6,*), KINC
 C             write(6,*), 'stress trial'
 C             write(6,*), StressTrial
 C       ENDIF 
-
+      IF (((NOEL.EQ.10).AND.(NPT.EQ.1))) THEN
+      write(6,*),''
+      write(6,*), KINC, '-----------------------------'
+      END IF   
+      
       DO WHILE (FaiValue .GT. IterAccu)        
         ITERN = ITERN + 1
+c DBGMSG ---     
+c     DBG
+      IF (((NOEL.EQ.10).AND.(NPT.EQ.2))) THEN
+      write(6,*), 'CP1', ITERN, Faivalue, NOEL, NPT, KINC
+      END IF  
+      IF (((NOEL.EQ.10).AND.(NPT.EQ.2))) THEN
+      write(6,*), 'CP1a', ITERN, Faivalue, NOEL, NPT, KINC
+      END IF  
+      IF (((NOEL.EQ.10).AND.(NPT.EQ.2))) THEN
+      write(6,*), 'CP1b', ITERN, Faivalue, NOEL, NPT, KINC
+      END IF  
+      IF (((NOEL.EQ.10).AND.(NPT.EQ.2))) THEN
+      write(6,*), ITERN, Faivalue, NOEL, NPT, KINC
+      write(6,*),'Fai'
+      write(6,*), Fai      
+      write(6,*), ''
+      write(6,*),'StressV'
+      write(6,*), StressV     
+      write(6,*), ''
+      write(6,*),'dStress'
+      write(6,*), dStress     
+      write(6,*), ''
+      END IF       
+c --- Now to redo the stuff
+      IF (ITERN.EQ.1) THEN
+      ELSE
+      CALL CalculateTauS(StressVMat, 
+     1  TAU, TAUPE, TAUSE, TAUCB, TAU_SIGN,
+     +  FCC_S, FCC_N, CUBIC_S, CUBIC_N,
+     +  FCC_SPE, FCC_NPE,
+     +  FCC_SSE, FCC_NSE,
+     +  FCC_SCB, FCC_NCB)  
+      IF (((NOEL.EQ.10).AND.(NPT.EQ.2))) THEN
+      write(6,*), 'CP2', ITERN, Faivalue, NOEL, NPT, KINC
+      END IF  
+     
+      CALL GetCSDHTauC(TAUPE,TAUSE,TAUCB,
+     1 STATEV(46:63), TAUC, 	   
+     2 PROPS(16:28),PROPS(39))
+c   --- DBG
+C        TAUC=0.0 
+      CALL CalculateSlipRate( 
+     1  TAU, TAU_SIGN,
+     2  TauPass, TauCut, TauC,
+     +  FCC_S, FCC_N, CUBIC_S, CUBIC_N,
+     2  Lp, GammaDot, dGammadTau, TauEff, 
+     3  PROPS(29:30))      
+       END IF       
+       IF (((NOEL.EQ.10).AND.(NPT.EQ.2))) THEN
+      write(6,*), 'CP3', ITERN, Faivalue, NOEL, NPT, KINC
+      END IF         
           if(any(dGammadTau /= dGammadTau) .or. 
      1          any(dGammadTau-1 == dGammadTau)) then
               pnewdt = 0.5 ! if sinh( ) has probably blown up then try again with smaller dt
@@ -160,7 +215,9 @@ c --- Calculate Stress Increments
       Fai = StressTrial - StressV - matmul(StiffR,plasStrainInc2)
       dStress = matmul(xFaiInv,Fai)
       StressV = StressV + dStress
-      
+       IF (((NOEL.EQ.10).AND.(NPT.EQ.2))) THEN
+      write(6,*), 'CP4', ITERN, Faivalue, NOEL, NPT, KINC
+      END IF      
 C     DBG
 C       IF ((NPT.EQ.1).AND.(STATEV(200).LT.0.5)) THEN
 C           write(6,*), ITERN, FAIVALUE
@@ -177,8 +234,7 @@ C       ENDIF
       FaiValue = sqrt(sum(Fai*Fai))
       
       
-c     DBG
-       
+    
       
       
 c --- Ditch if too big
@@ -208,25 +264,7 @@ C       DO I = 1,18
         STATEV(149) = ITERN        
 C       END DO
       
-c --- Now to redo the stuff
-      CALL CalculateTauS(StressVMat, 
-     1  TAU, TAUPE, TAUSE, TAUCB, TAU_SIGN,
-     +  FCC_S, FCC_N, CUBIC_S, CUBIC_N,
-     +  FCC_SPE, FCC_NPE,
-     +  FCC_SSE, FCC_NSE,
-     +  FCC_SCB, FCC_NCB)  
-     
-      CALL GetCSDHTauC(TAUPE,TAUSE,TAUCB,
-     1 STATEV(46:63), TAUC, 	   
-     2 PROPS(16:28),PROPS(39))
-c   --- DBG
-C        TAUC=0.0 
-      CALL CalculateSlipRate( 
-     1  TAU, TAU_SIGN,
-     2  TauPass, TauCut, TauC,
-     +  FCC_S, FCC_N, CUBIC_S, CUBIC_N,
-     2  Lp, GammaDot, dGammadTau, TauEff, 
-     3  PROPS(29:30))      
+
       
       END DO
 
@@ -290,18 +328,18 @@ C     DDSDDE = DONE
       call MutexUnlock( 5 )   
       
 C     RHO SSD
-      DO I = 1,18
-        STATEV(27+I) = STATEV(27+I)+SSDDot(I)*DTIME
-      END DO
+C       DO I = 1,18
+C         STATEV(27+I) = STATEV(27+I)+SSDDot(I)*DTIME
+C       END DO
 
 C     RHO CSD DONE
 C     GNDS
 
 C DBG
-      Call kcalcGND(FCC_S, FCC_N, FCC_T, 
-     + CUBIC_S, CUBIC_N, CUBIC_T,
-     + STATEV(64:81),STATEV(82:99),STATEV(100:117), STATEV(19:27),
-     + PROPS(38))
+C       Call kcalcGND(FCC_S, FCC_N, FCC_T, 
+C      + CUBIC_S, CUBIC_N, CUBIC_T,
+C      + STATEV(64:81),STATEV(82:99),STATEV(100:117), STATEV(19:27),
+C      + PROPS(38))
 
 c     CUMULATIVE GAMMA
       STATEV(140) = 0.0
@@ -432,7 +470,7 @@ c ---- Includes ------
       include 'PrepNewtonIter.f'
       include 'CalculateTauS.f'
       include 'GetCSDHTauC.f'
-       include 'CalculateSlipRateSinh.f'
+       include 'CalculateSlipRate.f'
 C       include 'CalculateSlipRateLinear.f' 
       
       include 'GetSSDEvolve.f'

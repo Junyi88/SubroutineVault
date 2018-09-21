@@ -1,9 +1,3 @@
-c  --- For Declaration      
-      REAL*8 :: kgausscoords, kFp, kcurlFp      
-      COMMON/UMPS/kgausscoords(TOTALELEMENTNUM,8,3),
-     1 kFp(TOTALELEMENTNUM,8, 9),
-     1 kcurlFp(TOTALELEMENTNUM, 8, 9)
-      
       INTEGER :: I,J,K
 c  --- For Initialise
       REAL*8 :: ROTM(3,3) 
@@ -85,4 +79,8 @@ c ---- For ROTATION
        real*8 :: FeInv(3,3)
       real*8 :: elasspin(3,3), matrix(3,3), update(3,3), ROTMnew(3,3)
       
-      
+c  --- For Declaration      
+      REAL*8 :: kgausscoords, kFp, kcurlFp      
+      COMMON/UMPS/kgausscoords(TOTALELEMENTNUM,8,3),
+     1 kFp(TOTALELEMENTNUM,8, 9),
+     1 kcurlFp(TOTALELEMENTNUM, 8, 9)    
