@@ -5,4 +5,4 @@
       INTEGER, parameter :: MaxITER = 200
  
       REAL*8, parameter :: UserZero = 1.0e-12
-      REAL*8, parameter :: InitSSD = 0.012      
+      REAL*8, parameter :: InitSSD = 0.03      
