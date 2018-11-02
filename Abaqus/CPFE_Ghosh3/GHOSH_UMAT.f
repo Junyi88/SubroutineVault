@@ -30,7 +30,7 @@ c ---- LOAD SDV
       DO J = 1,3
          ROTM(I,J)=STATEV(J+(I-1)*3)                                   
          FP(I,J) = STATEV(9+J+(I-1)*3)
-         STATEV(18+J+(I-1)*3) = kcurlFp(noel,J+(I-1)*3,i)
+         STATEV(18+J+(I-1)*3) = kcurlFp(NOEL, NPT,J+(I-1)*3)
       END DO
       END DO
     
@@ -201,7 +201,7 @@ C     DDSDDE = DONE
  
       call MutexLock( 5 )      
       DO i=1, 9
-          kFp(noel,NPT,i) = STATEV(9+J+(I-1)*3)
+          kFp(noel,NPT,i) = STATEV(I)
       END DO
       call MutexUnlock( 5 )   
       
@@ -246,6 +246,7 @@ C ===== ROTATE ========================
       ELSE
          write(*,*) "Error in orientation update: finding inv(Fp)",noel,
      +    npt, kinc
+         write(*,*) Fp
          call XIT       
       END IF 
       
@@ -256,7 +257,8 @@ C ===== ROTATE ========================
 !         IF(info5 /= 0) write(6,*) "inverse failure: print3 in kmat"         
       ELSE
           write(6,*) "Error in orientation update: finding inv(Fe)",noel
-     +     ,npt, kinc
+     +     ,npt, kinc, deter
+          write(6,*) Fe
          call XIT      
       END IF    
       
