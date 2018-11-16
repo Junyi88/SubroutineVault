@@ -160,7 +160,8 @@ c -- Calculate Other Stuff
 C     *** UPDATE PLASTIC DEFORMATION GRADIENT    
       tempSys1 = 0.; tempSys2 = 0.
       tempSys1 = xI - Lp*dtime      
-      CALL kdeter(tempSys1,deter)      
+      CALL kdeter(tempSys1,deter)
+      STATEV(150) = kdeter      
       IF (deter /= 0.0) THEN
          CALL lapinverse(tempSys1,3,info,tempSys2)
          fp = matmul(tempSys2,fp)
@@ -245,7 +246,7 @@ C ===== ROTATE ========================
          Fe = matmul(F,Fpinv) ! SHOULD BE THE NEW F RIGHT?         
       ELSE
          write(*,*) "Error in orientation update: finding inv(Fp)",noel,
-     +    npt, kinc
+     +    npt, kinc, deter, STATEV(150)
          write(*,*) Fp
          call XIT       
       END IF 
