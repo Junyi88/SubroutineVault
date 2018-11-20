@@ -18,5 +18,8 @@ c     SDV(140) :: RHO SSD ALL
 c     SDV(141) :: RHO CSD ALL
 c     SDV(142) :: RHO GND ALL
 
+
+c     SDV(149) :: ITRNUM
+c     SDV(150) :: FaiValue
 c ---------------------------------
 c SDV(163) :: Cumulative gamma slip
