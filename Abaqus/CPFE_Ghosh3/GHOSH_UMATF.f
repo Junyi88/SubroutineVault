@@ -12,12 +12,9 @@
      3 props(nprops),coords(3),drot(3,3),dfgrd0(3,3),dfgrd1(3,3)
      
 c ---- User Start ------     
-      include 'UserParameters14.f'     
+      include 'UserParametersF.f'     
       include 'HeaderUMAT.f'      
-
-C-DBG---
-      write(*,*) "------------------------------"      
-      write(*,*) "Start:", kinc, noel, npt
+     
      
 c ---- INITIALISE
       CALL InitialiseUMAT(
@@ -27,9 +24,6 @@ c ---- INITIALISE
      1 ROTM, COORDS
      1 )     
 
-C-DBG---  
-      write(*,*) "Initialise"    
-     
 C ==== Preliminary Calculations before constitutive ============= 
 c ---- LOAD SDV
       DO I = 1,3
@@ -39,17 +33,10 @@ c ---- LOAD SDV
          STATEV(18+J+(I-1)*3) = kcurlFp(NOEL, NPT,J+(I-1)*3)
       END DO
       END DO
-
-C-DBG---  
-      write(*,*) "LOAD SDV"    
-     
-      
+    
 c ---- ROTATE STIFFNESS TENSOR
       CALL RotateStiffnessTensorSimple(ROTM,
      1 PROPS(10:12), StiffR)     
-
-C-DBG---  
-      write(*,*) "ROTATE STIFFNESS TENSOR"    
      
 c ---- ROTATE Slip Systems
       CALL RotateSlipSystems(ROTM,
@@ -58,10 +45,7 @@ c ---- ROTATE Slip Systems
      1 FCC_SSE, FCC_NSE,
      1 FCC_SCB, FCC_NCB,
      1 CUBIC_S, CUBIC_N, CUBIC_T)     
- 
-C-DBG---  
-      write(*,*) "ROTATE SLIP SYSTEM"     
- 
+     
 c ---- Calculate Rhos    
       CALL GetRhoPFM(RhoP,RhoF,RhoM,
      1 STATEV(28:45),
@@ -69,17 +53,11 @@ c ---- Calculate Rhos
      2 FCC_S, FCC_N, FCC_T,  
      2 CUBIC_S, CUBIC_N, CUBIC_T,
      5 PROPS(13))
-
-C-DBG---  
-      write(*,*) "CALCULATE RHOs"    
      
 c ---- Calculate Tau Slips 
       CALL GetTauSlips(RhoP,RhoF,RhoM,
      1 TauPass, TauCut, PROPS(14:15))
 
-C-DBG---  
-      write(*,*) "GET TAU SLIP"         
-     
 C ==== Initialise Loop For Newton =============       
       CALL PrepNewtonIter(
      1 DFGRD1,DFGRD0, DTIME,
@@ -88,9 +66,6 @@ C ==== Initialise Loop For Newton =============
      1 StressV, StressVMat,
      1 StressTrial, StressTrialMat, F
      1 )     
-
-C-DBG---  
-      write(*,*) "INITIALISE LOOP"    
      
       CALL CalculateTauS(StressTrialMat, 
      1  TAU, TAUPE, TAUSE, TAUCB, TAU_SIGN,
@@ -98,16 +73,11 @@ C-DBG---
      +  FCC_SPE, FCC_NPE,
      +  FCC_SSE, FCC_NSE,
      +  FCC_SCB, FCC_NCB)	     
-
-C-DBG---  
-      write(*,*) "CALCULATE TAU S"         
      
       CALL GetCSDHTauC(TAUPE,TAUSE,TAUCB,
      1 STATEV(46:63), TAUC, 	   
      2 PROPS(16:28),PROPS(39))
-
-C-DBG---  
-      write(*,*) "CALCULATE TAU C"         
+ 
  
       CALL CalculateSlipRate( 
      1  TAU, TAU_SIGN,
@@ -115,10 +85,7 @@ C-DBG---
      +  FCC_S, FCC_N, CUBIC_S, CUBIC_N,
      2  Lp, GammaDot, dGammadTau, TauEff, 
      3  PROPS(29:30))
-
-C-DBG---  
-      write(*,*) "CALCUATE SLIP RATE"    
-     
+      
       PlasticFlag = maxval(TauEff)
       IF (PlasticFlag.GT.UserZero) THEN     
 C **** START NEWTON CALCULATIONS ***************
@@ -185,8 +152,7 @@ c --- Ditch if too big
       
       END DO
 
-C **** FINISH NEWTON CALCULATIONS ***************  
-
+C **** FINISH NEWTON CALCULATIONS ***************
 c -- Calculate Other Stuff
       DDSDDE =  matmul(xFaiInv,StiffR)  
       plasStrainrate=(Lp+transpose(Lp))*0.5  
@@ -194,7 +160,8 @@ c -- Calculate Other Stuff
 C     *** UPDATE PLASTIC DEFORMATION GRADIENT    
       tempSys1 = 0.; tempSys2 = 0.
       tempSys1 = xI - Lp*dtime      
-      CALL kdeter(tempSys1,deter)      
+      CALL kdeter(tempSys1,deter)
+      STATEV(150) = kdeter      
       IF (deter /= 0.0) THEN
          CALL lapinverse(tempSys1,3,info,tempSys2)
          fp = matmul(tempSys2,fp)
@@ -210,16 +177,11 @@ cc --- Elastic
       ENDIF
 C ================================================================
 
-C-DBG---  
-      write(*,*) "FINISH NEWTON CALCULATIONS"  
-
 c --   Calculate Other Stuff
       CALL GetSSDEvolve(RhoM, RhoF,STATEV(28:45),
      1 GammaDot, TauEff, SSDDot, TAU,   
      2 PROPS(31:37))
-C-DBG---  
-      write(*,*) "SSD EVOLVE"
-      
+     
       CALL kmatvec6(StressVMat,STRESS) !output stress
 c ===
 
@@ -227,10 +189,6 @@ C ====  NOW TO CALCULATE GNDs ==================================================
       IF (NPT.EQ.8) THEN 
          CALL PerformCurl(NOEL,NPT)
       END IF
-
-C-DBG---  
-      write(*,*) "CURL"
-
       
 C ====  NOW TO UPDATE EVERYTHING ===================================================== 
 C     STRESS = DONE
@@ -278,9 +236,6 @@ c     CUMULATIVE GAMMA
       STATEV(142) = STATEV(142) +  STATEV(99+I)*STATEV(99+I)      
       END DO      
       STATEV(142) = sqrt(STATEV(142))
-
-C-DBG---  
-      write(*,*) "UPDATE"      
       
 C ===== ROTATE ========================
       CALL kdeter(Fp,deter)            
@@ -291,7 +246,7 @@ C ===== ROTATE ========================
          Fe = matmul(F,Fpinv) ! SHOULD BE THE NEW F RIGHT?         
       ELSE
          write(*,*) "Error in orientation update: finding inv(Fp)",noel,
-     +    npt, kinc
+     +    npt, kinc, deter, STATEV(150)
          write(*,*) Fp
          call XIT       
       END IF 
@@ -339,8 +294,7 @@ C ===== ROTATE ========================
        end if 
 
 c =========== 
-C-DBG---  
-      write(*,*) "DONE"    
+
 c --------------------------------------
 C       DO ISLIPS=1,6
 C        IF ((ABS(DStress(ISLIPS)).LT.5.0e1)) THEN

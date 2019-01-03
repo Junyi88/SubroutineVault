@@ -28,7 +28,7 @@ C Subroutine to calculate forest parallel and mobile dislocations
       INTEGER :: I,J,K
       REAL*8 :: CosProjection, SinProjection      
       INTEGER :: nA, nB, nAX      
-      REAL*8 :: MyFactor=0.05 ! DANGER
+      REAL*8 :: MyFactor=0.05e-8 ! DANGER
       
       REAL*8 :: TSlipNA(3), TSlipNB(3), TSlipSB(3), TSlipTB(3)
 

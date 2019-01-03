@@ -1,4 +1,4 @@
-      integer, parameter :: TOTALELEMENTNUM=173000
+      integer, parameter :: TOTALELEMENTNUM=36600
       
       REAL*8, parameter :: IterAccu = 1.0e-6
       REAL*8, parameter :: FuzzyAccept = 1.0e-5
