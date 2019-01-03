@@ -1,0 +1,30 @@
+#!/bin/sh
+#PBS -j oe
+#PBS -l walltime=24:00:00,select=1:ncpus=24:mpiprocs=24:mem=63500mb
+
+module load abaqus/6.14
+module load intel-suite mpi
+
+export LM_LICENSE_FILE="@iclic25.cc.imperial.ac.uk"
+export ABAQUS_LICENSE_FILE="@iclic25.cc.imperial.ac.uk"
+
+CurrentRun="CMSX4_12CoarseLean_R6"
+PreviousRun="CMSX4_12CoarseLean_R5"
+NextRun="Ayan_Batch_R7.qsub "
+
+CopyIn=" get -R /home/jl1908/Downloads/Ayan_Batch/Output_R5/"${PreviousRun}".*"
+CopyOut=" put -R "${CurrentRun}".* /home/jl1908/Downloads/Ayan_Batch/Output_R6/"
+
+# ----------------------------------------
+echo ${CopyIn} >> InScript.sh
+echo ${CopyOut} >> OutScript.sh
+
+cp $WORK/Ayan_Batch/Ffiles/*.f $TMPDIR
+cp $WORK/Ayan_Batch/Inputs/${CurrentRun}.inp $TMPDIR
+sftp -b ./InScript.sh jl1908@me-yw1107.me.ic.ac.uk
+
+timeout --kill-after=15.0m 20.0h abaqus job=${CurrentRun} oldjob=${PreviousRun}  user=JunyiUMAT8LeanR.f cpus=24 memory=63144
+sftp -b ./OutScript.sh jl1908@me-yw1107.me.ic.ac.uk
+
+qsub $WORK/Ayan_Batch/Qsubs/${NextRun}
+echo "Done"

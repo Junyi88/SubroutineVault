@@ -141,8 +141,8 @@ for nSl=1:18
     ASol(nG,nSl).dFpN=dFpN;
     ASol(nG,nSl).dFpTN=dFpTN;
     
-    fc(:,nG)=dFpN;
-    fcT(:,nG)=dFpTN;
+    fc(:,nG)=FpN;
+    fcT(:,nG)=FpTN;
     end
     [CurlOut]=GetGaussianCurl(fc,NatCoords,NatCoords,GaussPosShape.');
     [CurlOutT]=GetGaussianCurl(fcT,NatCoords,NatCoords,GaussPosShape.');

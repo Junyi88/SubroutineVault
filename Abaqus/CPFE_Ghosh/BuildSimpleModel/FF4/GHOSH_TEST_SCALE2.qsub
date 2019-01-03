@@ -1,0 +1,16 @@
+#!/bin/sh
+#PBS -j oe
+#PBS -l walltime=24:00:00,select=1:ncpus=24:mpiprocs=24:mem=16200mb
+
+#
+module load abaqus/6.14
+module load intel-suite mpi
+
+export LM_LICENSE_FILE="@iclic25.cc.imperial.ac.uk"
+
+
+cp $WORK/FF4/Input/* $TMPDIR
+
+pbsexec -grace 180 abaqus job=GHOSH_TEST_SCALE2 input=GHOSH_TEST_SCALE2.inp user=JunyiUMAT2G.f cpus=24 memory=15144
+sftp -b $HOME/Scripts/MoveFiles.sh jl1908@me-yw1107.me.ic.ac.uk
+cp * $WORK/FF4/Output

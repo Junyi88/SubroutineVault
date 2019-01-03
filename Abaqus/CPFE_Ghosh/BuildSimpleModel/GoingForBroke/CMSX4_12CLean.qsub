@@ -1,0 +1,14 @@
+#!/bin/sh
+#PBS -j oe
+#PBS -l walltime=12:00:00,select=1:ncpus=24:mpiprocs=24:mem=63500mb
+
+module load abaqus/6.14
+module load intel-suite mpi
+
+export LM_LICENSE_FILE="@iclic25.cc.imperial.ac.uk"
+
+cp $WORK/CMSX4_11/Input/* $TMPDIR
+
+pbsexec -grace 300 abaqus job=CMSX4_12CoarseLean input=CMSX4_12CoarseLean.inp user=JunyiUMAT8Lean.f cpus=24 memory=63144
+sftp -b $HOME/Scripts/MoveFiles.sh jl1908@me-yw1107.me.ic.ac.uk
+cp * $WORK/CMSX4_11/Output2
