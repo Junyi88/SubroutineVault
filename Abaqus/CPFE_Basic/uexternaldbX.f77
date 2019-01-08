@@ -15,7 +15,7 @@
       write(6,*) "A0"	 
 c       write(6,*) "MWTF---------------------------"
       IF (LOP == 0 ) THEN         
-c      include 'HeaderUMAT.f'   
+      include 'HeaderUMAT.f'   
 C           open (201, file = '/home/jl1908/projects/scrap/X/LogLog.txt', 
 C      1 status = 'NEW', 
 C      1 ACCESS='APPEND', ACTION='WRITE') 	  

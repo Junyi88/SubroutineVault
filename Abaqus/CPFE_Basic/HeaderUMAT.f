@@ -55,11 +55,14 @@ c --- After NEWTON
      1  0.0, 0.0, 1.0 
      1  ], [3,3]) 
 
-	 
+      real*8 :: G(12), Gamma(12) 
       REAL*8 :: dG(12), HH(12)
 c      REAL*8 :: TAU_SIGN(12)	 
 
      
-      REAL*8, INTENT(OUT) :: Lp(3,3), GammaDot(12), dGammadTau(6,6)
-
+      REAL*8 :: Lp(3,3), GammaDot(12), dGammadTau(6,6)
+c ---- For ROTATION
+      real*8 :: FPinv(3,3), Fe(3,3), Le(3,3), LpFeinv(3,3),F(3,3)
+       real*8 :: FeInv(3,3)
+      real*8 :: elasspin(3,3), matrix(3,3), update(3,3), ROTMnew(3,3)
 	  

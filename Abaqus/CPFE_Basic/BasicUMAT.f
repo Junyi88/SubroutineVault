@@ -14,7 +14,9 @@
 c ---- User Start ------     
       include 'UserParameters.f'     
       include 'HeaderUMAT.f'      
-
+      open (201, file = '/home/jl1908/projects/scrap/X/LogLog.txt', 
+     1 ACCESS='APPEND', ACTION='WRITE') 	  
+      !write(201,*) "C0"	 
 c ------------------------------------------------	
 c ---- INITIALISE
       CALL InitialiseUMAT(
@@ -23,7 +25,11 @@ c ---- INITIALISE
      1 KSTEP, KINC, NOEL, NPT,
      1 ROTM, COORDS
      1 )     
-	  
+	 
+        DO I = 31, 42
+            STATEV(I) = PROPS(13)
+        END DO	 
+      !write(201,*) "C1"	 	  
 C ==== Preliminary Calculations before constitutive ============= 
 c ---- LOAD SDV
       DO I = 1,3
@@ -33,12 +39,15 @@ c ---- LOAD SDV
 c         STATEV(18+J+(I-1)*3) = kcurlFp(NOEL, NPT,J+(I-1)*3) !?
       END DO
       END DO
-	  
+      !write(201,*) "C2"	 	  
 c ---- ROTATE STIFFNESS TENSOR
       CALL RotateStiffnessTensorSimple(ROTM,
-     1 PROPS(10:12), StiffR)    
+     1 PROPS(10:12), StiffR)  
+
+      !write(201,*) "C3"	 	 
       CALL RotateSlipSystems(ROTM,
-     1 FCC_S, FCC_N, FCC_T)     	  
+     1 FCC_S, FCC_N, FCC_T)   
+      !write(201,*) "C4"	 	 
 c -------------------------------	  
 C ==== Initialise Loop For Newton =============       
       CALL PrepNewtonIter(
@@ -48,42 +57,49 @@ C ==== Initialise Loop For Newton =============
      1 StressV, StressVMat,
      1 StressTrial, StressTrialMat, F
      1 )     
-
-      subroutine CalculateTauS(StressTrialMat, 
+      !write(201,*) "C5"	 
+      call CalculateTauS(StressTrialMat, 
      1  TAU, TAU_SIGN,
      +  FCC_S, FCC_N)	 	 
-	 
-      subroutine CalculateSlipRate( 
+      !write(201,*) "C6"	 	 
+      call CalculateSlipRate( 
      1  TAU, TAU_SIGN,
-     +  FCC_S, FCC_N, SDV(31:42), SDV(43:54),
-     2  Lp, GammaDot, dGammadTau, TauEff, 
-     3  PROPS)
-
+     +  FCC_S, FCC_N, STATEV(31:42), STATEV(43:54),
+     2  Lp, GammaDot, dGammadTau,  
+     3  PROPS,nprops)
+      !write(201,*) "C7"	 
 c     SDV(31->42) :: G
 c     SDV(43->54) :: gamma	 
+       IF (KINC>1) THEN
 c ------------------------------------------------	
       ITRNUM= 0
       FaiValue = 1.0
       DO WHILE (FaiValue  .GT. IterAccu)        
         ITRNUM= ITRNUM+ 1
+      !write(201,*) "ITRNUM------"	,ITRNUM , NOEL, NPT, KINC
+      !write(201,*) dGammadTau 	
+	        !write(201,*) "G----"
+      !write(201,*) STATEV(31:42) 	
+      !write(201,*) "TAU" , TAU	  
           if(any(dGammadTau /= dGammadTau) .or. 
      1          any(dGammadTau-1 == dGammadTau)) then
+
               pnewdt = 0.5 ! if sinh( ) has probably blown up then try again with smaller dt
               return
           end if  
 
        IF (ITERN.GT.1) THEN
 c --- Now to redo the stuff
-      subroutine CalculateTauS(StressTrialMat, 
+      call CalculateTauS(StressTrialMat, 
      1  TAU, TAU_SIGN,
      +  FCC_S, FCC_N)	 	 
 	 
-      subroutine CalculateSlipRate( 
+      call CalculateSlipRate( 
      1  TAU, TAU_SIGN,
-     +  FCC_S, FCC_N, G, Gamma,
-     2  Lp, GammaDot, dGammadTau, TauEff, 
-     3  PROPS)
-		  
+     +  FCC_S, FCC_N, STATEV(31:42), STATEV(43:54),
+     2  Lp, GammaDot, dGammadTau, 
+     3  PROPS,nprops)
+      END IF		  
 c --- Calculate Plastic Strains
       plasStrainRate = (Lp+transpose(Lp))*0.5*dtime
       CALL kmatvec6(plasStrainRate,plasStrainInc2)
@@ -92,9 +108,15 @@ c --- Calculate Stress Increments
       dGammadTau=dGammadTau*DTIME
       xFai =  xIden6 + matmul(StiffR,dGammadTau)
       CALL lapinverse(xFai,6,info,xFaiInv)   
-
+        !write(201,*) "GammaDot" , GammaDot
+		!write(201,*) "dGammadTau" , dGammadTau
+	        !write(201,*) "LP" , LP
+	        !write(201,*) "xfai" , xfai
+			!write(201,*) "xFaiInv" , xFaiInv
       Fai = StressTrial - StressV - matmul(StiffR,plasStrainInc2)
+	   !write(201,*) "FAI" , FAI
       dStress = matmul(xFaiInv,Fai)
+	  !write(201,*) "dStress" , dStress
       StressV = StressV + dStress
       CALL kvecmat6(StressV,StressVMat)      
       FaiValue = sqrt(sum(Fai*Fai))
@@ -114,7 +136,7 @@ c --- Ditch if too big
 
       
       END DO
-
+      !write(201,*) "C8"	 
 c -- Calculate Other Stuff
       DDSDDE =  matmul(xFaiInv,StiffR)  
       plasStrainrate=(Lp+transpose(Lp))*0.5  
@@ -137,22 +159,37 @@ c PROP(15): taus
 c PROP(16): h0
 c PROP(17): adot
 c prOP(18): N
-
+      !write(201,*) "C9"	 
 c     SDV(31->42) :: G
 c     SDV(43->54) :: gamma
       do I =1 ,12
-       SDV(42+I) = SDV(42+I) + GAMMADOT(I)*DTIME
-       HH(I) = 1.0/cosh(abs(PROPS(16)*SDV(42+I))/(PROPS(15)-PROPS(14)))
+       STATEV(42+I) = STATEV(42+I) + GAMMADOT(I)*DTIME
+       HH(I) = 1.0/cosh(abs(PROPS(16)*STATEV(42+I))/(
+     1 PROPS(15)-PROPS(14)))
 	   dG(I) = (HH(I)**2.0)*DTIME*PROPS(16)*GAMMADOT(I)
-	   SDV(30+I)= SDV(30+I) +dG(I)
+	   STATEV(30+I)= STATEV(30+I) +dG(I)
       END DO
 
 C **** FINISH NEWTON CALCULATIONS ***************  
-	  
+	        ELSE
+cc --- Elastic      
+      StressVMat = StressTrialMat
+      DDSDDE = StiffR 
+      plasStrainrate= 0.0 
+
+      IF ((KSTEP.GT.1).AND.(KINC.LE.1)) THEN
+      DO I = 1,3
+      DO J = 1,3
+         FP(I,J) = STATEV(9+J+(I-1)*3)  
+      END DO
+      END DO
+      ENDIF
+      CALL kmatvec6(StressVMat,STRESS) !output stress
+      ENDIF
 C ====  NOW TO UPDATE EVERYTHING ===================================================== 
 C     STRESS = DONE
 C     DDSDDE = DONE
-
+      !write(201,*) "C10"	 
       DO I = 1,3
       DO J = 1,3
          STATEV(9+J+(I-1)*3) = FP(I,J) 
@@ -164,18 +201,18 @@ C     DDSDDE = DONE
           kFp(noel,NPT,i) = STATEV(I)
       END DO
       call MutexUnlock( 5 )  
-
+      !write(201,*) "C11"	 
 C ===== ROTATE ========================
       CALL kdeter(Fp,deter)            
       IF (deter /= 0.) THEN
          Fpinv = 0.
          CALL lapinverse(Fp,3,info,Fpinv)
-!         IF(info5 /= 0) write(6,*) "inverse failure: print3 in kmat"
+!         IF(info5 /= 0) !write(201,*) "inverse failure: print3 in kmat"
          Fe = matmul(F,Fpinv) ! SHOULD BE THE NEW F RIGHT?         
       ELSE
-         write(*,*) "Error in orientation update: finding inv(Fp)",noel,
+         !write(201,*) "Error in orientation update: finding inv(Fp)",noel,
      +    npt, kinc, plasStrainrate
-         write(*,*) Fp
+         !write(201,*) Fp
          call XIT       
       END IF 
       
@@ -183,11 +220,11 @@ C ===== ROTATE ========================
       IF (deter /= 0.) THEN
          Feinv = 0.
          CALL lapinverse(Fe,3,info5,Feinv)
-!         IF(info5 /= 0) write(6,*) "inverse failure: print3 in kmat"         
+!         IF(info5 /= 0) !write(201,*) "inverse failure: print3 in kmat"         
       ELSE
-          write(6,*) "Error in orientation update: finding inv(Fe)",noel
+          !write(201,*) "Error in orientation update: finding inv(Fe)",noel
      +     ,npt, kinc, deter
-          write(6,*) Fe
+          !write(201,*) Fe
          call XIT      
       END IF    
       
@@ -200,29 +237,29 @@ C ===== ROTATE ========================
       IF (deter /= 0.) THEN
          update = 0.
          CALL lapinverse(matrix,3,info,update)
-         IF(info /= 0) write(6,*) "inverse failure: print3 in kmat"
+         IF(info /= 0) !write(201,*) "inverse failure: print3 in kmat"
          !print3 = 0.
          !print3 = gmatinv + dtime*matmul(elasspin,gmatinv)
          ROTMnew = matmul(update,ROTM)                        
-         !write(*,*) "gmatinv, print3", gmatinv, print3      
+         !!write(201,*) "gmatinv, print3", gmatinv, print3      
       ELSE         
          ROTMnew = ROTM
-      write(6,*) "WARNING gmatinv not updated at noel,npt, kinc:", noel,
+      !write(201,*) "WARNING gmatinv not updated at noel,npt, kinc:", noel,
      + npt, kinc
       END IF    
       
       DO I = 1,3
         DO J = 1,3 
-           STATEV(J+(I-1)*3) = ROTMnew(I,J)
+        STATEV(J+(I-1)*3) = ROTMnew(I,J)
         END DO
       END DO        
        if (maxval(ROTMnew) > 1.0) then
-          write(6,*) "something very wrong with gmatinv"
+          !write(201,*) "something very wrong with gmatinv"
           call XIT
        end if 
-
+      !write(201,*) "CE"	 
 	  
-	  
+      close(201)
       return
       end subroutine UMAT
 	  

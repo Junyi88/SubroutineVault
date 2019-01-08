@@ -12,13 +12,10 @@ C Subroutine Calculating All Values of ResolveShearStress
       
       REAL*8, INTENT(IN) :: StressTrialMat(3,3)
       REAL*8, INTENT(IN) :: FCC_S(NDOF,NFCC), FCC_N(NDOF,NFCC)
-      REAL*8, INTENT(IN) :: CUBIC_S(NDOF,NCUB), CUBIC_N(NDOF,NCUB)
-	  
-      REAL*8, INTENT(IN) :: FCC_SPE(NDOF,NFCC), FCC_NPE(NDOF,NFCC)
-      REAL*8, INTENT(IN) :: FCC_SSE(NDOF,NFCC), FCC_NSE(NDOF,NFCC)
-      REAL*8, INTENT(IN) :: FCC_SCB(NDOF,NFCC), FCC_NCB(NDOF,NFCC)
 
-      REAL*8, INTENT(OUT) :: TAU(12), TAUPE(12), TAUSE(12), TAUCB(12)  
+	  
+
+      REAL*8, INTENT(OUT) :: TAU(12) 
       REAL*8, INTENT(OUT) :: TAU_SIGN(12)
 
       INTEGER :: ISLIPS, I
@@ -34,7 +31,7 @@ C --------------------------------------------------------------------------
 C --------------------------------------------------------------------------
 C Calculate Tau	  
       DO I=1,12
-        IF (I.LE.12) THEN            
+         
 		 tempNorm = FCC_N(:,I)
          tempDir = FCC_S(:,I)
 
