@@ -1,0 +1,1 @@
+abaqus job=test user=umat.f input=InputDeck.inp int cpus=1
