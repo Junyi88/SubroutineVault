@@ -265,6 +265,12 @@ c ------------------------------------------------
 		   STATEV(429+ISLIPS)=STATEV(429+ISLIPS)+dRhoET(ISLIPS)
 		   STATEV(447+ISLIPS)=STATEV(447+ISLIPS)+dRhoEN(ISLIPS)		   
          END DO		
+
+         DO ISLIPS=1,6
+		     IF (abs(DSTRESS(ISLIPS).GT.20.0e6) THEN
+			 pnewdt=0.25 
+			 END IF 
+         END DO
 		 
 c ------------------------------------------------	 
       return
