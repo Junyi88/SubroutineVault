@@ -21,11 +21,11 @@ C
       psi = 1.457e-4       !82.8457 if placed above in the slip rule
 
       
-      rhossdm = 0.05
-      xhelmholtz = 3.4559E-20 *1E12 ! microN.microns = pJ
+      rhossdm = 5.0e-6
+      xhelmholtz = 3.4559E-20 *1E3 ! N.mm = mJ
       xfreq = 1.0E+11
       
-      xboltzman = 1.381E-23 *1E12 ! pJ / K
+      xboltzman = 1.381E-23 *1E3 ! mJ / K
       xtemp = 293.0 !823.0  !for Zr! CRSS was chosen based on T.
       !Later we can use iphase to prescribe different xhelmholtz, xfreq, etc for the different phase within here!
       !L = microns, stress = MPa, F = microN, therefore E = pJ

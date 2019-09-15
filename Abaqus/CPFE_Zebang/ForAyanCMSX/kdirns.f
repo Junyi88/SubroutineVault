@@ -20,8 +20,11 @@
          include 'xNorm0.f'
       else if(iphase .eq. 1) then !bcc (24/48)
          include 'xDir1.f'
-         include 'xNorm1.f'   
-      else !fcc
+         include 'xNorm1.f'
+      else if(iphase .eq. 2) then !fcc
+         include 'xDir2.f'
+         include 'xNorm2.f'      
+      else !fcc and cubic
          include 'xDir2.f'
          include 'xNorm2.f' 
       end if     
