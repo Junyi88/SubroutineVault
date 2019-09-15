@@ -181,13 +181,62 @@ CC  -------------------------------------------------------
       burgerv = burger
       tauc = xtauc  
 CC  -------------------------------------------------------
+      case(11) !percipitate
+      nSys = L2
+      XTAUC = 260.0 ! (563.4/sqrt(6) = 230.0)
+      burger = 3.5072e-7
+      
+   !   E1 = 207.0E+3; E3 = E1
+   !   v12 = 0.28; v13 = v12
+   !   G12 = E1/(2.0*(1.0+v12)); G13 = G12
+      
+      E1 = 207.0E+3; E3 = E1
+      v12 = 0.28; v13 = v12
+      G12 = E1/(2.0*(1.0+v12)); G13 = G12
+      
+      alpha1 = 13.0e-6; alpha2 = alpha1; alpha3 = alpha1
+      
+      gammast = 150.0e-6
+     
+      
+      allocate(xNorm(nSys,M),xDir(nSys,M),tau(nSys),gammaDot(nSys),gndall(nSys),
+     + gndold(nSys),burgerv(nSys),tauc(nSys),ids(nSys),tau2(nSys),STAT=ialloc)
+     
+      burgerv = burger
+      tauc = xtauc
+      
+      case(12) !channel
+      nSys = L2
+      XTAUC = 160.0 ! (563.4/sqrt(6) = 230.0)
+      burger = 3.5072e-7
+      
+   !   E1 = 207.0E+3; E3 = E1
+   !   v12 = 0.28; v13 = v12
+   !   G12 = E1/(2.0*(1.0+v12)); G13 = G12
+      
+      E1 = 207.0E+3; E3 = E1
+      v12 = 0.28; v13 = v12
+      G12 = E1/(2.0*(1.0+v12)); G13 = G12
+      
+      alpha1 = 13.0e-6; alpha2 = alpha1; alpha3 = alpha1
+      
+      gammast = 150.0e-6
+     
+      
+      allocate(xNorm(nSys,M),xDir(nSys,M),tau(nSys),gammaDot(nSys),gndall(nSys),
+     + gndold(nSys),burgerv(nSys),tauc(nSys),ids(nSys),tau2(nSys),STAT=ialloc)
+     
+      burgerv = burger
+      tauc = xtauc
+      
+cc -------------------------------------------------------
       case default
       WRITE(6,*)
       WRITE(6,*)"Not sure what crystal type. Material constants."
       END SELECT  
 CC  -------------------------------------------------------
       h = 0.0      
-      kslip = 6
+      kslip = 5
       !0 = original slip rule with no GND coupling.
       !5 = original slip rule with GND coupling, with a new parameter to make rhoc more physically reasonable, slip included.
       !6 = Slip rule with constant Activation Volume
@@ -222,18 +271,40 @@ C     *** ZERO ARRAYS ***
       thermat(1,1) = alpha1; thermat(2,2)=alpha2; thermat(3,3) = alpha3 
 CC  -------------------------------------------------------
 C     *** SET UP ELASTIC STIFFNESS MATRIX IN LATTICE SYSTEM ***   
+      SELECT CASE(iphase)
+      CASE(11) ! Precipitate
+      xStiff(1,1:3) = (/298000., 191000., 191000./)
+      xStiff(2,1:3) = (/191000., 298000., 191000./)
+      xStiff(3,1:3) = (/191000., 191000., 298000./)
+      xStiff(4,4:4) = (/139000./)
+      xStiff(5,5:5) = (/139000./)
+      xStiff(6,6:6) = (/139000./)
+
+      CASE(12) ! Channel
+      xStiff(1,1:3) = (/325000., 209000., 209000./)
+      xStiff(2,1:3) = (/209000., 325000., 209000./)
+      xStiff(3,1:3) = (/209000., 209000., 325000./)
+      xStiff(4,4:4) = (/144000./)
+      xStiff(5,5:5) = (/144000./)
+      xStiff(6,6:6) = (/144000./)
+
+
+      CASE DEFAULT
       compliance(1,1:3) = (/1./E1,-v12/E1,-v13/E1/)
       compliance(2,2:3) =         (/1./E1,-v13/E1/)
       compliance(3,3:3) =                 (/1./E3/)
       compliance(4,4:4) =                       (/1./G12/)
       compliance(5,5:5) =                       (/1./G13/)
       compliance(6,6:6) =                       (/1./G13/)
+C
       DO i=2,6
          DO j=1,i-1
             compliance(i,j)=compliance(j,i)
          END DO
-      END DO   
+      END DO
+      
       CALL lapinverse(compliance,6,info,xStiff)
+      END SELECT
 CC  -------------------------------------------------------
 C     *** INITIALIZE USER ARRAYS ***
       DO i=1,3

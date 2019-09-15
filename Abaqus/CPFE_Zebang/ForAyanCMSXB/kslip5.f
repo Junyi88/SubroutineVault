@@ -21,18 +21,16 @@ C
       psi = 1.457e-4       !82.8457 if placed above in the slip rule
 
       
-      rhossdm = 0.05
-      xhelmholtz = 3.4559E-20 *1E12 ! microN.microns = pJ
+      rhossdm = 5.0e-6
+      xhelmholtz = 3.4559E-20 *1E3 ! N.mm = mJ
       xfreq = 1.0E+11
       
-      xboltzman = 1.381E-23 *1E12 ! pJ / K
+      xboltzman = 1.381E-23 *1E3 ! mJ / K
       xtemp = 293.0 !823.0  !for Zr! CRSS was chosen based on T.
       !Later we can use iphase to prescribe different xhelmholtz, xfreq, etc for the different phase within here!
       !L = microns, stress = MPa, F = microN, therefore E = pJ
-      gamm0 = 8.33E-6 ! this is some reference strain which appears in some papers eg http://dx.doi.org/10.1016/j.ijsolstr.2015.02.023
+      gamm0 = 8.33E-6 !8.33E-6 ! this is some reference strain which appears in some papers eg http://dx.doi.org/10.1016/j.ijsolstr.2015.02.023
 C
-      tmat=0.; xlp = 0.;result4=0.
-	     
       rhogndold=sum(gndold)
       Do I=1,L
 	              
