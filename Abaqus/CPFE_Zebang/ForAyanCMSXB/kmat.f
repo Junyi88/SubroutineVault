@@ -306,6 +306,7 @@ C
       
       CALL lapinverse(compliance,6,info,xStiff)
       END SELECT
+      write(*,*) 'QZ2A' 	  
 CC  -------------------------------------------------------
 C     *** INITIALIZE USER ARRAYS ***
       DO i=1,3
@@ -316,6 +317,7 @@ C     *** INITIALIZE USER ARRAYS ***
 C
       p = usvars(10)
 C
+      write(*,*) 'QZ2B'
       DO i=1,6
         totplasstran(i) = usvars(10+i)
       END DO
@@ -332,29 +334,35 @@ C
 C     
       rhossd = usvars(54)
       rho=rhoGND+rhossd
-      rho=usvars(56)              
+      rho=usvars(56)
+      write(*,*) 'QZ2C'	  
       DO i=1,nSys
         gndold(i) = usvars(56+i)
       END DO
 C
+      write(*,*) 'QZ2D'
       DO i=1,3
         DO j=1,3
           fp(i,j) = usvars(80+j+((i-1)*3))
         END DO
       END DO              
 C
+      write(*,*) 'QZ2E'
       DO i=1,3
         DO j=1,3 
          curlfp(i,j) = usvars(37+j+(i-1)*3)
         END DO
       END DO
+      write(*,*) 'QZ2F'	  
 CC  -------------------------------------------------------
 C     *** DIRECTIONS FROM LATTICE TO DEFORMED SYSTEM ***      
       CALL kdirns(gmatinv,iphase,nSys,xDir,xNorm)
 C     *** STIFFNESS FROM LATTICE TO DEFORMED SYSTEM ***
+      write(*,*) 'QZ2G'
       CALL rotord4sig(gmatinv,tSig)
       CALL rotord4str(gmatinv,tStr)
       CALL lapinverse(tSig,6,info2,tSiginv)
+      write(*,*) 'QZ2H'
       prod6 = matmul(tSiginv,xStiff)      
       xStiffdef = matmul(prod6,tStr)
       expanse33 = matmul(matmul(gmatinv,thermat),transpose(gmatinv))
@@ -369,6 +377,7 @@ C     *** DETERMINE INCREMENT IN TOTAL STRAIN (6X1 ***
       dtotstran(4:6) = 2.0*dtotstran(4:6)
 CC  -------------------------------------------------------
 C     *** COMPUTE TRIAL STRESS ***
+      write(*,*) 'QZ2I'
       stressV = xstressdef ! old stress
       trialstress = stressV+matmul(xStiffdef,dtotstran)-
      + matmul(xStiffdef,dstranth)            
@@ -378,6 +387,7 @@ C     *** COMPUTE TRIAL STRESS ***
      + matmul(stressM,spin))*dtime 
 CC  -------------------------------------------------------
 C     *** CALCULATE RESOLVED SHEAR STRESS ON A SLIP SYSTEMS ***
+      write(*,*) 'QZ2J'
       DO I=1,nSys
         tempNorm = xNorm(I,:); tempDir = xDir(I,:)
         prod = matmul(trialstressM,tempNorm)
@@ -389,7 +399,8 @@ C     *** CALCULATE RESOLVED SHEAR STRESS ON A SLIP SYSTEMS ***
           END DO
         END IF
       END DO
-      xtau = maxval(tau/tauc)  
+      xtau = maxval(tau/tauc)
+      write(*,*) 'QZ2K'	  
 CC  -------------------------------------------------------
 C     *** PLASTIC DEFORMATION ***
       IF (xtau >= 1.0 ) THEN      
@@ -512,9 +523,11 @@ C     *** UPDATE PLASTIC DEFORMATION GRADIENT
 CC  -------------------------------------------------------
 C     *** ELASTIC DEFORMATION ***     
       ELSE
-      xstressmdef = trialstressM
+      write(*,*) 'QZ3x'
+	  xstressmdef = trialstressM
       C = xStiffdef      
       END IF      
+	  
 !     CALL kvecmat6(xstressdef,stressM) 
 !     xstressmdef = xstressmdef + (matmul(spin,stressM) - matmul(stressM,spin))*dtime     
       CALL kmatvec6(xstressmdef,xstressdef) !output stress
@@ -550,7 +563,8 @@ C     *** ELASTIC DEFORMATION ***
   !    tauPris= sum(tauR(4:6))
    !   tauPyr = sum(tauR(7:12))       
   !    DO slipSys=1,2 ! Cycle through each system      
-  !    IF (ids(slipSys) > 0) THEN   
+  !    IF (ids(slipSys) > 0) THEN 
+       write(*,*) 'QZA1'  
         DO I=1,12 ! 1-12 for fcc type       
             burgX = xDir(I,:) !slip direction
             burgX = burgX*burger       
@@ -571,6 +585,7 @@ C     *** ELASTIC DEFORMATION ***
   ! ***********************************************************************    
       ! Matrix inversion by singular value decomposition: A+ = [V][S+][U*]
   ! ***********************************************************************   
+       write(*,*) 'QZA2'  
         CALL SVD(A,U,S,V,MZ,NZ)       
         DO i = 1, ubound(S,1)
             IF (S(i) > 1e-6) THEN
@@ -597,7 +612,8 @@ C     *** ORIENTATION UPDATE ***
       !We = L - Fe Lp inv(Fe)
       ! G(t+dt) = G(t) + We G(t)dt dt or an implicit update is G(t+dt)  = G(t)exp[We(t+dt)dt]  ~ inv[I - We(t+dt) dt] G(t)       
       ! We need Fe and inv(Fe) using F = Fe Fp gives Fe = F.inv(Fp)
-      CALL kdeter(Fp,deter)            
+      CALL kdeter(Fp,deter)
+       write(*,*) 'QZA3'	  
       IF (deter /= 0.) THEN
          Fpinv = 0.
          CALL lapinverse(Fp,3,info5,Fpinv)
@@ -608,6 +624,7 @@ C     *** ORIENTATION UPDATE ***
      +    npt, kinc
          call XIT       
       END IF      
+       write(*,*) 'QZA4'	  
       CALL kdeter(Fe,deter)            
       IF (deter /= 0.) THEN
          Feinv = 0.
@@ -617,7 +634,8 @@ C     *** ORIENTATION UPDATE ***
           write(*,*) "Error in orientation update: finding inv(Fe)",noel
      +     ,npt, kinc
          call XIT      
-      END IF                    
+      END IF
+       write(*,*) 'QZA5'	  
       LpFeinv = 0.; 
       LpFeinv = matmul(Lp, Feinv)
       Le = L - matmul(Fe,LpFeinv)        
@@ -636,7 +654,8 @@ C     *** ORIENTATION UPDATE ***
          gmatinvnew = gmatinv
       write(*,*) "WARNING gmatinv not updated at noel,npt, kinc:", noel,
      + npt, kinc
-      END IF      
+      END IF
+       write(*,*) 'QZA6'      
       gmatinv =  gmatinvnew                  
        if (maxval(gmatinv) > 1) then
           write(*,*) "something very wrong with gmatinv"
@@ -653,14 +672,17 @@ C************************************************
 C     Stored Energy Criterion Bo.
 C************************************************
 C     Update Stored Energy
+       write(*,*) 'QZA7'
       Gdot=0
       DO i=1,6
           Gdot=Gdot+(0.05*abs(xstressdef(i))*abs(plasStrainInc2(i)))
       END DO
+       write(*,*) 'QZA8'	  
 C Combine SSDs and GNDs            
       Gdot = Gdot / SQRT(rhoGND + rhossd)      
       Gstored = usvars(102) + Gdot      
-      usvars(102) = GStored 
+      usvars(102) = GStored
+       write(*,*) 'QZA9'	  
 C     *** UPDATE STATE VARIABLES *** ! Free: None
       DO i=1,3
         DO j=1,3
@@ -668,6 +690,7 @@ C     *** UPDATE STATE VARIABLES *** ! Free: None
         END DO
       END DO
       usvars(10) = p
+       write(*,*) 'QZA10'	  
       DO i=1,6
         usvars(10+i) = totplasstran(i) + 
      +                                  plasStrainInc2(i)
@@ -675,7 +698,8 @@ C     *** UPDATE STATE VARIABLES *** ! Free: None
 C
       DO i=1,6
         usvars(16+i) = totstran(i) + dtotstran(i)
-      END DO        
+      END DO
+       write(*,*) 'QZA11'	  
       !23-25 are rotations stored in UEL    
 C     usvars((kint-1)*knsdv+34) = xtau     
       usvars(26) = rhoGND !all
@@ -702,14 +726,17 @@ C     usvars((kint-1)*knsdv+34) = xtau
       usvars(54) = rhossd
       usvars(55) = vms
       rho=rhoGND+rhossd
-      usvars(56) = rho     
+      usvars(56) = rho  
+       write(*,*) 'QZA12'
+       write(*,*) 'nsvars', nsvars	   
       !GNDs on indiviual systems
       !max(nSys) is currently limited to 24. IF all 48 of bcc is needed, storage should be raised to match that!
       DO i=1,nSys
        usvars(56+i) = gndold(i)
        slip(i)=abs(gammaDot(i))*dtime
        usvars(89+i)=usvars(89+i)+slip(i)
-      END DO     
+      END DO
+       write(*,*) 'QZA13'	  
       DO i=1,3
        DO j=1,3 
         usvars(80+j+(i-1)*3) = fp(i,j)
