@@ -270,7 +270,8 @@ C     *** ZERO ARRAYS ***
       abasedge=0.;ascrew=0.     
       thermat(1,1) = alpha1; thermat(2,2)=alpha2; thermat(3,3) = alpha3 
 CC  -------------------------------------------------------
-C     *** SET UP ELASTIC STIFFNESS MATRIX IN LATTICE SYSTEM ***   
+C     *** SET UP ELASTIC STIFFNESS MATRIX IN LATTICE SYSTEM ***  
+      write(*,*) 'QZ2' 
       SELECT CASE(iphase)
       CASE(11) ! Precipitate
       xStiff(1,1:3) = (/298000., 191000., 191000./)
@@ -406,6 +407,7 @@ C      END IF
       iter=0
 CC  -------------------------------------------------------
 C     *** USE NEWTON METHOD TO DETERMINE STRESS INCREMENT ***
+      write(*,*) 'QZ3'       
       DO WHILE (faivalue .gt. xacc)            
       iter=iter+1
       !============================================================================   
@@ -490,7 +492,8 @@ C     *** UPDATE OUTPUT VARIABLES ***
 C      IF (kint == 1) THEN
 C        PRINT *, pdot
 C      END IF 
-CC  -------------------------------------------------------      
+CC  -------------------------------------------------------
+      write(*,*) 'QZ4'       
 C     *** UPDATE PLASTIC DEFORMATION GRADIENT    
       print2 = 0.; print3 = 0.
       print2 = xI - Lp*dtime      
@@ -713,6 +716,7 @@ C     usvars((kint-1)*knsdv+34) = xtau
        END DO
       END DO   
 !C     *** WRITE RESULTS TO DUMMY UMAT!!
+      write(*,*) 'QZ5' 
 !
 !      DO i=1,knsdv
 !        ksdv(kint,i) = usvars(i)

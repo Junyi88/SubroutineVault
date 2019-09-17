@@ -175,11 +175,11 @@ C      and stress
           statev(37+i) = kcurlfp(noel,npt,i)
       END DO
       
-
+      write(*,*) 'QZ1'
       call kmat(dtime,NSTATV,STATEV,xI,NOEL,NPT,knsdv,time,F,L,iphase,
      +    DDSDDE,stressV,dstressinc,totstran,dtotstran,
      +    TEMP,DTEMP,vms,pdot,pnewdt)
-
+      write(*,*) 'QZ6' 
    
 C    RECOVER stress for calculating residual force
       DO K=1,6
@@ -212,7 +212,7 @@ C    RECOVER stress for calculating residual force
       call MutexUnlock( 1 )      ! lock Mutex #1 
       
       
-      
+      write(*,*) 'QZ7'       
       
       IF (npt == 8 ) THEN ! update curl Fp
       
@@ -242,9 +242,9 @@ C=======================================================================
          
 C=======================================================================   
 C   A FULL INTEGRATION GRADIENT SCHEME
-
+      write(*,*) 'QZ8' 
       CALL kcurl(nsvars,svars,knsdv,xnat8,gauss,gausscoords)
-      
+      write(*,*) 'QZ9'       
       call MutexLock( 3 )      ! lock Mutex #1 
       DO kint =1, 8
           DO i=1, 9
